@@ -3,7 +3,9 @@ local test = REPENTOGON_TEST
 local EntityLaserTest = include(REPENTOGON_TEST.TestsRoot .. "Entity")
 
 function EntityLaserTest:BeforeEach()
-	return Isaac.Spawn(EntityType.ENTITY_LASER, LaserVariant.THIN_RED, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil):ToLaser()
+	local laser = Isaac.Spawn(EntityType.ENTITY_LASER, LaserVariant.THIN_RED, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil):ToLaser()
+	laser:Update()
+	return laser
 end
 
 function EntityLaserTest:AfterEach(entitylaser)
@@ -139,19 +141,25 @@ function EntityLaserTest:TestIsPrismTouched(entitylaser)
 end
 
 function EntityLaserTest:TestRecalculateSamplesNextUpdate(entitylaser)
+	test.AssertEquals(entitylaser.LaserLength, 280)
+	entitylaser:SetMaxDistance(100)
+	test.AssertEquals(entitylaser.LaserLength, 280)
 	entitylaser:RecalculateSamplesNextUpdate()
+	test.AssertEquals(entitylaser.LaserLength, 280)
+	entitylaser:Update()
+	test.AssertEquals(entitylaser.LaserLength, 100)
 end
 
 function EntityLaserTest:TestResetSpriteScale(entitylaser)
 	entitylaser:ResetSpriteScale()
 end
---[[
+
 function EntityLaserTest:TestRotateToAngle(entitylaser)
 	local angle = 1
 	local speed = 1
 	entitylaser:RotateToAngle(angle, speed)
 end
-]]
+
 function EntityLaserTest:TestSetDamageMultiplier(entitylaser)
 	local originalVal = entitylaser:GetDamageMultiplier()
 	for _, val in pairs(test.TestFloats) do

@@ -1,0 +1,3 @@
+<costumes anm2root="gfx/characters/">
+	<costume id="1" anm2path="repentogon_test_costume.anm2" type="none" priority="999" />
+</costumes>

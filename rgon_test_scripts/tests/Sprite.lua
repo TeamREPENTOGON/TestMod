@@ -12,6 +12,42 @@ end
 
 ----------
 
+local TEST_SHADER = "shaders/coloroffset_gold_test"
+
+function SpriteTest:TestSetCustomShader(sprite)
+	test.AssertFalse(sprite:HasCustomShader())
+	test.AssertFalse(sprite:HasCustomShader(TEST_SHADER))
+
+	sprite:SetCustomShader(TEST_SHADER)
+
+	test.AssertTrue(sprite:HasCustomShader())
+	test.AssertTrue(sprite:HasCustomShader(TEST_SHADER))
+	test.AssertFalse(sprite:HasCustomShader("notshader"))
+	test.AssertFalse(sprite:HasCustomChampionShader())
+
+	sprite:ClearCustomShader()
+
+	test.AssertFalse(sprite:HasCustomShader())
+	test.AssertFalse(sprite:HasCustomShader(TEST_SHADER))
+end
+
+function SpriteTest:TestSetCustomChampionShader(sprite)
+	test.AssertFalse(sprite:HasCustomChampionShader())
+	test.AssertFalse(sprite:HasCustomChampionShader(TEST_SHADER))
+
+	sprite:SetCustomChampionShader(TEST_SHADER)
+
+	test.AssertTrue(sprite:HasCustomChampionShader())
+	test.AssertTrue(sprite:HasCustomChampionShader(TEST_SHADER))
+	test.AssertFalse(sprite:HasCustomChampionShader("notshader"))
+	test.AssertFalse(sprite:HasCustomShader())
+
+	sprite:ClearCustomChampionShader()
+
+	test.AssertFalse(sprite:HasCustomChampionShader())
+	test.AssertFalse(sprite:HasCustomChampionShader(TEST_SHADER))
+end
+
 function SpriteTest:TestGetAnimation(sprite)
 	sprite:GetAnimation()
 end
@@ -186,35 +222,6 @@ end
 function SpriteTest:TestWasEventTriggered(sprite)
 	local eventname = "hello"
 	sprite:WasEventTriggered(eventname)
-end
-
--- Would need a shader available to test these, or for the functions to be able to read basegame shaders?
-function SpriteTest:TestSetCustomShader(sprite)
-	local shaderpath = "hello"
-	--sprite:SetCustomShader(shaderpath)
-end
-
-function SpriteTest:TestSetCustomChampionShader(sprite)
-	local shaderpath = "hello"
-	--sprite:SetCustomChampionShader(shaderpath)
-end
-
-function SpriteTest:TestHasCustomShader(sprite)
-	local shaderpath = "hello"
-	sprite:HasCustomShader(shaderpath)
-end
-
-function SpriteTest:TestHasCustomChampionShader(sprite)
-	local shaderpath = "hello"
-	sprite:HasCustomChampionShader(shaderpath)
-end
-
-function SpriteTest:TestClearCustomShader(sprite)
-	sprite:ClearCustomShader()
-end
-
-function SpriteTest:TestClearCustomChampionShader(sprite)
-	sprite:ClearCustomChampionShader()
 end
 
 function SpriteTest:TestContinue(sprite)

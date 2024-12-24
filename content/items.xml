@@ -1,0 +1,4 @@
+<items gfxroot="gfx/items/" version="1">
+	<passive id="1" name="REPENTOGON TEST ITEM" description="Test" gfx="Collectibles_001_TheSadOnion.png" customtags="" />
+	<null id="1" name="REPENTOGON TEST NULL" persistent="true" customtags="" />
+</items>

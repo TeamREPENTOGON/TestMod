@@ -12,73 +12,262 @@ end
 
 ----------
 
-function EntityTest:TestAddBurn(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	local damage = 1
-	entity:AddBurn(source, duration, damage)
+local TEST_DURATION_1 = 10
+local TEST_DURATION_2 = 20
+
+local function CreateTestStatusCallbacks(entity, playerRef, testStatusID, hasIgnoreBossStatusCooldownBool)
+	local precallback
+	precallback = function(_, statusid, target, source, duration, ignoreBossStatusCooldown)
+		test:RemoveCallback(ModCallbacks.MC_PRE_STATUS_EFFECT_APPLY, precallback)
+		test.AssertEquals(statusid, testStatusID)
+		test.AssertEquals(GetPtrHash(target), GetPtrHash(entity))
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(playerRef.Entity))
+		test.AssertEquals(duration, TEST_DURATION_1)
+		if hasIgnoreBossStatusCooldownBool then
+			test.AssertTrue(ignoreBossStatusCooldown)
+			return {TEST_DURATION_2, false}
+		end
+		return TEST_DURATION_2
+	end
+	local postcallback
+	postcallback = function(_, statusid, target, source, duration, ignoreBossStatusCooldown)
+		test:RemoveCallback(ModCallbacks.MC_POST_STATUS_EFFECT_APPLY, postcallback)
+		test.AssertEquals(statusid, testStatusID)
+		test.AssertEquals(GetPtrHash(target), GetPtrHash(entity))
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(playerRef.Entity))
+		test.AssertEquals(duration, TEST_DURATION_2)
+		if hasIgnoreBossStatusCooldownBool then
+			test.AssertFalse(ignoreBossStatusCooldown)
+		end
+	end
+	test:AddCallback(ModCallbacks.MC_PRE_STATUS_EFFECT_APPLY, precallback)
+	test:AddCallback(ModCallbacks.MC_POST_STATUS_EFFECT_APPLY, postcallback)
 end
 
+
+function EntityTest:TestAddBrimstoneMark(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.BRIMSTONE_MARK)
+	entity:AddBrimstoneMark(playerRef, TEST_DURATION_1)
+	test.AssertEquals(entity:GetBrimstoneMarkCountdown(), TEST_DURATION_2)
+end
+
+function EntityTest:TestAddIce(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.ICE)
+	entity:AddIce(playerRef, TEST_DURATION_1)
+	test.AssertEquals(entity:GetIceCountdown(), TEST_DURATION_2)
+end
+
+function EntityTest:TestAddWeakness(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.WEAKNESS)
+	entity:AddWeakness(playerRef, TEST_DURATION_1)
+	test.AssertEquals(entity:GetWeaknessCountdown(), TEST_DURATION_2)
+end
+
+
+function EntityTest:TestAddBaited(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.BAITED)
+	entity:AddBaited(playerRef, TEST_DURATION_1)
+	test.AssertEquals(entity:GetBaitedCountdown(), TEST_DURATION_2)
+end
+
+function EntityTest:TestAddBleeding(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.BLEEDING)
+	entity:AddBleeding(playerRef, TEST_DURATION_1)
+	test.AssertEquals(entity:GetBleedingCountdown(), TEST_DURATION_2)
+end
+
+function EntityTest:TestAddMagnetized(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.MAGNETIZED)
+	entity:AddMagnetized(playerRef, TEST_DURATION_1)
+	test.AssertEquals(entity:GetMagnetizedCountdown(), TEST_DURATION_2)
+end
+
+
 function EntityTest:TestAddCharmed(entity)
-	local sourceentity = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	entity:AddCharmed(sourceentity, duration)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.CHARMED, true)
+	entity:AddCharmed(playerRef, TEST_DURATION_1, true)
+	test.AssertEquals(entity:GetCharmedCountdown(), TEST_DURATION_2)
 end
 
 function EntityTest:TestAddConfusion(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	local ignorebosses = true
-	entity:AddConfusion(source, duration, ignorebosses)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.CONFUSION, true)
+	entity:AddConfusion(playerRef, TEST_DURATION_1, true)
+	test.AssertEquals(entity:GetConfusionCountdown(), TEST_DURATION_2)
 end
+
+function EntityTest:TestAddFear(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.FEAR, true)
+	entity:AddFear(playerRef, TEST_DURATION_1, true)
+	test.AssertEquals(entity:GetFearCountdown(), TEST_DURATION_2)
+end
+
+function EntityTest:TestAddFreeze(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.FREEZE, true)
+	entity:AddFreeze(playerRef, TEST_DURATION_1, true)
+	test.AssertEquals(entity:GetFreezeCountdown(), TEST_DURATION_2)
+end
+
+function EntityTest:TestAddMidasFreeze(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.MIDAS_FREEZE, true)
+	entity:AddMidasFreeze(playerRef, TEST_DURATION_1, true)
+	test.AssertEquals(entity:GetMidasFreezeCountdown(), TEST_DURATION_2)
+end
+
+function EntityTest:TestAddShrink(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	CreateTestStatusCallbacks(entity, playerRef, StatusEffect.SHRINK, true)
+	entity:AddShrink(playerRef, TEST_DURATION_1, true)
+	test.AssertEquals(entity:GetShrinkCountdown(), TEST_DURATION_2)
+end
+
+
+function EntityTest:TestAddBurn(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	local testDamage = 1.5
+	local precallback
+	precallback = function(_, statusid, target, source, duration, damage, ignoreBossStatusCooldown)
+		test:RemoveCallback(ModCallbacks.MC_PRE_STATUS_EFFECT_APPLY, precallback)
+		test.AssertEquals(statusid, StatusEffect.BURN)
+		test.AssertEquals(GetPtrHash(target), GetPtrHash(entity))
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(playerRef.Entity))
+		test.AssertEquals(duration, TEST_DURATION_1)
+		test.AssertEquals(damage, testDamage)
+		test.AssertTrue(ignoreBossStatusCooldown)
+		return {TEST_DURATION_2, testDamage+1, false}
+	end
+	local postcallback
+	postcallback = function(_, statusid, target, source, duration, damage, ignoreBossStatusCooldown)
+		test:RemoveCallback(ModCallbacks.MC_POST_STATUS_EFFECT_APPLY, postcallback)
+		test.AssertEquals(statusid, StatusEffect.BURN)
+		test.AssertEquals(GetPtrHash(target), GetPtrHash(entity))
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(playerRef.Entity))
+		test.AssertEquals(duration, TEST_DURATION_2)
+		test.AssertEquals(damage, testDamage+1)
+		test.AssertFalse(ignoreBossStatusCooldown)
+	end
+	test:AddCallback(ModCallbacks.MC_PRE_STATUS_EFFECT_APPLY, precallback)
+	test:AddCallback(ModCallbacks.MC_POST_STATUS_EFFECT_APPLY, postcallback)
+	entity:AddBurn(playerRef, TEST_DURATION_1, testDamage, true)
+	test.AssertEquals(entity:GetBurnCountdown(), TEST_DURATION_2)
+end
+
+function EntityTest:TestAddPoison(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	local testDamage = 1.5
+	local precallback
+	precallback = function(_, statusid, target, source, duration, damage, ignoreBossStatusCooldown)
+		test:RemoveCallback(ModCallbacks.MC_PRE_STATUS_EFFECT_APPLY, precallback)
+		test.AssertEquals(statusid, StatusEffect.POISON)
+		test.AssertEquals(GetPtrHash(target), GetPtrHash(entity))
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(playerRef.Entity))
+		test.AssertEquals(duration, TEST_DURATION_1)
+		test.AssertEquals(damage, testDamage)
+		test.AssertTrue(ignoreBossStatusCooldown)
+		return {TEST_DURATION_2, testDamage+1, false}
+	end
+	local postcallback
+	postcallback = function(_, statusid, target, source, duration, damage, ignoreBossStatusCooldown)
+		test:RemoveCallback(ModCallbacks.MC_POST_STATUS_EFFECT_APPLY, postcallback)
+		test.AssertEquals(statusid, StatusEffect.POISON)
+		test.AssertEquals(GetPtrHash(target), GetPtrHash(entity))
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(playerRef.Entity))
+		test.AssertEquals(duration, TEST_DURATION_2)
+		test.AssertEquals(damage, testDamage+1)
+		test.AssertFalse(ignoreBossStatusCooldown)
+	end
+	test:AddCallback(ModCallbacks.MC_PRE_STATUS_EFFECT_APPLY, precallback)
+	test:AddCallback(ModCallbacks.MC_POST_STATUS_EFFECT_APPLY, postcallback)
+	entity:AddPoison(playerRef, TEST_DURATION_1, testDamage, true)
+	test.AssertEquals(entity:GetPoisonCountdown(), TEST_DURATION_2)
+end
+
+
+function EntityTest:TestAddSlowing(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	local testSlowValue = 1.5
+	local testColor1 = Color(1,1,1,1)
+	local testColor2 = Color(2,2,2,1)
+	local precallback
+	precallback = function(_, statusid, target, source, duration, slow, color, ignoreBossStatusCooldown)
+		test:RemoveCallback(ModCallbacks.MC_PRE_STATUS_EFFECT_APPLY, precallback)
+		test.AssertEquals(statusid, StatusEffect.SLOWING)
+		test.AssertEquals(GetPtrHash(target), GetPtrHash(entity))
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(playerRef.Entity))
+		test.AssertEquals(duration, TEST_DURATION_1)
+		test.AssertEquals(slow, testSlowValue)
+		test.AssertEquals(color, testColor1)
+		test.AssertTrue(ignoreBossStatusCooldown)
+		return {TEST_DURATION_2, testSlowValue+1, testColor2, false}
+	end
+	local postcallback
+	postcallback = function(_, statusid, target, source, duration, slow, color, ignoreBossStatusCooldown)
+		test:RemoveCallback(ModCallbacks.MC_POST_STATUS_EFFECT_APPLY, postcallback)
+		test.AssertEquals(statusid, StatusEffect.SLOWING)
+		test.AssertEquals(GetPtrHash(target), GetPtrHash(entity))
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(playerRef.Entity))
+		test.AssertEquals(duration, TEST_DURATION_2)
+		test.AssertEquals(slow, testSlowValue+1)
+		test.AssertEquals(color, testColor2)
+		test.AssertFalse(ignoreBossStatusCooldown)
+	end
+	test:AddCallback(ModCallbacks.MC_PRE_STATUS_EFFECT_APPLY, precallback)
+	test:AddCallback(ModCallbacks.MC_POST_STATUS_EFFECT_APPLY, postcallback)
+	entity:AddSlowing(playerRef, TEST_DURATION_1, testSlowValue, testColor1, true)
+	test.AssertEquals(entity:GetSlowingCountdown(), TEST_DURATION_2)
+end
+
+function EntityTest:TestAddKnockback(entity)
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	local testPushDir1 = Vector(1,0)
+	local testPushDir2 = Vector(0,1)
+	local precallback
+	precallback = function(_, statusid, target, source, duration, pushDir, takeImpactDamage)
+		test:RemoveCallback(ModCallbacks.MC_PRE_STATUS_EFFECT_APPLY, precallback)
+		test.AssertEquals(statusid, StatusEffect.KNOCKBACK)
+		test.AssertEquals(GetPtrHash(target), GetPtrHash(entity))
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(playerRef.Entity))
+		test.AssertEquals(duration, TEST_DURATION_1)
+		test.AssertEquals(pushDir, testPushDir1)
+		test.AssertTrue(takeImpactDamage)
+		return {TEST_DURATION_2, testPushDir2, false}
+	end
+	local postcallback
+	postcallback = function(_, statusid, target, source, duration, pushDir, takeImpactDamage)
+		test:RemoveCallback(ModCallbacks.MC_POST_STATUS_EFFECT_APPLY, postcallback)
+		test.AssertEquals(statusid, StatusEffect.KNOCKBACK)
+		test.AssertEquals(GetPtrHash(target), GetPtrHash(entity))
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(playerRef.Entity))
+		test.AssertEquals(duration, TEST_DURATION_2)
+		test.AssertEquals(pushDir, testPushDir2)
+		test.AssertFalse(takeImpactDamage)
+	end
+	test:AddCallback(ModCallbacks.MC_PRE_STATUS_EFFECT_APPLY, precallback)
+	test:AddCallback(ModCallbacks.MC_POST_STATUS_EFFECT_APPLY, postcallback)
+	entity:AddKnockback(playerRef, testPushDir1, TEST_DURATION_1, true)
+	test.AssertEquals(entity:GetKnockbackCountdown(), TEST_DURATION_2)
+	test.AssertEquals(entity:GetKnockbackDirection(), testPushDir2)
+end
+
 
 function EntityTest:TestAddEntityFlags(entity)
 	local flags = 1
 	entity:AddEntityFlags(flags)
 end
 
-function EntityTest:TestAddFear(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	entity:AddFear(source, duration)
-end
-
-function EntityTest:TestAddFreeze(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	entity:AddFreeze(source, duration)
-end
-
 function EntityTest:TestAddHealth(entity)
 	local hitpoints = 1
 	entity:AddHealth(hitpoints)
-end
-
-function EntityTest:TestAddMidasFreeze(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	entity:AddMidasFreeze(source, duration)
-end
-
-function EntityTest:TestAddPoison(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	local damage = 1
-	entity:AddPoison(source, duration, damage)
-end
-
-function EntityTest:TestAddShrink(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	entity:AddShrink(source, duration)
-end
-
-function EntityTest:TestAddSlowing(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	local slowvalue = 1
-	local slowcolor = Color(1,1,1,1)
-	entity:AddSlowing(source, duration, slowvalue, slowcolor)
 end
 
 function EntityTest:TestAddVelocity(entity)
@@ -310,50 +499,6 @@ end
 
 function EntityTest:TestUpdate(entity)
 	entity:Update()
-end
-
-function EntityTest:TestAddBaited(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	entity:AddBaited(source, duration)
-end
-
-function EntityTest:TestAddBleeding(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	entity:AddBleeding(source, duration)
-end
-
-function EntityTest:TestAddBrimstoneMark(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	entity:AddBrimstoneMark(source, duration)
-end
-
-function EntityTest:TestAddIce(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	entity:AddIce(source, duration)
-end
-
-function EntityTest:TestAddKnockback(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local pushdirection = Vector(1,1)
-	local duration = 1
-	local takeimpactdamage = true
-	entity:AddKnockback(source, pushdirection, duration, takeimpactdamage)
-end
-
-function EntityTest:TestAddMagnetized(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	entity:AddMagnetized(source, duration)
-end
-
-function EntityTest:TestAddWeakness(entity)
-	local source = EntityRef(Isaac.GetPlayer())
-	local duration = 1
-	entity:AddWeakness(source, duration)
 end
 
 function EntityTest:TestComputeStatusEffectDuration(entity)

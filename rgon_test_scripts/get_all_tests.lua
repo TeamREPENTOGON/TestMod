@@ -137,5 +137,6 @@ return {
 		Beam = include(root.."Beam"),
 		BlendMode = include(root.."BlendMode"),
 		Point = include(root.."Point"),
+		XmlFeatures = include(root.."XmlFeatures"),
 	}
 }

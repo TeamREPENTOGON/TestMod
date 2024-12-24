@@ -31,11 +31,25 @@ REPENTOGON_TEST.TestColors = {
 	Color(1,1,1,1),
 }
 
+local function Round(n, numDecimalPlaces)
+	local mult = 10^(numDecimalPlaces or 0)
+	local x = (n*mult) % 1 >= 0.5 and math.ceil(n*mult) or math.floor(n*mult)
+	return x / mult
+end
+
 -- Triggers a lua error if a ~= b. The error will log the line where AssertEquals was called from.
 -- For userdata, supports Color and Vector.
 function REPENTOGON_TEST.AssertEquals(a, b)
 	if type(a) ~= type(b) then
 		error("Expected " .. type(b) .. ", got " .. type(a), 2)
+	end
+	if type(b) == "number" then
+		if math.floor(a) ~= a then
+			a = Round(a, 4)
+		end
+		if math.floor(b) ~= b then
+			b = Round(b, 4)
+		end
 	end
 	if type(b) == "userdata" then
 		local atype = getmetatable(a).__name
@@ -51,6 +65,28 @@ function REPENTOGON_TEST.AssertEquals(a, b)
 		error("Expected " .. tostring(b) .. ", got " .. tostring(a), 2)
 	end
 end
+
+-- Triggers a lua error if the provided value is anything other than a TRUE boolean.
+function REPENTOGON_TEST.AssertTrue(val)
+	if type(val) ~= "boolean" or not val then
+		error("Expected true, got " .. tostring(val), 2)
+	end
+end
+
+-- Triggers a lua error if the provided value is anything other than a FALSE boolean.
+function REPENTOGON_TEST.AssertFalse(val)
+	if type(val) ~= "boolean" or val then
+		error("Expected false, got " .. tostring(val), 2)
+	end
+end
+
+-- Triggers a lua error if the provided value is non-nil.
+function REPENTOGON_TEST.AssertNil(val)
+	if val ~= nil then
+		error("Expected nil, got " .. tostring(val), 2)
+	end
+end
+REPENTOGON_TEST.AssertNull = REPENTOGON_TEST.AssertNil  -- lol
 
 function REPENTOGON_TEST.GetTestSprite()
 	local sprite = Sprite("gfx/001.000_player.anm2", true)

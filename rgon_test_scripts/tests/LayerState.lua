@@ -12,33 +12,40 @@ end
 
 ----------
 
--- Would need a shader available to test these, or for the functions to be able to read basegame shaders?
-function LayerStateTest:TestSetCustomShader(layerstate)
-	local shaderpath = "hello"
-	--layerstate:SetCustomShader(shaderpath)
-end
+local TEST_SHADER = "shaders/coloroffset_gold_test"
 
-function LayerStateTest:TestSetCustomChampionShader(layerstate)
-	local shaderpath = "hello"
-	--layerstate:SetCustomChampionShader(shaderpath)
-end
+function LayerStateTest:TestCustomShader(layerstate)
+	test.AssertFalse(layerstate:HasCustomShader())
+	test.AssertFalse(layerstate:HasCustomShader(TEST_SHADER))
 
-function LayerStateTest:TestHasCustomShader(layerstate)
-	local shaderpath = "hello"
-	layerstate:HasCustomShader(shaderpath)
-end
+	layerstate:SetCustomShader(TEST_SHADER)
 
-function LayerStateTest:TestHasCustomChampionShader(layerstate)
-	local shaderpath = "hello"
-	layerstate:HasCustomChampionShader(shaderpath)
-end
+	test.AssertTrue(layerstate:HasCustomShader())
+	test.AssertTrue(layerstate:HasCustomShader(TEST_SHADER))
+	test.AssertFalse(layerstate:HasCustomShader("notshader"))
+	test.AssertFalse(layerstate:HasCustomChampionShader())
 
-function LayerStateTest:TestClearCustomShader(layerstate)
 	layerstate:ClearCustomShader()
+
+	test.AssertFalse(layerstate:HasCustomShader())
+	test.AssertFalse(layerstate:HasCustomShader(TEST_SHADER))
 end
 
-function LayerStateTest:TestClearCustomChampionShader(layerstate)
+function LayerStateTest:TestCustomChampionShader(layerstate)
+	test.AssertFalse(layerstate:HasCustomChampionShader())
+	test.AssertFalse(layerstate:HasCustomChampionShader(TEST_SHADER))
+
+	layerstate:SetCustomChampionShader(TEST_SHADER)
+
+	test.AssertTrue(layerstate:HasCustomChampionShader())
+	test.AssertTrue(layerstate:HasCustomChampionShader(TEST_SHADER))
+	test.AssertFalse(layerstate:HasCustomChampionShader("notshader"))
+	test.AssertFalse(layerstate:HasCustomShader())
+
 	layerstate:ClearCustomChampionShader()
+
+	test.AssertFalse(layerstate:HasCustomChampionShader())
+	test.AssertFalse(layerstate:HasCustomChampionShader(TEST_SHADER))
 end
 
 function LayerStateTest:TestGetBlendMode(layerstate)

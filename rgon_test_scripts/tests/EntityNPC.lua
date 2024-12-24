@@ -139,10 +139,6 @@ function EntityNPCTest:TestGetPathfinder(entitynpc)
 	entitynpc:GetPathfinder()
 end
 
-function EntityNPCTest:TestClearFlyingOverride(entitynpc)
-	entitynpc:ClearFlyingOverride()
-end
-
 function EntityNPCTest:TestFireBossProjectilesEx(entitynpc)
 	local numprojectiles = 1
 	local targetpos = Vector(1,1)
@@ -180,10 +176,6 @@ function EntityNPCTest:TestGetFireplaceLoot(entitynpc)
 	entitynpc:GetFireplaceLoot()
 end
 
-function EntityNPCTest:TestGetFlyingOverride(entitynpc)
-	entitynpc:GetFlyingOverride()
-end
-
 function EntityNPCTest:TestGetHitList(entitynpc)
 	entitynpc:GetHitList()
 end
@@ -212,9 +204,36 @@ function EntityNPCTest:TestSetControllerId(entitynpc)
 	entitynpc:SetControllerId(controllerid)
 end
 ]]
-function EntityNPCTest:TestSetFlyingOverride(entitynpc)
-	local canfly = true
-	entitynpc:SetFlyingOverride(canfly)
+function EntityNPCTest:TestFlyingOverrideTrue(entitynpc)
+	test.AssertFalse(entitynpc:IsFlying())
+	test.AssertNil(entitynpc:GetFlyingOverride())
+
+	entitynpc:SetFlyingOverride(true)
+
+	test.AssertTrue(entitynpc:IsFlying())
+	test.AssertTrue(entitynpc:GetFlyingOverride())
+
+	entitynpc:ClearFlyingOverride()
+
+	test.AssertFalse(entitynpc:IsFlying())
+	test.AssertNil(entitynpc:GetFlyingOverride())
+end
+
+function EntityNPCTest:TestFlyingOverrideFalse(entitynpc)
+	entitynpc.GridCollisionClass = EntityGridCollisionClass.GRIDCOLL_NONE  -- Make the entity flying by default
+
+	test.AssertTrue(entitynpc:IsFlying())
+	test.AssertNil(entitynpc:GetFlyingOverride())
+
+	entitynpc:SetFlyingOverride(false)
+
+	test.AssertFalse(entitynpc:IsFlying())
+	test.AssertFalse(entitynpc:GetFlyingOverride())
+
+	entitynpc:ClearFlyingOverride()
+
+	test.AssertTrue(entitynpc:IsFlying())
+	test.AssertNil(entitynpc:GetFlyingOverride())
 end
 
 function EntityNPCTest:TestSetShieldStrength(entitynpc)

@@ -1,0 +1,11 @@
+<players root="gfx/characters/" 
+		 portraitroot="gfx/ui/" 
+		 nameimageroot="gfx/ui/boss/"
+		 bigportraitroot="gfx/ui/">
+	<player name="Testsaac" skin="costumes/character_001_isaac_red.png" hp="4" healthtype="4"
+          nameimage="PlayerName_01_Isaac.png" 
+          portrait="PlayerPortrait_01_Isaac.png" 
+          bigportrait="PlayerPortraitBig_01_Isaac.png" skinColor="3"
+		  birthright="not done"
+		  modcostume="1"/>
+</players>
