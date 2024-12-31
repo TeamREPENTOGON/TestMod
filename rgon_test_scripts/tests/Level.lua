@@ -406,39 +406,73 @@ function LevelTest:TestVarDungeonReturnPosition(level)
 end
 
 function LevelTest:TestVarDungeonReturnRoomIndex(level)
-	local originalVal = level.DungeonReturnRoomIndex
-	for _, val in pairs(test.TestInts) do
-		level.DungeonReturnRoomIndex = val
-		test.AssertEquals(level.DungeonReturnRoomIndex, val)
-	end
-	level.DungeonReturnRoomIndex = originalVal
-end
+	local minimum = -20
+	local maximum = 168
 
-function LevelTest:TestVarEnterDoor(level)
-	local originalVal = level.EnterDoor
-	for _, val in pairs(test.TestInts) do
-		level.EnterDoor = val
-		test.AssertEquals(level.EnterDoor, val)
+	for i=minimum-2, maximum+2 do
+		level.DungeonReturnRoomIndex = i
+		if i < minimum then
+			test.AssertEquals(level.DungeonReturnRoomIndex, minimum)
+		elseif i > maximum then
+			test.AssertEquals(level.DungeonReturnRoomIndex, maximum)
+		else
+			test.AssertEquals(level.DungeonReturnRoomIndex, i)
+		end
 	end
-	level.EnterDoor = originalVal
+
+	level.DungeonReturnRoomIndex = 0
 end
 
 function LevelTest:TestVarGreedModeWave(level)
-	local originalVal = level.GreedModeWave
-	for _, val in pairs(test.TestUnsignedInts) do
-		level.GreedModeWave = val
-		test.AssertEquals(level.GreedModeWave, val)
+	local minimum = 0
+	local maximum = 12
+
+	for i=minimum-2, maximum+2 do
+		level.GreedModeWave = i
+		if i < minimum or i > maximum then
+			test.AssertEquals(level.GreedModeWave, maximum)
+		else
+			test.AssertEquals(level.GreedModeWave, i)
+		end
 	end
-	level.GreedModeWave = originalVal
+
+	level.GreedModeWave = 0
+end
+
+function LevelTest:TestVarEnterDoor(level)
+	local minimum = -1
+	local maximum = 7
+
+	for i=minimum-2, maximum+2 do
+		level.EnterDoor = i
+		if i < minimum then
+			test.AssertEquals(level.EnterDoor, minimum)
+		elseif i > maximum then
+			test.AssertEquals(level.EnterDoor, maximum)
+		else
+			test.AssertEquals(level.EnterDoor, i)
+		end
+	end
+
+	level.EnterDoor = -1
 end
 
 function LevelTest:TestVarLeaveDoor(level)
-	local originalVal = level.LeaveDoor
-	for _, val in pairs(test.TestInts) do
-		level.LeaveDoor = val
-		test.AssertEquals(level.LeaveDoor, val)
+	local minimum = -1
+	local maximum = 7
+
+	for i=minimum-2, maximum+2 do
+		level.LeaveDoor = i
+		if i < minimum then
+			test.AssertEquals(level.LeaveDoor, minimum)
+		elseif i > maximum then
+			test.AssertEquals(level.LeaveDoor, maximum)
+		else
+			test.AssertEquals(level.LeaveDoor, i)
+		end
 	end
-	level.LeaveDoor = originalVal
+
+	level.LeaveDoor = -1
 end
 
 

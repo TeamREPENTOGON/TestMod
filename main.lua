@@ -3,6 +3,8 @@ REPENTOGON_TEST = RegisterMod("REPENTOGON Tests", 1)
 REPENTOGON_TEST.Root = "rgon_test_scripts/"
 REPENTOGON_TEST.TestsRoot = REPENTOGON_TEST.Root .. "tests/"
 
+include(REPENTOGON_TEST.Root .. "misc")
+
 local BIG_FLOAT = 9999999  -- Precision issues start if you add another 9 here
 local LONG_STRING = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"  -- Mostly just wanted something with >16 characters
 
@@ -87,6 +89,19 @@ function REPENTOGON_TEST.AssertNil(val)
 	end
 end
 REPENTOGON_TEST.AssertNull = REPENTOGON_TEST.AssertNil  -- lol
+
+-- Add a callback that removes itself when it runs.
+function REPENTOGON_TEST:AddOneTimePriorityCallback(callbackid, priority, func, param)
+	local wrapper
+	wrapper = function(...)
+		REPENTOGON_TEST:RemoveCallback(callbackid, wrapper)
+		return func(...)
+	end
+	REPENTOGON_TEST:AddPriorityCallback(callbackid, priority, wrapper, param)
+end
+function REPENTOGON_TEST:AddOneTimeCallback(callbackid, func, param)
+	REPENTOGON_TEST:AddOneTimePriorityCallback(callbackid, CallbackPriority.DEFAULT, func, param)
+end
 
 function REPENTOGON_TEST.GetTestSprite()
 	local sprite = Sprite("gfx/001.000_player.anm2", true)

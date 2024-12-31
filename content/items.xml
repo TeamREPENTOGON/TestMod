@@ -1,4 +1,10 @@
 <items gfxroot="gfx/items/" version="1">
 	<passive id="1" name="REPENTOGON TEST ITEM" description="Test" gfx="Collectibles_001_TheSadOnion.png" customtags="" />
+	<passive id="2" name="REPENTOGON TEST REVIVE" description="Test" gfx="Collectibles_001_TheSadOnion.png" customtags="revive" />
+
 	<null id="1" name="REPENTOGON TEST NULL" persistent="true" customtags="" />
+	<null id="2" name="REPENTOGON TEST NULL REVIVE" persistent="true" customtags="revive chancerevive" />
+	<null id="3" name="REPENTOGON TEST NULL HIDDEN REVIVE" persistent="true" customtags="reviveeffect hiddenrevive" />
+	
+	<trinket id="1" name="REPENTOGON TEST TRINKET REVIVEEFFECT" description="Test" customtags="reviveeffect" gfx="trinket_001_swallowedpenny.png" />
 </items>

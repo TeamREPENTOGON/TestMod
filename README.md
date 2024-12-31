@@ -56,15 +56,14 @@ New test files must be hooked into `rgon_test_scripts/get_all_tests.lua` in orde
 ## Test Utilities
 
 - `REPENTOGON_TEST.AssertEquals(a, b)`: Triggers a lua error if a ~= b. Good for stopping a test and logging the test failure as well as the line where the Assert was called. 
+- `REPENTOGON_TEST.AssertTrue/AssertFalse/AssertNil(val)`: Triggers a lua error if the provided value is not the intended value (true/false boolean or nil).
+- `REPENTOGON_TEST.AddOneTime(Priority)Callback`: Nifty drop-in replacement for Add(Priority)Callback where the callback automatically removes itself after executing once. Otherwise you may need to manage removing added callbacks yourself, as they are NOT automatically wiped between tests.
 - `REPENTOGON_TEST.TestInts`: A table of sample integers for testing purposes, including the int32 max/min values. Iterating over this table while testing something like a Setter+Getter isn't strictly necessary but can be useful for testing certain bounds, or finding out that extra large or negative values lead to unexpected results. There are various similar tables defined in the `main.lua`, such as `TestUnsignedInts`, `TestUInt16s`, `TestFloats`, `TestVectors`, etc.
 - `REPENTOGON_TEST.GetTestSprite()`: Initializes an instance of a Sprite with the player anm2 loaded.
 
 ## Running Tests
 
 Tests can be executed in-game via the console using the REPENTOGON_TEST global.
-
-> [!WARNING]
-> At time of writing, running ALL tests will most likely crash the game on Repantance+. This can be a good way to find an issue to investigate, but also refer to https://github.com/TeamREPENTOGON/REPENTOGON/issues/591 for a checklist of known issues/broken functions in Rep+. Do NOT comment out failing tests!!!
 
 Run all tests (main menu tests on the main menu, ingame tests ingame):
 ```

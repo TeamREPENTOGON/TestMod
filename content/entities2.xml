@@ -1,0 +1,3 @@
+<entities anm2root="gfx/" version="5">
+	<entity anm2path="003.001_Brother Bobby.anm2" baseHP="3" boss="0" champion="0" collisionDamage="10" collisionMass="3" collisionRadius="13" friction="1" id="3" name="Brother Bobentogon" numGridCollisionPoints="12" shadowSize="11" stageHP="0" tags="cansacrifice" variant="1" customtags="familiarcantakedamage familiarblockprojectiles familiarignorebffs nocharm"/>
+</entities>

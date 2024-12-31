@@ -187,13 +187,24 @@ function EntityPickupTest:TestVarPrice(entitypickup)
 	entitypickup.Price = originalVal
 end
 
+-- ShopItemId automatically clamping to this range seems to be new in rep+
 function EntityPickupTest:TestVarShopItemId(entitypickup)
-	local originalVal = entitypickup.ShopItemId
-	for _, val in pairs(test.TestInts) do
-		entitypickup.ShopItemId = val
-		test.AssertEquals(entitypickup.ShopItemId, val)
+	local minimum = -2
+	local maximum = 7
+
+	for i=minimum-2, maximum+2 do
+		entitypickup.ShopItemId = i
+
+		if i < minimum then
+			test.AssertEquals(entitypickup.ShopItemId, minimum)
+		elseif i > maximum then
+			test.AssertEquals(entitypickup.ShopItemId, maximum)
+		else
+			test.AssertEquals(entitypickup.ShopItemId, i)
+		end
 	end
-	entitypickup.ShopItemId = originalVal
+
+	entitypickup.ShopItemId = 0
 end
 
 function EntityPickupTest:TestVarState(entitypickup)

@@ -325,30 +325,58 @@ function GameTest:TestRerollLevelPickups(game)
 end
 
 function GameTest:TestSetLastDevilRoomStage(game)
-	local originalVal = game:GetLastDevilRoomStage()
-	for _, val in pairs(test.TestInts) do
-		game:SetLastDevilRoomStage(val)
-		test.AssertEquals(game:GetLastDevilRoomStage(), val)
+	local minimum = 0
+	local maximum = 13
+
+	for i=minimum-2, maximum+2 do
+		game:SetLastDevilRoomStage(i)
+		if i < minimum then
+			test.AssertEquals(game:GetLastDevilRoomStage(), minimum)
+		elseif i > maximum then
+			test.AssertEquals(game:GetLastDevilRoomStage(), maximum)
+		else
+			test.AssertEquals(game:GetLastDevilRoomStage(), i)
+		end
 	end
-	game:SetLastDevilRoomStage(originalVal)
+
+	game:SetLastDevilRoomStage(0)
 end
 
 function GameTest:TestSetLastLevelWithDamage(game)
-	local originalVal = game:GetLastLevelWithDamage()
-	for _, val in pairs(test.TestInts) do
-		game:SetLastLevelWithDamage(val)
-		test.AssertEquals(game:GetLastLevelWithDamage(), val)
+	local minimum = 0
+	local maximum = 13
+
+	for i=minimum-2, maximum+2 do
+		game:SetLastLevelWithDamage(i)
+		if i < minimum then
+			test.AssertEquals(game:GetLastLevelWithDamage(), minimum)
+		elseif i > maximum then
+			test.AssertEquals(game:GetLastLevelWithDamage(), maximum)
+		else
+			test.AssertEquals(game:GetLastLevelWithDamage(), i)
+		end
 	end
-	game:SetLastLevelWithDamage(originalVal)
+
+	game:SetLastLevelWithDamage(0)
 end
 
 function GameTest:TestSetLastLevelWithoutHalfHp(game)
-	local originalVal = game:GetLastLevelWithoutHalfHp()
-	for _, val in pairs(test.TestInts) do
-		game:SetLastLevelWithoutHalfHp(val)
-		test.AssertEquals(game:GetLastLevelWithoutHalfHp(), val)
+	local minimum = 0
+	local maximum = 13
+
+	for i=minimum-2, maximum+2 do
+		game:SetLastLevelWithoutHalfHp(i)
+		if i < minimum then
+			test.AssertEquals(game:GetLastLevelWithoutHalfHp(), minimum)
+		elseif i > maximum then
+			test.AssertEquals(game:GetLastLevelWithoutHalfHp(), maximum)
+		else
+			test.AssertEquals(game:GetLastLevelWithoutHalfHp(), i)
+		end
 	end
-	game:SetLastLevelWithoutHalfHp(originalVal)
+
+	game:SetLastLevelWithoutHalfHp(0)
+
 end
 
 function GameTest:TestSetStateFlag(game)
@@ -596,12 +624,21 @@ function GameTest:TestVarBossRushParTime(game)
 end
 
 function GameTest:TestVarChallenge(game)
-	local originalVal = game.Challenge
-	for _, val in pairs(test.TestInts) do
-		game.Challenge = val
-		test.AssertEquals(game.Challenge, val)
+	local minimum = 0
+	local maximum = 45
+
+	for i=minimum-2, maximum+2 do
+		game.Challenge = i
+		if i < minimum then
+			test.AssertEquals(game.Challenge, minimum)
+		elseif i > maximum then
+			test.AssertEquals(game.Challenge, maximum)
+		else
+			test.AssertEquals(game.Challenge, i)
+		end
 	end
-	game.Challenge = originalVal
+
+	game.Challenge = 0
 end
 
 function GameTest:TestVarDifficulty(game)

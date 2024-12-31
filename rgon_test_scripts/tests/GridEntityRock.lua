@@ -21,12 +21,21 @@ function GridEntityRockTest:TestGetSprite(gridentityrock)
 end
 
 function GridEntityRockTest:TestSetBigRockFrame(gridentityrock)
-	local originalVal = gridentityrock:GetBigRockFrame()
-	for _, val in pairs(test.TestNonNegativeInts) do
-		gridentityrock:SetBigRockFrame(val)
-		test.AssertEquals(gridentityrock:GetBigRockFrame(), val)
+	local minimum = -1
+	local maximum = 7
+
+	for i=minimum-2, maximum+2 do
+		gridentityrock:SetBigRockFrame(i)
+		if i < minimum then
+			test.AssertEquals(gridentityrock:GetBigRockFrame(), minimum)
+		elseif i > maximum then
+			test.AssertEquals(gridentityrock:GetBigRockFrame(), maximum)
+		else
+			test.AssertEquals(gridentityrock:GetBigRockFrame(), i)
+		end
 	end
-	gridentityrock:SetBigRockFrame(originalVal)
+
+	gridentityrock:SetBigRockFrame(-1)
 end
 
 function GridEntityRockTest:TestUpdateAnimFrame(gridentityrock)

@@ -73,10 +73,14 @@ function WeaponTest:TestSetFireDelay(weapon)
 end
 
 function WeaponTest:TestSetHeadLockTime(weapon)
-	local time = 1
-	weapon:SetHeadLockTime(time)
+	local t = 1
+	weapon:SetHeadLockTime(t)
 end
 
+-- Looks like Weapon:SetModifiers or's the provided flags into the existing ones rather than overwriting them.
+-- So there's no way to remove the flags once added?
+-- Also, looks like the default modifiers value is `1`, despite the docs claiming that that value is used for chocolate milk.
+-- ...Do these even DO anything?
 function WeaponTest:TestSetModifiers(weapon)
 	local originalVal = weapon:GetModifiers()
 	for _, val in pairs(test.TestUnsignedInts) do

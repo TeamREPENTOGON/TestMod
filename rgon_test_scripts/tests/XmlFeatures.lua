@@ -37,4 +37,74 @@ function XmlFeaturesTest:TestPlayerModCostume()
 end
 
 
+local REVIVE_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST REVIVE")
+local REVIVE_NULL = Isaac.GetNullItemIdByName("REPENTOGON TEST NULL REVIVE")
+local REVIVE_NULL_HIDDEN = Isaac.GetNullItemIdByName("REPENTOGON TEST NULL HIDDEN REVIVE")
+local REVIVE_TRINKET = Isaac.GetTrinketIdByName("REPENTOGON TEST TRINKET REVIVEEFFECT")
+
+function XmlFeaturesTest:TestRevive()
+	local player = Isaac.GetPlayer()
+	test.AssertFalse(player:WillPlayerRevive())
+	test.AssertEquals(player:GetExtraLives(), 0)
+	player:AddCollectible(REVIVE_ITEM)
+	test.AssertTrue(player:WillPlayerRevive())
+	test.AssertEquals(player:GetExtraLives(), 1)
+	player:RemoveCollectible(REVIVE_ITEM)
+end
+
+function XmlFeaturesTest:TestReviveEffect()
+	local player = Isaac.GetPlayer()
+	test.AssertFalse(player:WillPlayerRevive())
+	test.AssertEquals(player:GetExtraLives(), 0)
+	player:GetEffects():AddTrinketEffect(REVIVE_TRINKET)
+	test.AssertTrue(player:WillPlayerRevive())
+	test.AssertEquals(player:GetExtraLives(), 1)
+	player:GetEffects():RemoveTrinketEffect(REVIVE_TRINKET)
+end
+
+function XmlFeaturesTest:TestNullRevive()
+	local player = Isaac.GetPlayer()
+	test.AssertFalse(player:WillPlayerRevive())
+	test.AssertEquals(player:GetExtraLives(), 0)
+	player:GetEffects():AddNullEffect(REVIVE_NULL)
+	test.AssertTrue(player:WillPlayerRevive())
+	test.AssertEquals(player:GetExtraLives(), 1)
+	player:GetEffects():RemoveNullEffect(REVIVE_NULL)
+end
+
+function XmlFeaturesTest:TestHiddenRevive()
+	local player = Isaac.GetPlayer()
+	test.AssertFalse(player:WillPlayerRevive())
+	test.AssertEquals(player:GetExtraLives(), 0)
+	player:GetEffects():AddNullEffect(REVIVE_NULL_HIDDEN)
+	test.AssertTrue(player:WillPlayerRevive())
+	test.AssertEquals(player:GetExtraLives(), 0)
+	player:GetEffects():RemoveNullEffect(REVIVE_NULL_HIDDEN)
+end
+
+
+local TEST_FAMILIAR = Isaac.GetEntityVariantByName("Brother Bobentogon")
+
+function XmlFeaturesTest:TestFamiliarBlockProjectilesAndTakeDamage()
+	local fam = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, TEST_FAMILIAR, 0, Isaac.GetPlayer().Position, Vector.Zero, Isaac.GetPlayer()):ToFamiliar()
+	local projectile = Isaac.Spawn(EntityType.ENTITY_PROJECTILE, 0, 0, Vector.Zero, Vector.Zero, nil):ToProjectile()
+	local tookDamage = false
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, function()
+		tookDamage = true
+	end, EntityType.ENTITY_FAMILIAR)
+	fam:ForceCollide(projectile)
+	test.AssertTrue(tookDamage)
+	test.AssertTrue(projectile:IsDead())
+end
+
+function XmlFeaturesTest:TestFamiliarIgnoreBffs()
+	local fam = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, 1, 0, Isaac.GetPlayer().Position, Vector.Zero, Isaac.GetPlayer()):ToFamiliar()
+	local testFam = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, TEST_FAMILIAR, 0, Isaac.GetPlayer().Position, Vector.Zero, Isaac.GetPlayer()):ToFamiliar()
+	test.AssertEquals(fam:GetMultiplier(), 1.0)
+	test.AssertEquals(testFam:GetMultiplier(), 1.0)
+	Isaac.GetPlayer():AddCollectible(CollectibleType.COLLECTIBLE_BFFS)
+	test.AssertEquals(fam:GetMultiplier(), 2.0)
+	test.AssertEquals(testFam:GetMultiplier(), 1.0)
+end
+
 return XmlFeaturesTest

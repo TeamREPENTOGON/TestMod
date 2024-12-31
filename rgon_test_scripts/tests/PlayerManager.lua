@@ -91,17 +91,22 @@ end
 function PlayerManagerTest:TestIsCoopPlay()
 	PlayerManager.IsCoopPlay()
 end
+
 --[[
 function PlayerManagerTest:TestRemoveCoPlayer()
 	local player = Isaac.GetPlayer()
 	PlayerManager.RemoveCoPlayer(player)
 end
 ]]
+
+-- Leads to "controller disconnected" popups.
+--[[
 function PlayerManagerTest:TestSpawnSelectedBaby()
 	local babytype = 1
-	local controllerindex = 1
+	local controllerindex = 2
 	PlayerManager.SpawnSelectedBaby(babytype, controllerindex)
 end
+]]
 
 function PlayerManagerTest:TestTriggerRoomClear()
 	PlayerManager.TriggerRoomClear()
