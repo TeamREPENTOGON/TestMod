@@ -36,6 +36,7 @@ return {
 		EntityPtr = include(root.."EntityPtr"),
 		EntityRef = include(root.."EntityRef"),
 		EntityTear = include(root.."EntityTear"),
+		EntityGridCollision = include(root.."EntityGridCollision"),
 		Font = include(root.."Font"),
 		--FontRenderSettings = include(root.."FontRenderSettings"),  -- API functions made for this in rep+ are wonked
 		Game = include(root.."Game"),

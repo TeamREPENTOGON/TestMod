@@ -1296,12 +1296,6 @@ function EntityPlayerTest:TestAddLocust(entityplayer)
 	entityplayer:AddLocust(collectible, position)
 end
 
-function EntityPlayerTest:TestAddSmeltedTrinket(entityplayer)
-	local trinket = 1
-	local firsttimepickingup = true
-	entityplayer:AddSmeltedTrinket(trinket, firsttimepickingup)
-end
-
 function EntityPlayerTest:TestAddUrnSouls(entityplayer)
 	local count = 1
 	entityplayer:AddUrnSouls(count)
@@ -1539,8 +1533,23 @@ function EntityPlayerTest:TestGetPlayerIndex(entityplayer)
 	entityplayer:GetPlayerIndex()
 end
 
-function EntityPlayerTest:TestGetSmeltedTrinkets(entityplayer)
-	entityplayer:GetSmeltedTrinkets()
+function EntityPlayerTest:TestAddSmeltedTrinket(entityplayer)
+	entityplayer:AddSmeltedTrinket(TrinketType.TRINKET_WOODEN_CROSS, true)
+	entityplayer:AddSmeltedTrinket(TrinketType.TRINKET_SWALLOWED_PENNY | TrinketType.TRINKET_GOLDEN_FLAG, false)
+
+	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_WOODEN_CROSS].trinketAmount, 1)
+	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_WOODEN_CROSS].goldenTrinketAmount, 0)
+	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_SWALLOWED_PENNY].trinketAmount, 0)
+	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_SWALLOWED_PENNY].goldenTrinketAmount, 1)
+
+	test.AssertTrue(entityplayer:GetEffects():HasCollectibleEffect(CollectibleType.COLLECTIBLE_HOLY_MANTLE))
+
+	entityplayer:TryRemoveSmeltedTrinket(TrinketType.TRINKET_SWALLOWED_PENNY)
+
+	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_WOODEN_CROSS].trinketAmount, 1)
+	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_WOODEN_CROSS].goldenTrinketAmount, 0)
+	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_SWALLOWED_PENNY].trinketAmount, 0)
+	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_SWALLOWED_PENNY].goldenTrinketAmount, 0)
 end
 
 function EntityPlayerTest:TestGetSpecialGridCollision(entityplayer)
@@ -1565,8 +1574,31 @@ function EntityPlayerTest:TestGetUrnSouls(entityplayer)
 	entityplayer:GetUrnSouls()
 end
 
-function EntityPlayerTest:TestGetVoidedCollectiblesList(entityplayer)
-	entityplayer:GetVoidedCollectiblesList()
+
+function EntityPlayerTest:TestVoidedCollectibles(entityplayer)
+	test.AssertEquals(#entityplayer:GetVoidedCollectiblesList(), 0)
+
+	entityplayer:AddCollectible(CollectibleType.COLLECTIBLE_VOID)
+
+	local pickup1 = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, CollectibleType.COLLECTIBLE_SAD_ONION, Game():GetRoom():GetCenterPos(), Vector.Zero, nil)
+	local pickup2 = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, CollectibleType.COLLECTIBLE_D6, Game():GetRoom():GetCenterPos(), Vector.Zero, nil)
+	local pickup3 = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, CollectibleType.COLLECTIBLE_MOMS_BOTTLE_OF_PILLS, Game():GetRoom():GetCenterPos(), Vector.Zero, nil)
+	entityplayer:UseActiveItem(CollectibleType.COLLECTIBLE_VOID, UseFlag.USE_OWNED)
+	pickup1:Remove()
+	pickup2:Remove()
+	pickup3:Remove()
+
+	test.AssertEquals(#entityplayer:GetVoidedCollectiblesList(), 2)
+	test.AssertEquals(entityplayer:GetVoidedCollectiblesList()[1], CollectibleType.COLLECTIBLE_D6)
+	test.AssertEquals(entityplayer:GetVoidedCollectiblesList()[2], CollectibleType.COLLECTIBLE_MOMS_BOTTLE_OF_PILLS)
+
+	test.AssertFalse(entityplayer:VoidHasCollectible(CollectibleType.COLLECTIBLE_SAD_ONION))
+	test.AssertTrue(entityplayer:VoidHasCollectible(CollectibleType.COLLECTIBLE_D6))
+	test.AssertTrue(entityplayer:VoidHasCollectible(CollectibleType.COLLECTIBLE_MOMS_BOTTLE_OF_PILLS))
+
+	entityplayer:RemoveCollectible(CollectibleType.COLLECTIBLE_VOID)
+	test.AssertFalse(entityplayer:VoidHasCollectible(CollectibleType.COLLECTIBLE_D6))
+	test.AssertFalse(entityplayer:VoidHasCollectible(CollectibleType.COLLECTIBLE_MOMS_BOTTLE_OF_PILLS))
 end
 
 function EntityPlayerTest:TestGetWeapon(entityplayer)
@@ -2187,11 +2219,6 @@ function EntityPlayerTest:TestTryPreventDeath(entityplayer)
 	entityplayer:TryPreventDeath()
 end
 
-function EntityPlayerTest:TestTryRemoveSmeltedTrinket(entityplayer)
-	local id = 1
-	entityplayer:TryRemoveSmeltedTrinket(id)
-end
-
 function EntityPlayerTest:TestUnblockCollectible(entityplayer)
 	local collectible = 1
 	entityplayer:UnblockCollectible(collectible)
@@ -2200,11 +2227,6 @@ end
 function EntityPlayerTest:TestUpdateIsaacPregnancy(entityplayer)
 	local updatecambion = true
 	entityplayer:UpdateIsaacPregnancy(updatecambion)
-end
-
-function EntityPlayerTest:TestVoidHasCollectible(entityplayer)
-	local collectible = 1
-	entityplayer:VoidHasCollectible(collectible)
 end
 
 function EntityPlayerTest:TestVarBabySkin(entityplayer)

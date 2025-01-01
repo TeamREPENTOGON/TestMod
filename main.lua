@@ -90,13 +90,41 @@ function REPENTOGON_TEST.AssertNil(val)
 end
 REPENTOGON_TEST.AssertNull = REPENTOGON_TEST.AssertNil  -- lol
 
+-- Track one-time callbacks that were added so we can find ones that did not run.
+local oneTimeCallbacks = {}
+
+function REPENTOGON_TEST:ClearOneTimeCallbacks()
+	local found = 0
+
+	for callbackid, tab in pairs(oneTimeCallbacks) do
+		for _, func in ipairs(tab) do
+			found = found + 1
+			REPENTOGON_TEST:RemoveCallback(callbackid, func)
+		end
+	end
+
+	oneTimeCallbacks = {}
+
+	return found
+end
+
 -- Add a callback that removes itself when it runs.
 function REPENTOGON_TEST:AddOneTimePriorityCallback(callbackid, priority, func, param)
 	local wrapper
 	wrapper = function(...)
 		REPENTOGON_TEST:RemoveCallback(callbackid, wrapper)
+		local tab = oneTimeCallbacks[callbackid] or {}
+		for i, v in ipairs(tab) do
+			if v == wrapper then
+				table.remove(tab, i)
+			end
+		end
 		return func(...)
 	end
+	if not oneTimeCallbacks[callbackid] then
+		oneTimeCallbacks[callbackid] = {}
+	end
+	table.insert(oneTimeCallbacks[callbackid], wrapper)
 	REPENTOGON_TEST:AddPriorityCallback(callbackid, priority, wrapper, param)
 end
 function REPENTOGON_TEST:AddOneTimeCallback(callbackid, func, param)
@@ -144,7 +172,7 @@ end
 -- so doing this between each TEST would be too slow, but between each FILE is a good comprimise.
 -- Greed Mode is used to minimize the time wasted on level generation.
 local function ResetRun()
-	Isaac.StartNewGame(PlayerType.PLAYER_ISAAC, Challenge.CHALLENGE_NULL, Difficulty.DIFFICULTY_GREED, 1234)
+	Isaac.StartNewGame(PlayerType.PLAYER_ISAAC, Challenge.CHALLENGE_NULL, Difficulty.DIFFICULTY_GREED, 4)
 end
 
 local function Log(str, toConsole)
@@ -248,6 +276,16 @@ local function RunTestsForClass(className, classTests, functionToTest)
 					func(classTests, input)
 					afterFunc(classTests, input)
 				end)
+				local unrunCallbacks = REPENTOGON_TEST:ClearOneTimeCallbacks()
+				if unrunCallbacks > 0 then
+					local err = "- Found " .. unrunCallbacks .. " one-time callbacks that did not run!"
+					if success then
+						success = false
+						ret = err
+					else
+						ret = ret .. "\n\t" .. err
+					end
+				end
 				if not success then
 					LogFailure(className, funcName, ret)
 					TEST_FAILURES = TEST_FAILURES + 1

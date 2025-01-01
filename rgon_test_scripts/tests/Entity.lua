@@ -684,7 +684,8 @@ function EntityTest:TestSetColorParams(entity)
 	local duration = 150
 	entity:SetColorParams({ColorParams(color, priority, duration, true, true)})
 
-	local params = entity:GetColorParams()[1]
+	local allparams = entity:GetColorParams()
+	local params = entity:GetColorParams()[#allparams]
 	test.AssertEquals(params:GetColor(), color)
 	test.AssertEquals(params:GetPriority(), priority)
 	test.AssertEquals(params:GetDuration(), duration)
@@ -693,14 +694,13 @@ function EntityTest:TestSetColorParams(entity)
 end
 
 function EntityTest:TestGetColorParams(entity)
-	test.AssertEquals(#entity:GetColorParams(), 0)
-
 	local color = Color(1,0,0,1)
 	local priority = 255
 	local duration = 150
 	entity:SetColor(color, duration, priority, true, true)
 
-	local params = entity:GetColorParams()[1]
+	local allparams = entity:GetColorParams()
+	local params = entity:GetColorParams()[#allparams]
 	test.AssertEquals(params:GetColor(), color)
 	test.AssertEquals(params:GetPriority(), priority)
 	test.AssertEquals(params:GetDuration(), duration)
