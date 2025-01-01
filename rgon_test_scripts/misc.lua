@@ -44,3 +44,33 @@ REPENTOGON_TEST:AddCallback(ModCallbacks.MC_PRE_FAMILIAR_COLLISION, function(_, 
 		return {Collide=true}
 	end
 end, TEST_FAMILIAR)
+
+
+local FAMILIAR_MULT_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST FAMILIAR MULT ITEM")
+
+REPENTOGON_TEST:AddCallback(ModCallbacks.MC_EVALUATE_FAMILIAR_MULTIPLIER, function(_, fam, mult, player)
+	return mult + player:GetCollectibleNum(FAMILIAR_MULT_ITEM) + player:GetEffects():GetCollectibleEffectNum(FAMILIAR_MULT_ITEM)
+end)
+
+
+local MAXCOINS_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST MAX COINS ITEM")
+local MAXBOMBS_NULL = Isaac.GetNullItemIdByName("REPENTOGON TEST MAX BOMBS NULL")
+local MAXKEYS_TRINKET = Isaac.GetTrinketIdByName("REPENTOGON TEST MAX KEYS TRINKET")
+
+REPENTOGON_TEST:AddCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, player, cache, value)
+	if player:HasCollectible(MAXCOINS_ITEM) or player:GetEffects():HasCollectibleEffect(MAXCOINS_ITEM) then
+		return 9
+	end
+end, "maxcoins")
+
+REPENTOGON_TEST:AddCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, player, cache, value)
+	if player:GetEffects():HasNullEffect(MAXBOMBS_NULL) then
+		return 9
+	end
+end, "maxbombs")
+
+REPENTOGON_TEST:AddCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, player, cache, value)
+	if player:HasTrinket(MAXKEYS_TRINKET) or player:GetEffects():HasTrinketEffect(MAXKEYS_TRINKET) then
+		return 9
+	end
+end, "maxkeys")

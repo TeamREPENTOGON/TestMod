@@ -152,10 +152,6 @@ function EntityFamiliarTest:TestGetItemConfig(entityfamiliar)
 	entityfamiliar:GetItemConfig()
 end
 
-function EntityFamiliarTest:TestGetMultiplier(entityfamiliar)
-	entityfamiliar:GetMultiplier()
-end
-
 function EntityFamiliarTest:TestGetPathfinder(entityfamiliar)
 	entityfamiliar:GetPathfinder()
 end
@@ -350,6 +346,64 @@ function EntityFamiliarTest:TestVarState(entityfamiliar)
 		test.AssertEquals(entityfamiliar.State, val)
 	end
 	entityfamiliar.State = originalVal
+end
+
+
+local FAMILIAR_MULT_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST FAMILIAR MULT ITEM")
+
+function EntityFamiliarTest:TestGetMultiplier(testfam)
+	test.AssertEquals(testfam:GetMultiplier(), 1.0)
+
+	local callbackran = false
+
+	-- Verify callback runs using BFFs
+	test:AddOneTimeCallback(ModCallbacks.MC_EVALUATE_FAMILIAR_MULTIPLIER, function(_, fam, mult, player)
+		test.AssertEquals(GetPtrHash(fam), GetPtrHash(testfam))
+		test.AssertEquals(GetPtrHash(player), GetPtrHash(testfam.Player))
+		test.AssertEquals(mult, 2.0)
+		callbackran = true
+	end)
+	testfam.Player:AddCollectible(CollectibleType.COLLECTIBLE_BFFS)
+	test.AssertEquals(testfam:GetMultiplier(), 2.0)
+	test.AssertTrue(callbackran)
+
+	-- Manually trigger a re-evaluation and change the result
+	test:AddOneTimeCallback(ModCallbacks.MC_EVALUATE_FAMILIAR_MULTIPLIER, function(_, fam, mult, player)
+		return 3.5
+	end)
+	test.AssertEquals(testfam:GetMultiplier(), 2.0)
+	testfam.Player:AddCustomCacheTag("familiarmultiplier", true)
+	test.AssertEquals(testfam:GetMultiplier(), 3.5)
+
+	-- Collectibles
+	testfam.Player:AddCollectible(FAMILIAR_MULT_ITEM)
+	test.AssertEquals(testfam:GetMultiplier(), 3.0)
+	testfam.Player:AddCollectible(FAMILIAR_MULT_ITEM)
+	test.AssertEquals(testfam:GetMultiplier(), 4.0)
+	testfam.Player:RemoveCollectible(FAMILIAR_MULT_ITEM)
+	test.AssertEquals(testfam:GetMultiplier(), 3.0)
+
+	-- Effects
+	testfam.Player:GetEffects():AddCollectibleEffect(FAMILIAR_MULT_ITEM)
+	test.AssertEquals(testfam:GetMultiplier(), 3.0)
+	testfam.Player:Update()
+	test.AssertEquals(testfam:GetMultiplier(), 4.0)
+
+	testfam.Player:GetEffects():AddCollectibleEffect(FAMILIAR_MULT_ITEM, true, 2)
+	test.AssertEquals(testfam:GetMultiplier(), 4.0)
+	testfam.Player:Update()
+	test.AssertEquals(testfam:GetMultiplier(), 6.0)
+
+	testfam.Player:GetEffects():RemoveCollectibleEffect(FAMILIAR_MULT_ITEM, 2)
+	test.AssertEquals(testfam:GetMultiplier(), 6.0)
+	testfam.Player:Update()
+	test.AssertEquals(testfam:GetMultiplier(), 4.0)
+
+	-- Restore to 1.0
+	testfam.Player:RemoveCollectible(FAMILIAR_MULT_ITEM)
+	testfam.Player:GetEffects():RemoveCollectibleEffect(FAMILIAR_MULT_ITEM)
+	testfam.Player:RemoveCollectible(CollectibleType.COLLECTIBLE_BFFS)
+	test.AssertEquals(testfam:GetMultiplier(), 1.0)
 end
 
 

@@ -20,10 +20,6 @@ function EntityPickupTest:TestCanReroll(entitypickup)
 	entitypickup:CanReroll()
 end
 
-function EntityPickupTest:TestGetCoinValue(entitypickup)
-	entitypickup:GetCoinValue()
-end
-
 function EntityPickupTest:TestIsShopItem(entitypickup)
 	entitypickup:IsShopItem()
 end
@@ -238,6 +234,82 @@ function EntityPickupTest:TestVarWait(entitypickup)
 		test.AssertEquals(entitypickup.Wait, val)
 	end
 	entitypickup.Wait = originalVal
+end
+
+
+local function SpawnTestPenny()
+	local subt = Isaac.GetEntitySubTypeByName("Test Penny")
+	test.AssertTrue(subt > 0)
+
+	local coin = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COIN, subt, Vector.Zero, Vector.Zero, nil):ToPickup()
+	coin:GetSprite():SetLastFrame()
+	coin:Update()
+
+	return coin
+end
+
+function EntityPickupTest:TestGetCoinValue()
+	local coin = SpawnTestPenny()
+
+	test.AssertEquals(coin:GetCoinValue(), 3)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PICKUP_GET_COIN_VALUE, function(_, pickup)
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(coin))
+		return 5
+	end, subt)
+
+	test.AssertEquals(coin:GetCoinValue(), 5)
+
+	coin:Remove()
+end
+
+function EntityPickupTest:TestPlayerCollectCoin()
+	local coin = SpawnTestPenny()
+
+	local numcoins = Isaac.GetPlayer():GetNumCoins()
+	Isaac.GetPlayer():ForceCollide(coin, true)
+	test.AssertEquals(Isaac.GetPlayer():GetNumCoins(), numcoins+3)
+
+	coin:Remove()
+end
+
+function EntityPickupTest:TestFamiliarCollectCoin()
+	local coin = SpawnTestPenny()
+
+	local fam = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, FamiliarVariant.BUM_FRIEND, 0, Vector.Zero, Vector.Zero, nil):ToFamiliar()
+
+	local numcoins = fam.Coins
+	fam:ForceCollide(coin, true)
+	test.AssertEquals(fam.Coins, numcoins+3)
+
+	fam:Remove()
+	coin:Remove()
+end
+
+function EntityPickupTest:TestBumbinoCollectCoin()
+	local coin = SpawnTestPenny()
+
+	local bumbino = Isaac.Spawn(EntityType.ENTITY_BUMBINO, 0, 0, Vector.Zero, Vector.Zero, nil):ToNPC()
+
+	local numcoins = bumbino.I2
+	bumbino:ForceCollide(coin, true)
+	test.AssertEquals(bumbino.I2, numcoins+3)
+
+	bumbino:Remove()
+	coin:Remove()
+end
+
+function EntityPickupTest:TestUltraGreedCollectCoin()
+	local coin = SpawnTestPenny()
+
+	local greed = Isaac.Spawn(EntityType.ENTITY_ULTRA_GREED, 0, 0, Vector.Zero, Vector.Zero, nil):ToNPC()
+
+	local numcoins = greed.I2
+	greed:ForceCollide(coin, true)
+	test.AssertEquals(greed.I2, numcoins+3)
+
+	greed:Remove()
+	coin:Remove()
 end
 
 
