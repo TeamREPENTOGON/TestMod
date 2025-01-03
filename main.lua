@@ -33,6 +33,9 @@ REPENTOGON_TEST.TestColors = {
 	Color(1,1,1,1),
 }
 
+REPENTOGON_TEST.TEST_PLAYER = Isaac.GetPlayerTypeByName("Testsaac")
+REPENTOGON_TEST.TEST_FAMILIAR = Isaac.GetEntityVariantByName("Brother Bobentogon")
+
 local function Round(n, numDecimalPlaces)
 	local mult = 10^(numDecimalPlaces or 0)
 	local x = (n*mult) % 1 >= 0.5 and math.ceil(n*mult) or math.floor(n*mult)
@@ -264,45 +267,58 @@ local function RunTestsForClass(className, classTests, functionToTest)
 		RenderTests = {},
 	}
 
+	-- Sort tests by name for the sake of determinism.
+	local sortedTests = {}
+	for funcName, func in pairs(classTests) do
+		if funcName:match("^Test") and (not functionToTest or funcName:match(functionToTest .. "$"))
+				and not (className == "FontRenderSettings" and not REPENTANCE_PLUS) then
+			table.insert(sortedTests, {Name = funcName, Func = func})
+		end
+	end
+	table.sort(sortedTests, function(a, b)
+		return a.Name < b.Name
+	end)
+
 	local beforeFunc = classTests.BeforeEach or function() end
 	local afterFunc = classTests.AfterEach or function() end
-	for funcName, func in pairs(classTests) do
-		if funcName:match("^Test") and (not functionToTest or funcName:match(functionToTest .. "$")) and not (className == "FontRenderSettings" and not REPENTANCE_PLUS) then
-			local runtest = function()
-				Log("Running test: " .. className ..".".. funcName .. "...")
-				TESTS_RAN = TESTS_RAN + 1
-				local success, ret = pcall(function()
-					local input = beforeFunc(classTests)
-					func(classTests, input)
-					afterFunc(classTests, input)
-				end)
-				local unrunCallbacks = REPENTOGON_TEST:ClearOneTimeCallbacks()
-				if unrunCallbacks > 0 then
-					local err = "- Found " .. unrunCallbacks .. " one-time callbacks that did not run!"
-					if success then
-						success = false
-						ret = err
-					else
-						ret = ret .. "\n\t" .. err
-					end
-				end
-				if not success then
-					LogFailure(className, funcName, ret)
-					TEST_FAILURES = TEST_FAILURES + 1
-				else
-					Log("...finished!")
-				end
-				return
-			end
+	for _, test in ipairs(sortedTests) do
+		local funcName = test.Name
+		local func = test.Func
 
-			-- Menu tests can be run immediately. Others are queued up to execute during callbacks.
-			if not Isaac.IsInGame() then
-				runtest()
-			elseif funcName:match("^TestRender") then
-				table.insert(testsToRun.RenderTests, runtest)
-			else
-				table.insert(testsToRun.UpdateTests, runtest)
+		local runtest = function()
+			Log("Running test: " .. className ..".".. funcName .. "...")
+			TESTS_RAN = TESTS_RAN + 1
+			local success, ret = pcall(function()
+				local input = beforeFunc(classTests)
+				func(classTests, input)
+				afterFunc(classTests, input)
+			end)
+			local unrunCallbacks = REPENTOGON_TEST:ClearOneTimeCallbacks()
+			if unrunCallbacks > 0 then
+				local err = "- Found " .. unrunCallbacks .. " one-time callbacks that did not run!"
+				if success then
+					success = false
+					ret = err
+				else
+					ret = ret .. "\n\t" .. err
+				end
 			end
+			if not success then
+				LogFailure(className, funcName, ret)
+				TEST_FAILURES = TEST_FAILURES + 1
+			else
+				Log("...finished!")
+			end
+			return
+		end
+
+		-- Menu tests can be run immediately. Others are queued up to execute during callbacks.
+		if not Isaac.IsInGame() then
+			runtest()
+		elseif funcName:match("^TestRender") then
+			table.insert(testsToRun.RenderTests, runtest)
+		else
+			table.insert(testsToRun.UpdateTests, runtest)
 		end
 	end
 
@@ -328,6 +344,9 @@ function REPENTOGON_TEST:RunTests(classToTest, functionToTest)
 	end
 
 	if Isaac.IsInGame() then
+		table.sort(TEST_QUEUE, function(a, b)
+			return a.Name < b.Name
+		end)
 		ResetRun()
 	else
 		LogTestsFinished()

@@ -348,6 +348,32 @@ function EntityFamiliarTest:TestVarState(entityfamiliar)
 	entityfamiliar.State = originalVal
 end
 
+function EntityFamiliarTest:TestTakeDamage()
+	local fam = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, test.TEST_FAMILIAR, 0, Isaac.GetPlayer().Position, Vector.Zero, Isaac.GetPlayer()):ToFamiliar()
+	local enemy = Isaac.Spawn(EntityType.ENTITY_GAPER, 0, 0, Vector.Zero, Vector.Zero, nil)
+
+	local testdamage = 0.5
+	local testflags = DamageFlag.DAMAGE_LASER | DamageFlag.DAMAGE_COUNTDOWN
+	local testsource = EntityRef(enemy)
+	local testdamagecountdown = 7
+
+	local testfunc = function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(fam))
+		test.AssertEquals(damage, testdamage)
+		test.AssertEquals(flags, testflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, testdamagecountdown)
+	end
+
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, testfunc)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, testfunc)
+
+	fam:TakeDamage(testdamage, testflags, testsource, testdamagecountdown)
+
+	fam:Remove()
+	enemy:Remove()
+end
+
 
 local FAMILIAR_MULT_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST FAMILIAR MULT ITEM")
 

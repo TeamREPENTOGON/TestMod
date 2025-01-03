@@ -401,5 +401,24 @@ function EntityLaserTest:TestVarTimeout(entitylaser)
 	entitylaser.Timeout = originalVal
 end
 
+function EntityLaserTest:TestLaserCollisionCallbacks()
+	local entity = Isaac.Spawn(EntityType.ENTITY_GUSHER, 1, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil)
+	entity:ClearEntityFlags(EntityFlag.FLAG_APPEAR)
+	entity:Update()
+
+	local testlaser = EntityLaser.ShootAngle(LaserVariant.THIN_RED, entity.Position + Vector(-40,0), 0, 10, Vector.Zero, Isaac.GetPlayer())
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_LASER_COLLISION, function(_, laser, collider)
+		test.AssertEquals(GetPtrHash(laser), GetPtrHash(testlaser))
+		test.AssertEquals(GetPtrHash(collider), GetPtrHash(entity))
+	end)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_LASER_COLLISION, function(_, laser, collider)
+		test.AssertEquals(GetPtrHash(laser), GetPtrHash(testlaser))
+		test.AssertEquals(GetPtrHash(collider), GetPtrHash(entity))
+	end)
+
+	testlaser:Update()
+end
+
 
 return EntityLaserTest

@@ -96,5 +96,28 @@ function EntityDeliriumTest:TestVarTransformationTimer(entitydelirium)
 	entitydelirium.TransformationTimer = originalVal
 end
 
+function EntityDeliriumTest:TestTransformationCallbacks(deli)
+	deli:ClearEntityFlags(EntityFlag.FLAG_APPEAR)
+	deli:Update()
+
+	Game():AddEncounteredBoss(EntityType.ENTITY_DUKE, 1)  -- Husk
+
+	test:AddOneTimeCallback(DeliriumCallbacks.TRANSFORMATION, function(_, ent, etype, evar)
+		test.AssertEquals(GetPtrHash(ent), GetPtrHash(deli))
+		test.AssertEquals(etype, EntityType.ENTITY_DUKE)
+		test.AssertEquals(evar, 1)
+		return {EntityType.ENTITY_GURGLING, 2}  -- Turdling
+	end)
+	test:AddOneTimeCallback(DeliriumCallbacks.POST_TRANSFORMATION, function(_, ent)
+		test.AssertEquals(GetPtrHash(ent), GetPtrHash(deli))
+	end)
+
+	deli.TransformationTimer = 0
+	deli:Update()
+
+	test.AssertEquals(deli.BossType, EntityType.ENTITY_GURGLING)
+	test.AssertEquals(deli.BossVariant, 2)
+end
+
 
 return EntityDeliriumTest

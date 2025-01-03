@@ -12,7 +12,6 @@ end
 
 ----------
 
-local TEST_PLAYER = Isaac.GetPlayerTypeByName("Testsaac")
 local TEST_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST ITEM")
 local TEST_NULL = Isaac.GetNullItemIdByName("REPENTOGON TEST NULL")
 local TEST_COSTUME = Isaac.GetCostumeIdByPath("gfx/characters/repentogon_test_costume.anm2")
@@ -33,7 +32,7 @@ function XmlFeaturesTest:TestNullItemCostume()
 end
 
 function XmlFeaturesTest:TestPlayerModCostume()
-	test.AssertEquals(EntityConfig.GetPlayer(TEST_PLAYER):GetCostumeID(), TEST_COSTUME)
+	test.AssertEquals(EntityConfig.GetPlayer(test.TEST_PLAYER):GetCostumeID(), TEST_COSTUME)
 end
 
 
@@ -83,10 +82,8 @@ function XmlFeaturesTest:TestHiddenRevive()
 end
 
 
-local TEST_FAMILIAR = Isaac.GetEntityVariantByName("Brother Bobentogon")
-
 function XmlFeaturesTest:TestFamiliarBlockProjectilesAndTakeDamage()
-	local fam = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, TEST_FAMILIAR, 0, Isaac.GetPlayer().Position, Vector.Zero, Isaac.GetPlayer()):ToFamiliar()
+	local fam = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, test.TEST_FAMILIAR, 0, Isaac.GetPlayer().Position, Vector.Zero, Isaac.GetPlayer()):ToFamiliar()
 	local projectile = Isaac.Spawn(EntityType.ENTITY_PROJECTILE, 0, 0, Vector.Zero, Vector.Zero, nil):ToProjectile()
 	local tookDamage = false
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, function()
@@ -100,7 +97,7 @@ end
 
 function XmlFeaturesTest:TestFamiliarIgnoreBffs()
 	local fam = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, 1, 0, Isaac.GetPlayer().Position, Vector.Zero, Isaac.GetPlayer()):ToFamiliar()
-	local testFam = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, TEST_FAMILIAR, 0, Isaac.GetPlayer().Position, Vector.Zero, Isaac.GetPlayer()):ToFamiliar()
+	local testFam = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, test.TEST_FAMILIAR, 0, Isaac.GetPlayer().Position, Vector.Zero, Isaac.GetPlayer()):ToFamiliar()
 	test.AssertEquals(fam:GetMultiplier(), 1.0)
 	test.AssertEquals(testFam:GetMultiplier(), 1.0)
 	Isaac.GetPlayer():AddCollectible(CollectibleType.COLLECTIBLE_BFFS)

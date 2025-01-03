@@ -3,7 +3,7 @@ local test = REPENTOGON_TEST
 local LayerStateTest = {}
 
 function LayerStateTest:BeforeEach()
-	return test.GetTestSprite():GetLayer(0)
+	return test.GetTestSprite():GetLayer(1)
 end
 
 function LayerStateTest:AfterEach(layerstate)
@@ -56,28 +56,23 @@ function LayerStateTest:TestGetDefaultSpritesheetPath(layerstate)
 	layerstate:GetDefaultSpritesheetPath()
 end
 
-function LayerStateTest:TestGetFlipX(layerstate)
-	layerstate:GetFlipX()
-end
-
-function LayerStateTest:TestGetFlipY(layerstate)
-	layerstate:GetFlipY()
-end
-
 function LayerStateTest:TestGetLayerID(layerstate)
-	layerstate:GetLayerID()
+	test.AssertEquals(layerstate:GetLayerID(), 1)
 end
 
 function LayerStateTest:TestGetName(layerstate)
-	layerstate:GetName()
+	test.AssertEquals(layerstate:GetName(), "body")
 end
 
 function LayerStateTest:TestGetSpritesheetPath(layerstate)
-	layerstate:GetSpritesheetPath()
+	test.AssertEquals(layerstate:GetSpritesheetPath():lower(), "gfx/characters/costumes/character_001_isaac.png")
 end
 
 function LayerStateTest:TestIsVisible(layerstate)
-	layerstate:IsVisible()
+	layerstate:SetVisible(false)
+	test.AssertFalse(layerstate:IsVisible())
+	layerstate:SetVisible(true)
+	test.AssertTrue(layerstate:IsVisible())
 end
 
 function LayerStateTest:TestSetColor(layerstate)
@@ -99,13 +94,17 @@ function LayerStateTest:TestSetCropOffset(layerstate)
 end
 
 function LayerStateTest:TestSetFlipX(layerstate)
-	local value = true
-	layerstate:SetFlipX(value)
+	layerstate:SetFlipX(true)
+	test.AssertTrue(layerstate:GetFlipX())
+	layerstate:SetFlipX(false)
+	test.AssertFalse(layerstate:GetFlipX())
 end
 
 function LayerStateTest:TestSetFlipY(layerstate)
-	local value = true
-	layerstate:SetFlipY(value)
+	layerstate:SetFlipY(true)
+	test.AssertTrue(layerstate:GetFlipY())
+	layerstate:SetFlipY(false)
+	test.AssertFalse(layerstate:GetFlipY())
 end
 
 function LayerStateTest:TestSetPos(layerstate)
@@ -142,11 +141,6 @@ function LayerStateTest:TestSetSize(layerstate)
 		test.AssertEquals(layerstate:GetSize(), val)
 	end
 	layerstate:SetSize(originalVal)
-end
-
-function LayerStateTest:TestSetVisible(layerstate)
-	local visible = true
-	layerstate:SetVisible(visible)
 end
 
 function LayerStateTest:TestSetWrapSMode(layerstate)

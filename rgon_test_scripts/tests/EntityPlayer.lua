@@ -3,7 +3,19 @@ local test = REPENTOGON_TEST
 local EntityPlayerTest = include(REPENTOGON_TEST.TestsRoot .. "Entity")
 
 function EntityPlayerTest:BeforeEach()
-	return Isaac.GetPlayer()
+	local player = Isaac.GetPlayer()
+	if player:IsDead() then
+		player:Revive()
+	end
+	if player:GetMaxHearts() < 6 then
+		player:AddMaxHearts(6 - player:GetMaxHearts())
+	end
+	player:AddHearts(player:GetMaxHearts())
+	player.ControlsEnabled = true
+	player.ControlsCooldown = 0
+	player:ResetDamageCooldown()
+	player:StopExtraAnimation()
+	return player
 end
 
 function EntityPlayerTest:AfterEach(entityplayer)
@@ -13,8 +25,11 @@ end
 ----------
 
 function EntityPlayerTest:TestAddBlackHearts(entityplayer)
-	local blackhearts = 1
-	entityplayer:AddBlackHearts(blackhearts)
+	test.AssertEquals(entityplayer:GetBlackHearts(), 0)
+	entityplayer:AddBlackHearts(1)
+	test.AssertTrue(entityplayer:GetBlackHearts() > 0)
+	entityplayer:AddBlackHearts(-1)
+	test.AssertEquals(entityplayer:GetBlackHearts(), 0)
 end
 
 function EntityPlayerTest:TestAddBloodCharge(entityplayer)
@@ -41,13 +56,19 @@ function EntityPlayerTest:TestAddBombs(entityplayer)
 end
 
 function EntityPlayerTest:TestAddBoneHearts(entityplayer)
-	local hearts = 1
-	entityplayer:AddBoneHearts(hearts)
+	test.AssertEquals(entityplayer:GetBoneHearts(), 0)
+	entityplayer:AddBoneHearts(1)
+	test.AssertEquals(entityplayer:GetBoneHearts(), 1)
+	entityplayer:AddBoneHearts(-1)
+	test.AssertEquals(entityplayer:GetBoneHearts(), 0)
 end
 
 function EntityPlayerTest:TestAddBrokenHearts(entityplayer)
-	local brokenhearts = 1
-	entityplayer:AddBrokenHearts(brokenhearts)
+	test.AssertEquals(entityplayer:GetBrokenHearts(), 0)
+	entityplayer:AddBrokenHearts(1)
+	test.AssertEquals(entityplayer:GetBrokenHearts(), 1)
+	entityplayer:AddBrokenHearts(-1)
+	test.AssertEquals(entityplayer:GetBrokenHearts(), 0)
 end
 
 function EntityPlayerTest:TestAddCacheFlags(entityplayer)
@@ -75,9 +96,13 @@ function EntityPlayerTest:TestAddCollectible(entityplayer)
 	entityplayer:AddCollectible(collectibletype, charge, firsttimepickingup, slot, vardata)
 end
 
-function EntityPlayerTest:TestAddControlsCooldown(entityplayer)
-	local cooldown = 1
-	entityplayer:AddControlsCooldown(cooldown)
+function EntityPlayerTest:TestControlsCooldown(entityplayer)
+	entityplayer.ControlsCooldown = 10
+	test.AssertEquals(entityplayer.ControlsCooldown, 10)
+	entityplayer:AddControlsCooldown(5)
+	test.AssertEquals(entityplayer.ControlsCooldown, 15)
+	entityplayer.ControlsCooldown = 0
+	test.AssertEquals(entityplayer.ControlsCooldown, 0)
 end
 
 function EntityPlayerTest:TestAddCostume(entityplayer)
@@ -99,8 +124,11 @@ function EntityPlayerTest:TestAddDollarBillEffect(entityplayer)
 end
 
 function EntityPlayerTest:TestAddEternalHearts(entityplayer)
-	local eternalhearts = 1
-	entityplayer:AddEternalHearts(eternalhearts)
+	test.AssertEquals(entityplayer:GetEternalHearts(), 0)
+	entityplayer:AddEternalHearts(1)
+	test.AssertEquals(entityplayer:GetEternalHearts(), 1)
+	entityplayer:AddEternalHearts(-1)
+	test.AssertEquals(entityplayer:GetEternalHearts(), 0)
 end
 
 function EntityPlayerTest:TestAddFriendlyDip(entityplayer)
@@ -119,8 +147,11 @@ function EntityPlayerTest:TestAddGoldenBomb(entityplayer)
 end
 
 function EntityPlayerTest:TestAddGoldenHearts(entityplayer)
-	local hearts = 1
-	entityplayer:AddGoldenHearts(hearts)
+	test.AssertEquals(entityplayer:GetGoldenHearts(), 0)
+	entityplayer:AddGoldenHearts(1)
+	test.AssertEquals(entityplayer:GetGoldenHearts(), 1)
+	entityplayer:AddGoldenHearts(-1)
+	test.AssertEquals(entityplayer:GetGoldenHearts(), 0)
 end
 
 function EntityPlayerTest:TestAddGoldenKey(entityplayer)
@@ -128,8 +159,14 @@ function EntityPlayerTest:TestAddGoldenKey(entityplayer)
 end
 
 function EntityPlayerTest:TestAddHearts(entityplayer)
-	local hearts = 1
-	entityplayer:AddHearts(hearts)
+	entityplayer:AddHearts(1-entityplayer:GetHearts())
+	test.AssertEquals(entityplayer:GetHearts(), 1)
+	entityplayer:AddHearts(1)
+	test.AssertEquals(entityplayer:GetHearts(), 2)
+	entityplayer:AddHearts(-1)
+	test.AssertEquals(entityplayer:GetHearts(), 1)
+	entityplayer:AddHearts(entityplayer:GetMaxHearts())
+	test.AssertEquals(entityplayer:GetHearts(), entityplayer:GetMaxHearts())
 end
 
 function EntityPlayerTest:TestAddItemWisp(entityplayer)
@@ -155,9 +192,13 @@ function EntityPlayerTest:TestAddKeys(entityplayer)
 end
 
 function EntityPlayerTest:TestAddMaxHearts(entityplayer)
-	local maxhearts = 1
+	local maxhearts = entityplayer:GetMaxHearts()
+	test.AssertEquals(maxhearts, entityplayer:GetMaxHearts())
 	local ignorekeeper = true
-	entityplayer:AddMaxHearts(maxhearts, ignorekeeper)
+	entityplayer:AddMaxHearts(1, ignorekeeper)
+	test.AssertEquals(entityplayer:GetMaxHearts(), maxhearts+1)
+	entityplayer:AddMaxHearts(-1, ignorekeeper)
+	test.AssertEquals(entityplayer:GetMaxHearts(), maxhearts)
 end
 
 function EntityPlayerTest:TestAddMinisaac(entityplayer)
@@ -191,8 +232,11 @@ function EntityPlayerTest:TestAddPrettyFly(entityplayer)
 end
 
 function EntityPlayerTest:TestAddRottenHearts(entityplayer)
-	local rottenhearts = 1
-	entityplayer:AddRottenHearts(rottenhearts)
+	entityplayer:AddRottenHearts(1)
+	test.AssertEquals(entityplayer:GetRottenHearts(), 1)
+	entityplayer:AddRottenHearts(-1)
+	test.AssertEquals(entityplayer:GetRottenHearts(), 0)
+	entityplayer:AddHearts(2)
 end
 
 function EntityPlayerTest:TestAddSoulCharge(entityplayer)
@@ -201,8 +245,11 @@ function EntityPlayerTest:TestAddSoulCharge(entityplayer)
 end
 
 function EntityPlayerTest:TestAddSoulHearts(entityplayer)
-	local soulhearts = 1
-	entityplayer:AddSoulHearts(soulhearts)
+	test.AssertEquals(entityplayer:GetSoulHearts(), 0)
+	entityplayer:AddSoulHearts(1)
+	test.AssertEquals(entityplayer:GetSoulHearts(), 1)
+	entityplayer:AddSoulHearts(-1)
+	test.AssertEquals(entityplayer:GetSoulHearts(), 0)
 end
 
 function EntityPlayerTest:TestAddSwarmFlyOrbital(entityplayer)
@@ -526,10 +573,6 @@ function EntityPlayerTest:TestGetBatteryCharge(entityplayer)
 	entityplayer:GetBatteryCharge(activeslot)
 end
 
-function EntityPlayerTest:TestGetBlackHearts(entityplayer)
-	entityplayer:GetBlackHearts()
-end
-
 function EntityPlayerTest:TestGetBodyColor(entityplayer)
 	entityplayer:GetBodyColor()
 end
@@ -542,10 +585,6 @@ function EntityPlayerTest:TestGetBombVariant(entityplayer)
 	local tearflags = BitSet128()
 	local forcesmallbomb = true
 	entityplayer:GetBombVariant(tearflags, forcesmallbomb)
-end
-
-function EntityPlayerTest:TestGetBoneHearts(entityplayer)
-	entityplayer:GetBoneHearts()
 end
 
 function EntityPlayerTest:TestGetBrokenHearts(entityplayer)
@@ -605,10 +644,6 @@ function EntityPlayerTest:TestGetEffects(entityplayer)
 	entityplayer:GetEffects()
 end
 
-function EntityPlayerTest:TestGetEternalHearts(entityplayer)
-	entityplayer:GetEternalHearts()
-end
-
 function EntityPlayerTest:TestGetExtraLives(entityplayer)
 	entityplayer:GetExtraLives()
 end
@@ -619,10 +654,6 @@ end
 
 function EntityPlayerTest:TestGetFlyingOffset(entityplayer)
 	entityplayer:GetFlyingOffset()
-end
-
-function EntityPlayerTest:TestGetGoldenHearts(entityplayer)
-	entityplayer:GetGoldenHearts()
 end
 
 function EntityPlayerTest:TestGetGreedDonationBreakChance(entityplayer)
@@ -639,10 +670,6 @@ end
 
 function EntityPlayerTest:TestGetHeartLimit(entityplayer)
 	entityplayer:GetHeartLimit()
-end
-
-function EntityPlayerTest:TestGetHearts(entityplayer)
-	entityplayer:GetHearts()
 end
 
 function EntityPlayerTest:TestGetJarFlies(entityplayer)
@@ -677,10 +704,6 @@ end
 
 function EntityPlayerTest:TestGetMainTwin(entityplayer)
 	entityplayer:GetMainTwin()
-end
-
-function EntityPlayerTest:TestGetMaxHearts(entityplayer)
-	entityplayer:GetMaxHearts()
 end
 
 function EntityPlayerTest:TestGetMaxPocketItems(entityplayer)
@@ -797,10 +820,6 @@ function EntityPlayerTest:TestGetRecentMovementVector(entityplayer)
 	entityplayer:GetRecentMovementVector()
 end
 
-function EntityPlayerTest:TestGetRottenHearts(entityplayer)
-	entityplayer:GetRottenHearts()
-end
-
 function EntityPlayerTest:TestGetShootingInput(entityplayer)
 	entityplayer:GetShootingInput()
 end
@@ -811,10 +830,6 @@ end
 
 function EntityPlayerTest:TestGetSmoothBodyRotation(entityplayer)
 	entityplayer:GetSmoothBodyRotation()
-end
-
-function EntityPlayerTest:TestGetSoulHearts(entityplayer)
-	entityplayer:GetSoulHearts()
 end
 
 function EntityPlayerTest:TestGetSubPlayer(entityplayer)
@@ -1550,6 +1565,9 @@ function EntityPlayerTest:TestAddSmeltedTrinket(entityplayer)
 	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_WOODEN_CROSS].goldenTrinketAmount, 0)
 	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_SWALLOWED_PENNY].trinketAmount, 0)
 	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_SWALLOWED_PENNY].goldenTrinketAmount, 0)
+
+	entityplayer:TryRemoveSmeltedTrinket(TrinketType.TRINKET_WOODEN_CROSS)
+	test.AssertEquals(entityplayer:GetSmeltedTrinkets()[TrinketType.TRINKET_WOODEN_CROSS].trinketAmount, 0)
 end
 
 function EntityPlayerTest:TestGetSpecialGridCollision(entityplayer)
@@ -1826,15 +1844,6 @@ function EntityPlayerTest:TestSetBombPlaceDelay(entityplayer)
 	entityplayer:SetBombPlaceDelay(originalVal)
 end
 
-function EntityPlayerTest:TestSetCambionConceptionState(entityplayer)
-	local originalVal = entityplayer:GetCambionConceptionState()
-	for _, val in pairs(test.TestInts) do
-		entityplayer:SetCambionConceptionState(val)
-		test.AssertEquals(entityplayer:GetCambionConceptionState(), val)
-	end
-	entityplayer:SetCambionConceptionState(originalVal)
-end
-
 function EntityPlayerTest:TestSetCanShoot(entityplayer)
 	local canshoot = true
 	entityplayer:SetCanShoot(canshoot)
@@ -1982,16 +1991,6 @@ function EntityPlayerTest:TestSetHeadDirectionLockTime(entityplayer)
 		test.AssertEquals(entityplayer:GetHeadDirectionLockTime(), val)
 	end
 	entityplayer:SetHeadDirectionLockTime(originalVal)
-end
-
-function EntityPlayerTest:TestSetImmaculateConceptionState(entityplayer)
-	local originalVal = entityplayer:GetImmaculateConceptionState()
-	entityplayer:SetImmaculateConceptionState(0)
-	test.AssertEquals(entityplayer:GetImmaculateConceptionState(), 0)
-	entityplayer:SetImmaculateConceptionState(1)
-	test.AssertEquals(entityplayer:GetImmaculateConceptionState(), 1)
-	entityplayer:SetImmaculateConceptionState(originalVal)
-	test.AssertEquals(entityplayer:GetImmaculateConceptionState(), originalVal)
 end
 
 function EntityPlayerTest:TestSetItemState(entityplayer)
@@ -2248,15 +2247,6 @@ function EntityPlayerTest:TestVarControllerIndex(entityplayer)
 	local controllerindex = entityplayer.ControllerIndex
 end
 
-function EntityPlayerTest:TestVarControlsCooldown(entityplayer)
-	local originalVal = entityplayer.ControlsCooldown
-	for _, val in pairs(test.TestInts) do
-		entityplayer.ControlsCooldown = val
-		test.AssertEquals(entityplayer.ControlsCooldown, val)
-	end
-	entityplayer.ControlsCooldown = originalVal
-end
-
 function EntityPlayerTest:TestVarControlsEnabled(entityplayer)
 	local originalVal = entityplayer.ControlsEnabled
 	entityplayer.ControlsEnabled = true
@@ -2430,6 +2420,100 @@ function EntityPlayerTest:TestVarTearsOffset(entityplayer)
 		test.AssertEquals(entityplayer.TearsOffset, val)
 	end
 	entityplayer.TearsOffset = originalVal
+end
+
+function EntityPlayerTest:TestSetCambionConceptionState(player)
+	player:AddCollectible(CollectibleType.COLLECTIBLE_CAMBION_CONCEPTION)
+
+	player:SetCambionConceptionState(0)
+	test.AssertEquals(player:GetCambionConceptionState(), 0)
+	player:SetCambionConceptionState(14)
+	test.AssertEquals(player:GetCambionConceptionState(), 14)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_GIVE_BIRTH_CAMBION, function(_, p, flag)
+		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
+		test.AssertTrue(flag > 0 and flag <= ConceptionFamiliarFlag.TWISTED_PAIR)
+	end)
+
+	player:AddHearts(1)
+	player:ResetDamageCooldown()
+	test.AssertTrue(player:TakeDamage(1, 0, EntityRef(player), 0))
+
+	test.AssertEquals(player:GetCambionConceptionState(), 15)
+
+	player:RemoveCollectible(CollectibleType.COLLECTIBLE_CAMBION_CONCEPTION)
+end
+
+function EntityPlayerTest:TestSetImmaculateConceptionState(player)
+	player:AddCollectible(CollectibleType.COLLECTIBLE_IMMACULATE_CONCEPTION)
+
+	player:SetImmaculateConceptionState(0)
+	test.AssertEquals(player:GetImmaculateConceptionState(), 0)
+	player:SetImmaculateConceptionState(14)
+	test.AssertEquals(player:GetImmaculateConceptionState(), 14)
+	player:SetImmaculateConceptionState(15)
+	test.AssertEquals(player:GetImmaculateConceptionState(), 14)
+
+	local heart = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_HEART, HeartSubType.HEART_FULL, player.Position, Vector.Zero, nil):ToPickup()
+	heart:GetSprite():SetLastFrame()
+	heart:Update()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_GIVE_BIRTH_IMMACULATE, function(_, p, flag)
+		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
+		test.AssertTrue(flag > 0 and flag <= ConceptionFamiliarFlag.TWISTED_PAIR)
+	end)
+
+	player:AddMaxHearts(2)
+	player:AddHearts(-2)
+	player:ForceCollide(heart, true)
+
+	test.AssertTrue(heart:IsDead())
+	test.AssertEquals(player:GetImmaculateConceptionState(), 0)
+
+	player:RemoveCollectible(CollectibleType.COLLECTIBLE_IMMACULATE_CONCEPTION)
+end
+
+function EntityPlayerTest:TestPlaceBombCallbacks(player)
+	local forceBombInput = function(_, player, hook, action)
+		if action == ButtonAction.ACTION_BOMB then
+			return true
+		end
+	end
+	test:AddCallback(ModCallbacks.MC_INPUT_ACTION, forceBombInput, InputHook.IS_ACTION_TRIGGERED)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_USE_BOMB, function(_, p)
+		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
+	end)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_USE_BOMB, function(_, p)
+		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
+	end)
+
+	player:AddBombs(1)
+	player:SetBombPlaceDelay(0)
+	player:Update()
+
+	test:RemoveCallback(ModCallbacks.MC_INPUT_ACTION, forceBombInput)
+end
+
+function EntityPlayerTest:TestTakeDamage(player)
+	local testdamage = 2
+	local testflags = DamageFlag.DAMAGE_SPIKES | DamageFlag.DAMAGE_POOP
+	local testsource = EntityRef(Isaac.GetPlayer())
+	local testdamagecountdown = 7
+
+	local testfunc = function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
+		test.AssertEquals(damage, testdamage)
+		test.AssertEquals(flags, testflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, testdamagecountdown)
+	end
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_TAKE_DMG, testfunc)
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, testfunc)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, testfunc)
+
+	player:TakeDamage(testdamage, testflags, testsource, testdamagecountdown)
 end
 
 

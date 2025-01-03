@@ -238,5 +238,13 @@ function EntityTearTest:TestVarWaitFrames(entitytear)
 	entitytear.WaitFrames = originalVal
 end
 
+function EntityTearTest:TestTearDeathCallback(testtear)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TEAR_DEATH, function(_, tear)
+		test.AssertEquals(GetPtrHash(tear), GetPtrHash(testtear))
+	end)
+	testtear:Kill()
+	testtear:Update()
+end
+
 
 return EntityTearTest

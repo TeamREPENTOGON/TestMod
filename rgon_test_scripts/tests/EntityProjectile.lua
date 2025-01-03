@@ -183,5 +183,13 @@ function EntityProjectileTest:TestVarWiggleFrameOffset(entityprojectile)
 	entityprojectile.WiggleFrameOffset = originalVal
 end
 
+function EntityProjectileTest:TestProjDeathCallback(testproj)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PROJECTILE_DEATH, function(_, proj)
+		test.AssertEquals(GetPtrHash(proj), GetPtrHash(testproj))
+	end)
+	testproj:Kill()
+	testproj:Update()
+end
+
 
 return EntityProjectileTest

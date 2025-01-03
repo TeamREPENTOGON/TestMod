@@ -3,7 +3,7 @@ local test = REPENTOGON_TEST
 local EntityTest = {}
 
 function EntityTest:BeforeEach()
-	return Isaac.Spawn(EntityType.ENTITY_GAPER, 0, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil)
+	return Isaac.Spawn(EntityType.ENTITY_GUSHER, 1, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil)
 end
 
 function EntityTest:AfterEach(entity)
@@ -406,7 +406,9 @@ function EntityTest:TestPostRender(entity)
 end
 
 function EntityTest:TestRemove(entity)
-	entity:Remove()
+	if not entity:ToPlayer() then
+		entity:Remove()
+	end
 end
 
 function EntityTest:TestRemoveStatusEffects(entity)
@@ -449,14 +451,6 @@ function EntityTest:TestSetSpriteOverlayFrame(entity)
 	local animationname = "hello"
 	local framenum = 1
 	entity:SetSpriteOverlayFrame(animationname, framenum)
-end
-
-function EntityTest:TestTakeDamage(entity)
-	local damage = 1
-	local flags = 1
-	local source = EntityRef(Isaac.GetPlayer())
-	local damagecountdown = 1
-	entity:TakeDamage(damage, flags, source, damagecountdown)
 end
 
 function EntityTest:TestToBomb(entity)
@@ -684,8 +678,8 @@ function EntityTest:TestSetColorParams(entity)
 	local duration = 150
 	entity:SetColorParams({ColorParams(color, priority, duration, true, true)})
 
-	local allparams = entity:GetColorParams()
-	local params = entity:GetColorParams()[#allparams]
+	test.AssertEquals(#entity:GetColorParams(), 1)
+	local params = entity:GetColorParams()[1]
 	test.AssertEquals(params:GetColor(), color)
 	test.AssertEquals(params:GetPriority(), priority)
 	test.AssertEquals(params:GetDuration(), duration)
@@ -694,6 +688,9 @@ function EntityTest:TestSetColorParams(entity)
 end
 
 function EntityTest:TestGetColorParams(entity)
+	entity:SetColorParams({})
+	test.AssertEquals(#entity:GetColorParams(), 0)
+
 	local color = Color(1,0,0,1)
 	local priority = 255
 	local duration = 150

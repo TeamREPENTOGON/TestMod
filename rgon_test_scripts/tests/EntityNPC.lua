@@ -4,7 +4,7 @@ local EntityNPCTest = include(REPENTOGON_TEST.TestsRoot .. "Entity")
 EntityNPCTest.TestCanShutDoors = nil
 
 function EntityNPCTest:BeforeEach()
-	return Isaac.Spawn(EntityType.ENTITY_GAPER, 0, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil):ToNPC()
+	return Isaac.Spawn(EntityType.ENTITY_GUSHER, 1, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil):ToNPC()
 end
 
 function EntityNPCTest:AfterEach(entitynpc)
@@ -164,8 +164,21 @@ function EntityNPCTest:TestGetControllerId(entitynpc)
 	entitynpc:GetControllerId()
 end
 
-function EntityNPCTest:TestGetDarkRedChampionRegenTimer(entitynpc)
-	entitynpc:GetDarkRedChampionRegenTimer()
+function EntityNPCTest:TestGetDarkRedChampionRegenTimer(npc)
+	if npc:ToDelirium() then return end
+
+	npc:MakeChampion(1234, ChampionColor.DARK_RED, true)
+	npc:Kill()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_NPC_DARK_RED_CHAMPION_REGEN, function(_, e)
+		test.AssertEquals(GetPtrHash(e), GetPtrHash(npc))
+	end)
+
+	for i=0,89 do
+		test.AssertEquals(npc:GetDarkRedChampionRegenTimer(), i)
+		npc:Update()
+	end
+	test.AssertEquals(npc:GetDarkRedChampionRegenTimer(), 0)
 end
 
 function EntityNPCTest:TestGetDirtColor(entitynpc)
@@ -409,6 +422,26 @@ function EntityNPCTest:TestVarStateFrame(entitynpc)
 		test.AssertEquals(entitynpc.StateFrame, val)
 	end
 	entitynpc.StateFrame = originalVal
+end
+
+function EntityNPCTest:TestTakeDamage(entitynpc)
+	local testdamage = 3.5
+	local testflags = DamageFlag.DAMAGE_SPIKES | DamageFlag.DAMAGE_POOP
+	local testsource = EntityRef(Isaac.GetPlayer())
+	local testdamagecountdown = 7
+
+	local testfunc = function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(entitynpc))
+		test.AssertEquals(damage, testdamage)
+		test.AssertEquals(flags, testflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, testdamagecountdown)
+	end
+
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, testfunc)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, testfunc)
+
+	entitynpc:TakeDamage(testdamage, testflags, testsource, testdamagecountdown)
 end
 
 
