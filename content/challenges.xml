@@ -1,0 +1,4 @@
+<challenges version = "1">
+	<challenge name="Test Challenge" endstage="1" playertype="Testsaac" startingitems="475" startingcard="5" unlockachievement="REPENTOGON_TEST_CHALLENGE"/>
+	<challenge name="Test Unlockable Challenge" endstage="1" achievements="REPENTOGON_TEST_CHALLENGE" playertype="Testsaac" canshoot="false"/>
+</challenges>

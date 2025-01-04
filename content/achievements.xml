@@ -1,3 +1,4 @@
 <achievements gfxroot="gfx/ui/achievement/">
-	<achievement name="REPENTOGON_TEST" gfx="achievement_191_apenny.png" />
+	<achievement name="REPENTOGON_TEST" gfx="achievement_test.png" />
+	<achievement name="REPENTOGON_TEST_CHALLENGE" gfx="achievement_testchallenge.png" />
 </achievements>
