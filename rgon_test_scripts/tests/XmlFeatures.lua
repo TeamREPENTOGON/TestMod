@@ -12,6 +12,22 @@ end
 
 ----------
 
+
+function XmlFeaturesTest:TestPlayerStats()
+	local player = Isaac.GetPlayer()
+	player:ChangePlayerType(test.TEST_PLAYER)
+
+	test.AssertEquals(player.MoveSpeed, 1.1)
+	test.AssertEquals(player.MaxFireDelay, 5)
+	test.AssertEquals(player.Damage, 4)
+	test.AssertEquals(player.TearRange, 280)
+	test.AssertEquals(player.ShotSpeed, 2)
+	test.AssertEquals(player.Luck, 1)
+
+	player:ChangePlayerType(PlayerType.PLAYER_ISAAC)
+end
+
+
 local TEST_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST ITEM")
 local TEST_NULL = Isaac.GetNullItemIdByName("REPENTOGON TEST NULL")
 local TEST_COSTUME = Isaac.GetCostumeIdByPath("gfx/characters/repentogon_test_costume.anm2")

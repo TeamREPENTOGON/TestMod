@@ -9,5 +9,11 @@
           bskinColor="3"
 		  birthright="not done"
 		  noshake="true"
+		  speedmodifier="0.1"
+		  firedelaymodifier="2"
+		  damagemodifier="0.5"
+		  rangemodifier="0.5"
+		  shotspeedmodifier="1"
+		  luckmodifier="1"
 		  modcostume="1"/>
 </players>
