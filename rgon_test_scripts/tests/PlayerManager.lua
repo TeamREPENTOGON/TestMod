@@ -63,10 +63,74 @@ function PlayerManagerTest:TestFirstPlayerByType()
 end
 
 function PlayerManagerTest:TestFirstTrinketOwner()
-	local trinket = 1
-	local rng = RNG()
-	local lazsharedglobaltag = true
-	PlayerManager.FirstTrinketOwner(trinket, rng, lazsharedglobaltag)
+	local player = Isaac.GetPlayer()
+	player:ChangePlayerType(PlayerType.PLAYER_LAZARUS_B)
+
+	local trinket = TrinketType.TRINKET_SWALLOWED_PENNY
+	local globalLazTrinket = TrinketType.TRINKET_GOLDEN_HORSE_SHOE
+
+	local rng = RNG(1234)  -- legacy rng param that never actually did anything ever
+
+	player:AddTrinket(globalLazTrinket)
+	player:UseActiveItem(CollectibleType.COLLECTIBLE_FLIP)
+	Game():GetRoom():Update()
+	player = Isaac.GetPlayer()
+	player:AddTrinket(trinket)
+
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket)), GetPtrHash(player:GetFlippedForm()))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, true)), GetPtrHash(player:GetFlippedForm()))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(globalLazTrinket, false))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, nil)), GetPtrHash(player:GetFlippedForm()))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(trinket)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(trinket, true)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(trinket, false)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(trinket, nil)), GetPtrHash(player))
+	-- Legacy compat
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, rng, true)), GetPtrHash(player:GetFlippedForm()))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, nil, true)), GetPtrHash(player:GetFlippedForm()))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(globalLazTrinket, rng, false))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(globalLazTrinket, nil, false))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, rng, nil)), GetPtrHash(player:GetFlippedForm()))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, nil, nil)), GetPtrHash(player:GetFlippedForm()))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, rng)), GetPtrHash(player:GetFlippedForm()))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(trinket, rng, true)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(trinket, nil, true)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(trinket, rng, false)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(trinket, nil, false)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(trinket, rng, nil)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(trinket, nil, nil)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(trinket, rng)), GetPtrHash(player))
+
+	player:UseActiveItem(CollectibleType.COLLECTIBLE_FLIP)
+	Game():GetRoom():Update()
+	player = Isaac.GetPlayer()
+
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, true)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, false)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, nil)), GetPtrHash(player))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(trinket))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(trinket, true))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(trinket, false))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(trinket, nil))
+	-- Legacy compat
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, rng, true)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, nil, true)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, rng, false)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, nil, false)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, rng, nil)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, nil, nil)), GetPtrHash(player))
+	test.AssertEquals(GetPtrHash(PlayerManager.FirstTrinketOwner(globalLazTrinket, rng)), GetPtrHash(player))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(trinket, rng, true))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(trinket, nil, true))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(trinket, rng, false))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(trinket, nil, false))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(trinket, rng, nil))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(trinket, nil, nil))
+	test.AssertNil(PlayerManager.FirstTrinketOwner(trinket, rng))
+
+	player:ChangePlayerType(PlayerType.PLAYER_ISAAC)
+	Game():GetRoom():Update()
 end
 
 function PlayerManagerTest:TestGetEsauJrState()

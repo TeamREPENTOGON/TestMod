@@ -387,8 +387,10 @@ function EntityPlayerTest:TestCanTurnHead(entityplayer)
 end
 
 function EntityPlayerTest:TestChangePlayerType(entityplayer)
-	local playertype = 1
-	entityplayer:ChangePlayerType(playertype)
+	entityplayer:ChangePlayerType(PlayerType.PLAYER_MAGDALENE)
+	test.AssertEquals(entityplayer:GetPlayerType(), PlayerType.PLAYER_MAGDALENE)
+	entityplayer:ChangePlayerType(PlayerType.PLAYER_ISAAC)
+	test.AssertEquals(entityplayer:GetPlayerType(), PlayerType.PLAYER_ISAAC)
 end
 
 function EntityPlayerTest:TestCheckFamiliar(entityplayer)
@@ -1275,13 +1277,34 @@ function EntityPlayerTest:TestAddNullItemEffect(entityplayer)
 	entityplayer:AddNullItemEffect(nullitemid, applycostume, cooldown, additive)
 end
 
-function EntityPlayerTest:TestAddActiveCharge(entityplayer)
-	local charge = 1
-	local slot = 1
+function EntityPlayerTest:TestAddActiveCharge(player)
+	player:AddCollectible(CollectibleType.COLLECTIBLE_D6)
+
+	player:SetActiveCharge(0)
+	test.AssertEquals(player:GetActiveCharge() + player:GetBatteryCharge(), 0)
+
 	local flashhud = true
-	local overcharge = true
-	local force = true
-	entityplayer:AddActiveCharge(charge, slot, flashhud, overcharge, force)
+	local overcharge = false
+	local force = false
+
+	player:AddActiveCharge(1, ActiveSlot.SLOT_PRIMARY, flashhud, overcharge, force)
+	test.AssertEquals(player:GetActiveCharge() + player:GetBatteryCharge(), 1)
+
+	player:AddActiveCharge(5, ActiveSlot.SLOT_PRIMARY, flashhud, overcharge, force)
+	test.AssertEquals(player:GetActiveCharge() + player:GetBatteryCharge(), 6)
+
+	player:AddActiveCharge(1, ActiveSlot.SLOT_PRIMARY, flashhud, overcharge, force)
+	test.AssertEquals(player:GetActiveCharge() + player:GetBatteryCharge(), 6)
+
+	player:AddActiveCharge(1, -1, flashhud, overcharge, force)
+	test.AssertEquals(player:GetActiveCharge() + player:GetBatteryCharge(), 6)
+
+	overcharge = true
+	player:AddActiveCharge(1, ActiveSlot.SLOT_PRIMARY, flashhud, overcharge, force)
+	test.AssertEquals(player:GetActiveCharge() + player:GetBatteryCharge(), 7)
+
+	player:AddActiveCharge(1, -1, flashhud, overcharge, force)
+	test.AssertEquals(player:GetActiveCharge() + player:GetBatteryCharge(), 8)
 end
 
 function EntityPlayerTest:TestAddBoneOrbital(entityplayer)
