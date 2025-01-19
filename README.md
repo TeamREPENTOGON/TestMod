@@ -57,7 +57,8 @@ New test files must be hooked into `rgon_test_scripts/get_all_tests.lua` in orde
 
 - `REPENTOGON_TEST.AssertEquals(a, b)`: Triggers a lua error if a ~= b. Good for stopping a test and logging the test failure as well as the line where the Assert was called. 
 - `REPENTOGON_TEST.AssertTrue/AssertFalse/AssertNil(val)`: Triggers a lua error if the provided value is not the intended value (true/false boolean or nil).
-- `REPENTOGON_TEST.AddOneTime(Priority)Callback`: Nifty drop-in replacement for Add(Priority)Callback where the callback automatically removes itself after executing once. If any of these callbacks have not run by the end of the test, they are removed and the test fails. If you use Add(Priority)Callback instead, you'll need to manage removing the callbacks yourself.
+- `REPENTOGON_TEST:Add(Priority)Callback`: Callbacks added within tests are automatically removed after the test, regardless of if the test succeeds or fails.
+- `REPENTOGON_TEST:AddOneTime(Priority)Callback`: Nifty drop-in replacement for Add(Priority)Callback where the callback automatically removes itself after executing once. If any of these callbacks have not run by the end of the test, the test fails.
 - `REPENTOGON_TEST.TestInts`: A table of sample integers for testing purposes, including the int32 max/min values. Iterating over this table while testing something like a Setter+Getter isn't strictly necessary but can be useful for testing certain bounds, or finding out that extra large or negative values lead to unexpected results. There are various similar tables defined in the `main.lua`, such as `TestUnsignedInts`, `TestUInt16s`, `TestFloats`, `TestVectors`, etc.
 - `REPENTOGON_TEST.GetTestSprite()`: Initializes an instance of a Sprite with the player anm2 loaded.
 

@@ -3,8 +3,6 @@ REPENTOGON_TEST = RegisterMod("REPENTOGON Tests", 1)
 REPENTOGON_TEST.Root = "rgon_test_scripts/"
 REPENTOGON_TEST.TestsRoot = REPENTOGON_TEST.Root .. "tests/"
 
-include(REPENTOGON_TEST.Root .. "misc")
-
 local BIG_FLOAT = 9999999  -- Precision issues start if you add another 9 here
 local LONG_STRING = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"  -- Mostly just wanted something with >16 characters
 
@@ -35,6 +33,8 @@ REPENTOGON_TEST.TestColors = {
 
 REPENTOGON_TEST.TEST_PLAYER = Isaac.GetPlayerTypeByName("Testsaac")
 REPENTOGON_TEST.TEST_FAMILIAR = Isaac.GetEntityVariantByName("Brother Bobentogon")
+
+include(REPENTOGON_TEST.Root .. "misc")
 
 local function Round(n, numDecimalPlaces)
 	local mult = 10^(numDecimalPlaces or 0)
@@ -92,6 +92,35 @@ function REPENTOGON_TEST.AssertNil(val)
 	end
 end
 REPENTOGON_TEST.AssertNull = REPENTOGON_TEST.AssertNil  -- lol
+
+-- Callbacks added during tests.
+local testCallbacks = {}
+
+function REPENTOGON_TEST:ClearTestCallbacks()
+	for callbackid, tab in pairs(testCallbacks) do
+		for _, func in ipairs(tab) do
+			REPENTOGON_TEST:RemoveCallback(callbackid, func)
+		end
+	end
+
+	testCallbacks = {}
+end
+
+REPENTOGON_TEST.OriginalAddPriorityCallback = REPENTOGON_TEST.AddPriorityCallback
+
+function REPENTOGON_TEST:AddPriorityCallback(callbackid, priority, func, param)
+	if REPENTOGON_TEST.RunningTest then
+		if not testCallbacks[callbackid] then
+			testCallbacks[callbackid] = {}
+		end
+		table.insert(testCallbacks[callbackid], func)
+	end
+	return REPENTOGON_TEST:OriginalAddPriorityCallback(callbackid, priority, func, param)
+end
+
+function REPENTOGON_TEST:AddCallback(callbackid, func, param)
+	return REPENTOGON_TEST:AddPriorityCallback(callbackid, CallbackPriority.DEFAULT, func, param)
+end
 
 -- Track one-time callbacks that were added so we can find ones that did not run.
 local oneTimeCallbacks = {}
@@ -204,7 +233,7 @@ end
 -- Returns a table of unit test files.
 -- Only returns InGame tests while in-game, and only InMenu tests while in the main menu.
 function REPENTOGON_TEST:GetUnitTests(menu)
-	local alltests = include(REPENTOGON_TEST.Root .. "get_all_tests")
+	local alltests = REPENTOGON_TEST.Tests
 	if menu == false or Isaac.IsInGame() then
 		return alltests.InGame
 	end
@@ -288,11 +317,14 @@ local function RunTestsForClass(className, classTests, functionToTest)
 		local runtest = function()
 			Log("Running test: " .. className ..".".. funcName .. "...")
 			TESTS_RAN = TESTS_RAN + 1
+			REPENTOGON_TEST.RunningTest = true
 			local success, ret = pcall(function()
 				local input = beforeFunc(classTests)
 				func(classTests, input)
 				afterFunc(classTests, input)
 			end)
+			REPENTOGON_TEST.RunningTest = false
+			REPENTOGON_TEST:ClearTestCallbacks()
 			local unrunCallbacks = REPENTOGON_TEST:ClearOneTimeCallbacks()
 			if unrunCallbacks > 0 then
 				local err = "- Found " .. unrunCallbacks .. " one-time callbacks that did not run!"
@@ -352,3 +384,5 @@ function REPENTOGON_TEST:RunTests(classToTest, functionToTest)
 		LogTestsFinished()
 	end
 end
+
+REPENTOGON_TEST.Tests = include(REPENTOGON_TEST.Root .. "get_all_tests")
