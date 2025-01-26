@@ -52,9 +52,25 @@ mod:AddCallback(ModCallbacks.MC_EVALUATE_FAMILIAR_MULTIPLIER, function(_, fam, m
 end)
 
 
+local HEALTHTYPE_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST HEALTH TYPE CHANGE ITEM")
 local MAXCOINS_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST MAX COINS ITEM")
 local MAXBOMBS_NULL = Isaac.GetNullItemIdByName("REPENTOGON TEST MAX BOMBS NULL")
 local MAXKEYS_TRINKET = Isaac.GetTrinketIdByName("REPENTOGON TEST MAX KEYS TRINKET")
+
+mod:AddCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, player, cache, value)
+	if player:HasCollectible(HEALTHTYPE_ITEM) then
+		return HealthType.SOUL
+	end
+end, "healthtype")
+
+mod:AddCallback(ModCallbacks.MC_PLAYER_HEALTH_TYPE_CHANGE, function(_, player, newHealthType, oldHealthType)
+	if player:HasCollectible(HEALTHTYPE_ITEM) and newHealthType == HealthType.SOUL and player:GetMaxHearts() > 0 then
+		player:AddMaxHearts(-player:GetMaxHearts())
+		if player:GetSoulHearts() == 0 then
+			player:AddSoulHearts(1)
+		end
+	end
+end)
 
 mod:AddCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, player, cache, value)
 	if player:HasCollectible(MAXCOINS_ITEM) or player:GetEffects():HasCollectibleEffect(MAXCOINS_ITEM) then

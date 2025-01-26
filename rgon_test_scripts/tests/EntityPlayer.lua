@@ -7,7 +7,18 @@ function EntityPlayerTest:BeforeEach()
 	if player:IsDead() then
 		player:Revive()
 	end
-	if player:GetMaxHearts() < 6 then
+	if player:GetPlayerType() ~= PlayerType.PLAYER_ISAAC then
+		player:ChangePlayerType(PlayerType.PLAYER_ISAAC)
+	end
+	player:AddSoulHearts(-999)
+	player:AddBlackHearts(-999)
+	player:AddBoneHearts(-999)
+	player:AddGoldenHearts(-999)
+	player:AddEternalHearts(-999)
+	player:AddBrokenHearts(-999)
+	player:AddRottenHearts(-999)
+	player:AddRottenHearts(-999)
+	if player:GetMaxHearts() ~= 6 then
 		player:AddMaxHearts(6 - player:GetMaxHearts())
 	end
 	player:AddHearts(player:GetMaxHearts())
@@ -195,9 +206,9 @@ function EntityPlayerTest:TestAddMaxHearts(entityplayer)
 	local maxhearts = entityplayer:GetMaxHearts()
 	test.AssertEquals(maxhearts, entityplayer:GetMaxHearts())
 	local ignorekeeper = true
-	entityplayer:AddMaxHearts(1, ignorekeeper)
-	test.AssertEquals(entityplayer:GetMaxHearts(), maxhearts+1)
-	entityplayer:AddMaxHearts(-1, ignorekeeper)
+	entityplayer:AddMaxHearts(2, ignorekeeper)
+	test.AssertEquals(entityplayer:GetMaxHearts(), maxhearts+2)
+	entityplayer:AddMaxHearts(-2, ignorekeeper)
 	test.AssertEquals(entityplayer:GetMaxHearts(), maxhearts)
 end
 
@@ -1514,10 +1525,6 @@ function EntityPlayerTest:TestGetGreedsGulletHearts(entityplayer)
 	entityplayer:GetGreedsGulletHearts()
 end
 
-function EntityPlayerTest:TestGetHealthType(entityplayer)
-	entityplayer:GetHealthType()
-end
-
 function EntityPlayerTest:TestGetHeldEntity(entityplayer)
 	entityplayer:GetHeldEntity()
 end
@@ -2514,8 +2521,6 @@ function EntityPlayerTest:TestPlaceBombCallbacks(player)
 	player:AddBombs(1)
 	player:SetBombPlaceDelay(0)
 	player:Update()
-
-	test:RemoveCallback(ModCallbacks.MC_INPUT_ACTION, forceBombInput)
 end
 
 function EntityPlayerTest:TestTakeDamage(player)
@@ -2537,6 +2542,122 @@ function EntityPlayerTest:TestTakeDamage(player)
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, testfunc)
 
 	player:TakeDamage(testdamage, testflags, testsource, testdamagecountdown)
+end
+
+function EntityPlayerTest:TestGetHealthType(player)
+	test.AssertEquals(player:GetHealthType(), HealthType.RED)
+end
+
+function EntityPlayerTest:TestChangeHealthTypeToSoul(player)
+	player:AddRottenHearts(1)
+	player:AddGoldenHearts(1)
+
+	test:AddCallback(ModCallbacks.MC_PLAYER_GET_HEALTH_TYPE, function(_, p)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		return HealthType.SOUL
+	end)
+
+	test.AssertEquals(player:GetHealthType(), HealthType.SOUL)
+	test.AssertEquals(player:GetHearts(), 0)
+	test.AssertEquals(player:GetRottenHearts(), 0)
+	test.AssertEquals(player:GetMaxHearts(), 0)
+	test.AssertEquals(player:GetSoulHearts(), 6)
+	test.AssertEquals(player:GetBoneHearts(), 0)
+	test.AssertEquals(player:GetGoldenHearts(), 1)
+end
+
+function EntityPlayerTest:TestChangeHealthTypeToSoulWithBoneHearts(player)
+	player:AddBoneHearts(1)
+	player:AddHearts(2)
+	player:AddRottenHearts(1)
+	player:AddGoldenHearts(1)
+
+	test:AddCallback(ModCallbacks.MC_PLAYER_GET_HEALTH_TYPE, function(_, p)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		return HealthType.SOUL
+	end)
+
+	test.AssertEquals(player:GetHealthType(), HealthType.SOUL)
+	test.AssertEquals(player:GetHearts(), 0)
+	test.AssertEquals(player:GetRottenHearts(), 0)
+	test.AssertEquals(player:GetMaxHearts(), 0)
+	test.AssertEquals(player:GetSoulHearts(), 6)
+	test.AssertEquals(player:GetBoneHearts(), 1)
+	test.AssertEquals(player:GetGoldenHearts(), 1)
+end
+
+function EntityPlayerTest:TestChangeHealthTypeToLost(player)
+	player:AddBoneHearts(1)
+	player:AddHearts(2)
+	player:AddRottenHearts(1)
+	player:AddGoldenHearts(1)
+	player:AddEternalHearts(1)
+	player:AddSoulHearts(2)
+
+	local callback = function(_, p)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		return HealthType.NO_HEALTH
+	end
+
+	test:AddCallback(ModCallbacks.MC_PLAYER_GET_HEALTH_TYPE, callback)
+
+	test.AssertEquals(player:GetHealthType(), HealthType.NO_HEALTH)
+	test.AssertEquals(player:GetHearts(), 0)
+	test.AssertEquals(player:GetRottenHearts(), 0)
+	test.AssertEquals(player:GetMaxHearts(), 0)
+	test.AssertEquals(player:GetSoulHearts(), 1)
+	test.AssertEquals(player:GetBoneHearts(), 0)
+	test.AssertEquals(player:GetEternalHearts(), 0)
+	test.AssertEquals(player:GetGoldenHearts(), 1)  -- lol
+end
+
+function EntityPlayerTest:TestChangeHealthTypeToCoin(player)
+	player:AddBoneHearts(1)
+	player:AddMaxHearts(-999)
+	player:AddHearts(-999)
+	player:AddRottenHearts(1)
+	player:AddSoulHearts(4)
+	player:AddEternalHearts(1)
+	player:AddGoldenHearts(1)
+
+	local callback = function(_, p)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		return HealthType.COIN
+	end
+
+	test:AddCallback(ModCallbacks.MC_PLAYER_GET_HEALTH_TYPE, callback)
+
+	test.AssertEquals(player:GetHealthType(), HealthType.COIN)
+	test.AssertEquals(player:GetHearts(), 2)
+	test.AssertEquals(player:GetRottenHearts(), 0)
+	test.AssertEquals(player:GetMaxHearts(), 2)
+	test.AssertEquals(player:GetSoulHearts(), 0)
+	test.AssertEquals(player:GetBoneHearts(), 0)
+	test.AssertEquals(player:GetGoldenHearts(), 1)
+	test.AssertEquals(player:GetEternalHearts(), 1)
+end
+
+function EntityPlayerTest:TestChangeHealthTypeToBone(player)
+	player:AddRottenHearts(1)
+	player:AddSoulHearts(2)
+	player:AddEternalHearts(1)
+	player:AddGoldenHearts(1)
+
+	local callback = function(_, p)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		return HealthType.BONE
+	end
+
+	test:AddCallback(ModCallbacks.MC_PLAYER_GET_HEALTH_TYPE, callback)
+
+	test.AssertEquals(player:GetHealthType(), HealthType.BONE)
+	test.AssertEquals(player:GetMaxHearts(), 0)
+	test.AssertEquals(player:GetBoneHearts(), 3)
+	test.AssertEquals(player:GetHearts(), 6)
+	test.AssertEquals(player:GetRottenHearts(), 1)
+	test.AssertEquals(player:GetSoulHearts(), 2)
+	test.AssertEquals(player:GetGoldenHearts(), 1)
+	test.AssertEquals(player:GetEternalHearts(), 1)
 end
 
 

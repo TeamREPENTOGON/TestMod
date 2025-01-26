@@ -3,6 +3,7 @@
 	<passive id="2" name="REPENTOGON TEST REVIVE" description="Test" gfx="Collectibles_001_TheSadOnion.png" customtags="revive" />
 	<passive id="3" name="REPENTOGON TEST MAX COINS ITEM" persistent="true" customcache="maxcoins" />
 	<passive id="4" name="REPENTOGON TEST FAMILIAR MULT ITEM" persistent="true" customcache="familiarmultiplier" />
+	<passive id="5" name="REPENTOGON TEST HEALTH TYPE CHANGE ITEM" description="Test" gfx="Collectibles_001_TheSadOnion.png" customcache="healthtype" />
 
 	<null id="1" name="REPENTOGON TEST NULL" persistent="true" customtags="" />
 	<null id="2" name="REPENTOGON TEST NULL REVIVE" persistent="true" customtags="revive chancerevive" />
