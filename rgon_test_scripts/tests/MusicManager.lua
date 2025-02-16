@@ -105,8 +105,7 @@ function MusicManagerTest:TestVolumeSlide(musicmanager)
 end
 
 function MusicManagerTest:TestPlayJingle(musicmanager)
-	local musicid = 1
-	musicmanager:PlayJingle(musicid)
+	musicmanager:PlayJingle(Music.MUSIC_JINGLE_TREASUREROOM_ENTRY_0)
 end
 
 function MusicManagerTest:TestSetCurrentPitch(musicmanager)

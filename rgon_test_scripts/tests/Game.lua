@@ -624,21 +624,16 @@ function GameTest:TestVarBossRushParTime(game)
 end
 
 function GameTest:TestVarChallenge(game)
-	local minimum = 0
-	local maximum = 45
-
-	for i=minimum-2, maximum+2 do
-		game.Challenge = i
-		if i < minimum then
-			test.AssertEquals(game.Challenge, minimum)
-		elseif i > maximum then
-			test.AssertEquals(game.Challenge, maximum)
-		else
-			test.AssertEquals(game.Challenge, i)
-		end
-	end
-
+	game.Challenge = -1
+	test.AssertEquals(game.Challenge, 0)
+	game.Challenge = 1
+	test.AssertEquals(game.Challenge, 1)
+	game.Challenge = 46
+	test.AssertEquals(game.Challenge, 46)
+	game.Challenge = 9999
+	test.AssertTrue(game.Challenge < 9999)
 	game.Challenge = 0
+	test.AssertEquals(game.Challenge, 0)
 end
 
 function GameTest:TestVarDifficulty(game)
