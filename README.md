@@ -62,6 +62,14 @@ New test files must be hooked into `rgon_test_scripts/get_all_tests.lua` in orde
 - `REPENTOGON_TEST.TestInts`: A table of sample integers for testing purposes, including the int32 max/min values. Iterating over this table while testing something like a Setter+Getter isn't strictly necessary but can be useful for testing certain bounds, or finding out that extra large or negative values lead to unexpected results. There are various similar tables defined in the `main.lua`, such as `TestUnsignedInts`, `TestUInt16s`, `TestFloats`, `TestVectors`, etc.
 - `REPENTOGON_TEST.GetTestSprite()`: Initializes an instance of a Sprite with the player anm2 loaded.
 
+## Test Writing Tips
+
+- Remember: Callbacks that you add during a test are automatically removed after the test completes! You don't need to remove them to clean up!
+- Use `AddOneTimeCallback` to automatically fail a test if that callback never gets triggered!
+- One of the primary purposes of these tests is to catch breakages or other issues that may come up from updates to REPENTOGON or the basegame. The more comprehensive coverage we get, the better! If anything changes or stops working under the hood, the test should fail!
+- For value getters, try to be mindful of the possibility of a bug where a value being obtained is reading from the wrong place, or otherwise being broken. Validate you get the expected value by default and under different circumstances!
+- When testing a getter for an object (such as a Sprite) you should also verify that some distinct attribute of that object is the expected value, such as testing `sprite:GetFilename()`. You need to make sure you obtained a valid reference to your expected object! This can help catch crashes following game updates.
+
 ## Running Tests
 
 Tests can be executed in-game via the console using the REPENTOGON_TEST global.
