@@ -119,7 +119,7 @@ function EntityPlayerTest:TestAddCard(entityplayer)
 	end)
 
 	entityplayer:AddCard(card)
-	test.AssertEquals(entityplayer:GetCard(PillCardSlot.PRIMARY), Card.CARD_NULL)
+	test.AssertEquals(Card.CARD_NULL, entityplayer:GetCard(PillCardSlot.PRIMARY))
 	entityplayer:RemovePocketItem(PillCardSlot.PRIMARY)
 
 	
