@@ -53,6 +53,9 @@ end
 function HUDTest:TestShowFortuneText(hud)
 	local mainstring = "hello"
 	local secondarystring = "hello"
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_FORTUNE_DISPLAY, function() end)
+
 	hud:ShowFortuneText(mainstring, secondarystring)
 end
 

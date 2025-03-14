@@ -165,5 +165,32 @@ function EntityEffectTest:TestVarTimeout(entityeffect)
 	entityeffect.Timeout = originalVal
 end
 
+function EntityEffectTest:TestUpdate(entityeffect)
+	-- Case #1: Test callback
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_EFFECT_UPDATE, function(_, cEffect)
+		test.AssertEquals(GetPtrHash(entityeffect), GetPtrHash(cEffect))
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_EFFECT_UPDATE, function(_, cEffect)
+		test.AssertEquals(GetPtrHash(entityeffect), GetPtrHash(cEffect))
+	end)
+
+	entityeffect:Update()
+
+	-- Case #2: Test update cancelling
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_EFFECT_UPDATE, function(_, cEffect)
+		test.AssertEquals(GetPtrHash(entityeffect), GetPtrHash(cEffect))
+		return true
+	end)
+
+	test:AddUncallableOneTimeCallback(ModCallbacks.MC_POST_EFFECT_UPDATE, function(_, cEffect)
+		test.AssertEquals(GetPtrHash(entityeffect), GetPtrHash(cEffect))
+	end)
+
+	entityeffect:Update()
+end
+
 
 return EntityEffectTest

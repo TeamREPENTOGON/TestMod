@@ -125,6 +125,10 @@ end
 -- Track one-time callbacks that were added so we can find ones that did not run.
 local oneTimeCallbacks = {}
 
+-- Stores tracked callbacks that should never fire to be removed.
+local uncallableCallbacks = {}
+local uncallableCallbacksFired = 0
+
 function REPENTOGON_TEST:ClearOneTimeCallbacks()
 	local found = 0
 
@@ -159,8 +163,24 @@ function REPENTOGON_TEST:AddOneTimePriorityCallback(callbackid, priority, func, 
 	table.insert(oneTimeCallbacks[callbackid], wrapper)
 	REPENTOGON_TEST:AddPriorityCallback(callbackid, priority, wrapper, param)
 end
+
+function REPENTOGON_TEST:AddUncallableOneTimePriorityCallback(callbackid, priority, func, param)
+	local wrapper
+	wrapper = function(...)
+		REPENTOGON_TEST:RemoveCallback(callbackid, wrapper)
+		uncallableCallbacksFired = uncallableCallbacksFired + 1
+	end
+
+	table.insert(uncallableCallbacks, {callbackid, wrapper})
+	REPENTOGON_TEST:AddPriorityCallback(callbackid, priority, wrapper, param)
+end
+
 function REPENTOGON_TEST:AddOneTimeCallback(callbackid, func, param)
 	REPENTOGON_TEST:AddOneTimePriorityCallback(callbackid, CallbackPriority.DEFAULT, func, param)
+end
+
+function REPENTOGON_TEST:AddUncallableOneTimeCallback(callbackid, func, param)
+	REPENTOGON_TEST:AddUncallableOneTimePriorityCallback(callbackid, CallbackPriority.DEFAULT, func, param)
 end
 
 function REPENTOGON_TEST.GetTestSprite()
@@ -335,6 +355,24 @@ local function RunTestsForClass(className, classTests, functionToTest)
 					ret = ret .. "\n\t" .. err
 				end
 			end
+
+			if uncallableCallbacksFired > 0 then
+				local err = "- Found " .. uncallableCallbacksFired .. " uncallable one-time callbacks that ran!"
+				if success then
+					success = false
+					ret = err
+				else
+					ret = ret .. "\n\t" .. err
+				end
+			end
+
+			for _, v in pairs(uncallableCallbacks) do
+				REPENTOGON_TEST:RemoveCallback(v[1], v[2])
+			end
+
+			uncallableCallbacks = {}
+			uncallableCallbacksFired = 0
+			
 			if not success then
 				LogFailure(className, funcName, ret)
 				TEST_FAILURES = TEST_FAILURES + 1

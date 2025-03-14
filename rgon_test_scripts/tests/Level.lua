@@ -136,7 +136,27 @@ end
 function LevelTest:TestGetRandomRoomIndex(level)
 	local iamerrorroom = true
 	local seed = 1
+	local overrideRoom = GridRooms.ROOM_THE_VOID_IDX
+
+	-- Case #1: No return
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_GET_RANDOM_ROOM_INDEX, function(_, cRoomIndex, cIAmError, cSeed)
+		test.AssertEquals(cIAmError, iamerrorroom)
+		test.AssertEquals(cSeed, seed)
+	end)
+	
 	level:GetRandomRoomIndex(iamerrorroom, seed)
+
+	-- Case #2: Room index overriding
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_GET_RANDOM_ROOM_INDEX, function(_, cRoomIndex, cIAmError, cSeed)
+		test.AssertEquals(cIAmError, iamerrorroom)
+		test.AssertEquals(cSeed, seed)
+		return overrideRoom
+	end)
+	
+	local index = level:GetRandomRoomIndex(iamerrorroom, seed)
+	test.AssertEquals(index, overrideRoom)
 end
 
 function LevelTest:TestGetRoomByIdx(level)
