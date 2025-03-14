@@ -225,7 +225,50 @@ end
 
 function EntityPlayerTest:TestAddPill(entityplayer)
 	local pill = 1
+	local overridePill = PillColor.PILL_GOLD
+
+	-- Test #1: No returns
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_ADD_PILL, function(_, cPlayer, cPillColor, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(entityplayer))
+		test.AssertEquals(pill, cPillColor)
+		test.AssertEquals(cSlot, PillCardSlot.PRIMARY)
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_ADD_PILL, function(_, cPlayer, cPillColor, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(entityplayer))
+		test.AssertEquals(pill, cPillColor)
+		test.AssertEquals(cSlot, PillCardSlot.PRIMARY)
+	end)
+
 	entityplayer:AddPill(pill)
+	entityplayer:RemovePocketItem(PillCardSlot.PRIMARY)
+
+	-- Test #2: Cancel pill adding
+	
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_ADD_PILL, function(_, cPlayer, cPillColor, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(entityplayer))
+		test.AssertEquals(pill, cPillColor)
+		test.AssertEquals(cSlot, PillCardSlot.PRIMARY)
+		return false
+	end)
+
+	entityplayer:AddPill(pill)
+	test.AssertEquals(entityplayer:GetPill(PillCardSlot.PRIMARY), PillColor.PILL_NULL)
+	entityplayer:RemovePocketItem(PillCardSlot.PRIMARY)
+
+	-- Test #3: Pill overriding
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_ADD_PILL, function(_, cPlayer, cPillColor, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(entityplayer))
+		test.AssertEquals(pill, cPillColor)
+		test.AssertEquals(cSlot, PillCardSlot.PRIMARY)
+		return overridePill
+	end)
+
+	entityplayer:AddPill(pill)
+	test.AssertEquals(entityplayer:GetPill(PillCardSlot.PRIMARY), overridePill)
+	entityplayer:RemovePocketItem(PillCardSlot.PRIMARY)
 end
 
 function EntityPlayerTest:TestAddPlayerFormCostume(entityplayer)
@@ -2658,6 +2701,83 @@ function EntityPlayerTest:TestChangeHealthTypeToBone(player)
 	test.AssertEquals(player:GetSoulHearts(), 2)
 	test.AssertEquals(player:GetGoldenHearts(), 1)
 	test.AssertEquals(player:GetEternalHearts(), 1)
+end
+
+function EntityPlayerTest:TestDropPill(player)
+	local slot = 0
+	local pillColor = PillColor.PILL_WHITE_BLUE
+	
+	player:AddPill(pillColor) 
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_DROP_PILL, function(_, cPlayer, cPickup, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(player))
+		test.AssertEquals(cPickup.Type, EntityType.ENTITY_PICKUP)
+		test.AssertEquals(cPickup.Variant, PickupVariant.PICKUP_PILL)
+		test.AssertEquals(cPickup.SubType, pillColor)
+		test.AssertEquals(cSlot, slot)
+	end)
+
+	player:DropPocketItem(slot, player.Position)
+end
+
+---@param player EntityPlayer
+function EntityPlayerTest:TestDropCard(player)
+	local slot = 0
+	local card = Card.CARD_ACE_OF_CLUBS
+	
+	player:AddCard(card) 
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_DROP_CARD, function(_, cPlayer, cPickup, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(player))
+		test.AssertEquals(cPickup.Type, EntityType.ENTITY_PICKUP)
+		test.AssertEquals(cPickup.Variant, PickupVariant.PICKUP_TAROTCARD)
+		test.AssertEquals(cPickup.SubType, card)
+		test.AssertEquals(cSlot, slot)
+	end)
+
+	player:DropPocketItem(slot, player.Position)
+end
+
+function EntityPlayerTest:TestRemovePill(player)
+	local slot = PillCardSlot.PRIMARY
+	local pillColor = PillColor.PILL_BLACK_YELLOW
+
+	local callback = function(_, cPlayer, cPillColor, cSlot)
+		test.AssertEquals(slot, cSlot)
+		test.AssertEquals(GetPtrHash(player), GetPtrHash(cPlayer))
+		test.AssertEquals(pillColor, cPillColor)
+	end
+	
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_REMOVE_PILL, callback)
+
+	player:AddPill(pillColor)
+	player:DropPocketItem(slot, player.Position)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_REMOVE_PILL, callback)
+
+	player:AddPill(pillColor)
+	player:RemovePocketItem(slot)
+end
+
+function EntityPlayerTest:TestRemoveCard(player)
+	local slot = PillCardSlot.PRIMARY
+	local card = Card.CARD_ACE_OF_DIAMONDS
+
+	local callback = function(_, cPlayer, cCard, cSlot)
+		test.AssertEquals(slot, cSlot)
+		test.AssertEquals(GetPtrHash(player), GetPtrHash(cPlayer))
+		test.AssertEquals(card, cCard)
+	end
+	
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_REMOVE_CARD, callback)
+
+	player:AddCard(card)
+	player:DropPocketItem(slot, player.Position)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_REMOVE_CARD, callback)
+
+	player:AddCard(card)
+	player:RemovePocketItem(slot)
 end
 
 
