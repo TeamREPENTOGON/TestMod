@@ -89,8 +89,60 @@ function EntityPlayerTest:TestAddCacheFlags(entityplayer)
 end
 
 function EntityPlayerTest:TestAddCard(entityplayer)
-	local id = 1
-	entityplayer:AddCard(id)
+	local card = 1
+	local overrideCard = Card.CARD_ACE_OF_CLUBS
+
+	-- Test #1: No returns
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_ADD_CARD, function(_, cPlayer, cCard, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(entityplayer))
+		test.AssertEquals(card, cCard)
+		test.AssertEquals(cSlot, PillCardSlot.PRIMARY)
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_ADD_CARD, function(_, cPlayer, cCard, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(entityplayer))
+		test.AssertEquals(card, cCard)
+		test.AssertEquals(cSlot, PillCardSlot.PRIMARY)
+	end)
+
+	entityplayer:AddCard(card)
+	entityplayer:RemovePocketItem(PillCardSlot.PRIMARY)
+
+	-- Test #2: Cancel card adding
+	
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_ADD_CARD, function(_, cPlayer, cCard, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(entityplayer))
+		test.AssertEquals(card, cCard)
+		test.AssertEquals(cSlot, PillCardSlot.PRIMARY)
+		return false
+	end)
+
+	entityplayer:AddCard(card)
+	test.AssertEquals(entityplayer:GetCard(PillCardSlot.PRIMARY), Card.CARD_NULL)
+	entityplayer:RemovePocketItem(PillCardSlot.PRIMARY)
+
+	
+	-- Test #3: Card overriding
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_ADD_CARD, function(_, cPlayer, cCard, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(entityplayer))
+		test.AssertEquals(card, cCard)
+		test.AssertEquals(cSlot, PillCardSlot.PRIMARY)
+		return overrideCard
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_ADD_CARD, function(_, cPlayer, cCard, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(entityplayer))
+		test.AssertEquals(overrideCard, cCard)
+		test.AssertEquals(cSlot, PillCardSlot.PRIMARY)
+		return overrideCard
+	end)
+
+	entityplayer:AddCard(card)
+	test.AssertEquals(entityplayer:GetCard(PillCardSlot.PRIMARY), overrideCard)
+	entityplayer:RemovePocketItem(PillCardSlot.PRIMARY)
+
 end
 
 function EntityPlayerTest:TestAddCoins(entityplayer)
@@ -254,7 +306,7 @@ function EntityPlayerTest:TestAddPill(entityplayer)
 	end)
 
 	entityplayer:AddPill(pill)
-	test.AssertEquals(entityplayer:GetPill(PillCardSlot.PRIMARY), PillColor.PILL_NULL)
+	test.AssertEquals(PillColor.PILL_NULL, entityplayer:GetPill(PillCardSlot.PRIMARY))
 	entityplayer:RemovePocketItem(PillCardSlot.PRIMARY)
 
 	-- Test #3: Pill overriding
@@ -266,8 +318,15 @@ function EntityPlayerTest:TestAddPill(entityplayer)
 		return overridePill
 	end)
 
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_ADD_PILL, function(_, cPlayer, cPillColor, cSlot)
+		test.AssertEquals(GetPtrHash(cPlayer), GetPtrHash(entityplayer))
+		test.AssertEquals(overridePill, cPillColor)
+		test.AssertEquals(cSlot, PillCardSlot.PRIMARY)
+		return overridePill
+	end)
+
 	entityplayer:AddPill(pill)
-	test.AssertEquals(entityplayer:GetPill(PillCardSlot.PRIMARY), overridePill)
+	test.AssertEquals(overridePill, entityplayer:GetPill(PillCardSlot.PRIMARY))
 	entityplayer:RemovePocketItem(PillCardSlot.PRIMARY)
 end
 
