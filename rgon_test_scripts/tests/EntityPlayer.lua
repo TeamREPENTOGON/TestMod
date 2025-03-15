@@ -2616,9 +2616,29 @@ function EntityPlayerTest:TestPlaceBombCallbacks(player)
 	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_USE_BOMB, function(_, p)
 		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
 	end)
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_USE_BOMB, function(_, p)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_USE_BOMB, function(_, p, b)
 		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
+		test.AssertEquals(b.Type, EntityType.ENTITY_BOMB)
 	end)
+
+	player:AddBombs(1)
+	player:SetBombPlaceDelay(0)
+	player:Update()
+end
+
+function EntityPlayerTest:TestCancelPlaceBombCallbacks(player)
+	local forceBombInput = function(_, player, hook, action)
+		if action == ButtonAction.ACTION_BOMB then
+			return true
+		end
+	end
+	test:AddCallback(ModCallbacks.MC_INPUT_ACTION, forceBombInput, InputHook.IS_ACTION_TRIGGERED)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_USE_BOMB, function(_, p)
+		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
+		return false
+	end)
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_PLAYER_USE_BOMB)
 
 	player:AddBombs(1)
 	player:SetBombPlaceDelay(0)

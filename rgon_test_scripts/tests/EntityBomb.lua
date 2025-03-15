@@ -36,9 +36,13 @@ function EntityBombTest:TestSetExplosionCountdown(entitybomb)
 	entitybomb:SetExplosionCountdown(originalVal)
 end
 
-function EntityBombTest:TestGetCostumeLayerSprite(entitybomb)
-	local layerid = 1
-	entitybomb:GetCostumeLayerSprite(layerid)
+function EntityBombTest:TestGetCostumeLayerSprite(bomb)
+	for i=0, 4 do
+		bomb:GetCostumeLayerSprite(i):GetFilename()
+	end
+	bomb.Flags = TearFlags.TEAR_BURN
+	bomb:Update()
+	test.AssertEquals(bomb:GetCostumeLayerSprite(0):GetFilename(), "gfx/items/pick ups/bombs/flame2.anm2")
 end
 
 function EntityBombTest:TestGetHitList(entitybomb)
@@ -71,9 +75,16 @@ function EntityBombTest:TestSetHeight(entitybomb)
 	entitybomb:SetHeight(originalVal)
 end
 
-function EntityBombTest:TestSetLoadCostumes(entitybomb)
-	local load = true
-	entitybomb:SetLoadCostumes(load)
+function EntityBombTest:TestSetLoadCostumes(bomb)
+	bomb:SetScale(0.75)
+	bomb:SetLoadCostumes(true)
+	bomb:Update()
+	test.AssertEquals(bomb:GetSprite():GetFilename(), "gfx/items/pick ups/bombs/bomb1.anm2")
+
+	bomb:SetScale(1)
+	bomb:SetLoadCostumes(true)
+	bomb:Update()
+	test.AssertEquals(bomb:GetSprite():GetFilename(), "gfx/items/pick ups/bombs/bomb2.anm2")
 end
 
 function EntityBombTest:TestSetPrismTouched(entitybomb)
