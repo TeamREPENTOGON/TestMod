@@ -126,8 +126,8 @@ end
 local oneTimeCallbacks = {}
 
 -- Stores tracked callbacks that should never fire to be removed.
-local uncallableCallbacks = {}
-local uncallableCallbacksFired = 0
+local unexpectedCallbacks = {}
+local unexpectedCallbacksFired = 0
 
 function REPENTOGON_TEST:ClearOneTimeCallbacks()
 	local found = 0
@@ -164,23 +164,23 @@ function REPENTOGON_TEST:AddOneTimePriorityCallback(callbackid, priority, func, 
 	REPENTOGON_TEST:AddPriorityCallback(callbackid, priority, wrapper, param)
 end
 
-function REPENTOGON_TEST:AddUncallableOneTimePriorityCallback(callbackid, priority, func, param)
+function REPENTOGON_TEST:AddUnexpectedPriorityCallback(callbackid, priority)
 	local wrapper
 	wrapper = function(...)
 		REPENTOGON_TEST:RemoveCallback(callbackid, wrapper)
-		uncallableCallbacksFired = uncallableCallbacksFired + 1
+		unexpectedCallbacksFired = unexpectedCallbacksFired + 1
 	end
 
-	table.insert(uncallableCallbacks, {callbackid, wrapper})
-	REPENTOGON_TEST:AddPriorityCallback(callbackid, priority, wrapper, param)
+	table.insert(unexpectedCallbacks, {callbackid, wrapper})
+	REPENTOGON_TEST:AddPriorityCallback(callbackid, priority, wrapper)
 end
 
 function REPENTOGON_TEST:AddOneTimeCallback(callbackid, func, param)
 	REPENTOGON_TEST:AddOneTimePriorityCallback(callbackid, CallbackPriority.DEFAULT, func, param)
 end
 
-function REPENTOGON_TEST:AddUncallableOneTimeCallback(callbackid, func, param)
-	REPENTOGON_TEST:AddUncallableOneTimePriorityCallback(callbackid, CallbackPriority.DEFAULT, func, param)
+function REPENTOGON_TEST:AddUnexpectedCallback(callbackid)
+	REPENTOGON_TEST:AddUnexpectedPriorityCallback(callbackid, CallbackPriority.DEFAULT)
 end
 
 function REPENTOGON_TEST.GetTestSprite()
@@ -356,8 +356,8 @@ local function RunTestsForClass(className, classTests, functionToTest)
 				end
 			end
 
-			if uncallableCallbacksFired > 0 then
-				local err = "- Found " .. uncallableCallbacksFired .. " uncallable one-time callbacks that ran!"
+			if unexpectedCallbacksFired > 0 then
+				local err = "- Found " .. unexpectedCallbacksFired .. " unexpected callbacks that ran!"
 				if success then
 					success = false
 					ret = err
@@ -366,12 +366,12 @@ local function RunTestsForClass(className, classTests, functionToTest)
 				end
 			end
 
-			for _, v in pairs(uncallableCallbacks) do
+			for _, v in pairs(unexpectedCallbacks) do
 				REPENTOGON_TEST:RemoveCallback(v[1], v[2])
 			end
 
-			uncallableCallbacks = {}
-			uncallableCallbacksFired = 0
+			unexpectedCallbacks = {}
+			unexpectedCallbacksFired = 0
 			
 			if not success then
 				LogFailure(className, funcName, ret)

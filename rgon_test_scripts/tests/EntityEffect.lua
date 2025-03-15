@@ -185,9 +185,7 @@ function EntityEffectTest:TestUpdate(entityeffect)
 		return true
 	end)
 
-	test:AddUncallableOneTimeCallback(ModCallbacks.MC_POST_EFFECT_UPDATE, function(_, cEffect)
-		test.AssertEquals(GetPtrHash(entityeffect), GetPtrHash(cEffect))
-	end)
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_EFFECT_UPDATE)
 
 	entityeffect:Update()
 end
