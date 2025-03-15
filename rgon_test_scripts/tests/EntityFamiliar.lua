@@ -432,5 +432,32 @@ function EntityFamiliarTest:TestGetMultiplier(testfam)
 	test.AssertEquals(testfam:GetMultiplier(), 1.0)
 end
 
+function EntityFamiliarTest:TestUpdate(entityfamiliar)
+	entityfamiliar:ClearEntityFlags(EntityFlag.FLAG_APPEAR)
+	
+	-- Case #1: Test callback
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_FAMILIAR_UPDATE, function(_, cFamiliar)
+		test.AssertEquals(GetPtrHash(entityfamiliar), GetPtrHash(cFamiliar))
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_FAMILIAR_UPDATE, function(_, cFamiliar)
+		test.AssertEquals(GetPtrHash(entityfamiliar), GetPtrHash(cFamiliar))
+	end)
+
+	entityfamiliar:Update()
+
+	-- Case #2: Test update cancelling
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_FAMILIAR_UPDATE, function(_, cFamiliar)
+		test.AssertEquals(GetPtrHash(entityfamiliar), GetPtrHash(cFamiliar))
+		return true
+	end)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_FAMILIAR_UPDATE)
+
+	entityfamiliar:Update()
+end
+
 
 return EntityFamiliarTest

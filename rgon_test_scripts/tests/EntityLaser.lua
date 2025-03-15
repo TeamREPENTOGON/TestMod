@@ -420,5 +420,30 @@ function EntityLaserTest:TestLaserCollisionCallbacks()
 	testlaser:Update()
 end
 
+function EntityLaserTest:TestUpdate(entitylaser)
+	-- Case #1: Test callback
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_LASER_UPDATE, function(_, cLaser)
+		test.AssertEquals(GetPtrHash(entitylaser), GetPtrHash(cLaser))
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_LASER_UPDATE, function(_, cLaser)
+		test.AssertEquals(GetPtrHash(entitylaser), GetPtrHash(cLaser))
+	end)
+
+	entitylaser:Update()
+
+	-- Case #2: Test update cancelling
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_LASER_UPDATE, function(_, cLaser)
+		test.AssertEquals(GetPtrHash(entitylaser), GetPtrHash(cLaser))
+		return true
+	end)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_LASER_UPDATE)
+
+	entitylaser:Update()
+end
+
 
 return EntityLaserTest

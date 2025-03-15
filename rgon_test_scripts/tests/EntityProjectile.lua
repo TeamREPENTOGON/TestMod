@@ -191,5 +191,29 @@ function EntityProjectileTest:TestProjDeathCallback(testproj)
 	testproj:Update()
 end
 
+function EntityProjectileTest:TestUpdate(entityprojectile)
+	-- Case #1: Test callback
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PROJECTILE_UPDATE, function(_, cProjectile)
+		test.AssertEquals(GetPtrHash(entityprojectile), GetPtrHash(cProjectile))
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PROJECTILE_UPDATE, function(_, cProjectile)
+		test.AssertEquals(GetPtrHash(entityprojectile), GetPtrHash(cProjectile))
+	end)
+
+	entityprojectile:Update()
+
+	-- Case #2: Test update cancelling
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PROJECTILE_UPDATE, function(_, cProjectile)
+		test.AssertEquals(GetPtrHash(entityprojectile), GetPtrHash(cProjectile))
+		return true
+	end)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_PROJECTILE_UPDATE)
+
+	entityprojectile:Update()
+end
 
 return EntityProjectileTest

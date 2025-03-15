@@ -167,5 +167,29 @@ function EntityKnifeTest:TestVarTearFlags(entityknife)
 	entityknife.TearFlags = originalVal
 end
 
+function EntityKnifeTest:TestUpdate(entityknife)
+	-- Case #1: Test callback
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_KNIFE_UPDATE, function(_, cKnife)
+		test.AssertEquals(GetPtrHash(entityknife), GetPtrHash(cKnife))
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_KNIFE_UPDATE, function(_, cKnife)
+		test.AssertEquals(GetPtrHash(entityknife), GetPtrHash(cKnife))
+	end)
+
+	entityknife:Update()
+
+	-- Case #2: Test update cancelling
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_KNIFE_UPDATE, function(_, cKnife)
+		test.AssertEquals(GetPtrHash(entityknife), GetPtrHash(cKnife))
+		return true
+	end)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_KNIFE_UPDATE)
+
+	entityknife:Update()
+end
 
 return EntityKnifeTest

@@ -246,5 +246,30 @@ function EntityTearTest:TestTearDeathCallback(testtear)
 	testtear:Update()
 end
 
+function EntityTearTest:TestUpdate(entitytear)
+	-- Case #1: Test callback
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_TEAR_UPDATE, function(_, cTear)
+		test.AssertEquals(GetPtrHash(entitytear), GetPtrHash(cTear))
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TEAR_UPDATE, function(_, cTear)
+		test.AssertEquals(GetPtrHash(entitytear), GetPtrHash(cTear))
+	end)
+
+	entitytear:Update()
+
+	-- Case #2: Test update cancelling
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_TEAR_UPDATE, function(_, cTear)
+		test.AssertEquals(GetPtrHash(entitytear), GetPtrHash(cTear))
+		return true
+	end)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_TEAR_UPDATE)
+
+	entitytear:Update()
+end
+
 
 return EntityTearTest

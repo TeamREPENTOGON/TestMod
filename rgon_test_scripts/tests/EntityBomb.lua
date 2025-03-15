@@ -142,5 +142,29 @@ function EntityBombTest:TestVarRadiusMultiplier(entitybomb)
 	entitybomb.RadiusMultiplier = originalVal
 end
 
+function EntityBombTest:TestUpdate(entitybomb)
+	-- Case #1: Test callback
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_UPDATE, function(_, cBomb)
+		test.AssertEquals(GetPtrHash(entitybomb), GetPtrHash(cBomb))
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_UPDATE, function(_, cBomb)
+		test.AssertEquals(GetPtrHash(entitybomb), GetPtrHash(cBomb))
+	end)
+
+	entitybomb:Update()
+
+	-- Case #2: Test update cancelling
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_UPDATE, function(_, cBomb)
+		test.AssertEquals(GetPtrHash(entitybomb), GetPtrHash(cBomb))
+		return true
+	end)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_BOMB_UPDATE)
+
+	entitybomb:Update()
+end
 
 return EntityBombTest

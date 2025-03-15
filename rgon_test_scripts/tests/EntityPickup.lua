@@ -312,5 +312,30 @@ function EntityPickupTest:TestUltraGreedCollectCoin()
 	coin:Remove()
 end
 
+function EntityPickupTest:TestUpdate(entitypickup)
+	-- Case #1: Test callback
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PICKUP_UPDATE, function(_, cPickup)
+		test.AssertEquals(GetPtrHash(entitypickup), GetPtrHash(cPickup))
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PICKUP_UPDATE, function(_, cPickup)
+		test.AssertEquals(GetPtrHash(entitypickup), GetPtrHash(cPickup))
+	end)
+
+	entitypickup:Update()
+
+	-- Case #2: Test update cancelling
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PICKUP_UPDATE, function(_, cPickup)
+		test.AssertEquals(GetPtrHash(entitypickup), GetPtrHash(cPickup))
+		return true
+	end)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_PICKUP_UPDATE)
+
+	entitypickup:Update()
+end
+
 
 return EntityPickupTest
