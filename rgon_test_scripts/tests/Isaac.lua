@@ -352,10 +352,10 @@ function IsaacTest:TestCenterCursor()
 	Isaac.CenterCursor()
 end
 
-function IsaacTest:TestClearBossHazards()
+--[[function IsaacTest:TestClearBossHazards()
 	local ignorenpcs = true
 	Isaac.ClearBossHazards(ignorenpcs)
-end
+end]]
 --[[
 function IsaacTest:TestClearChallenge()
 	local challengeid = 1
@@ -598,9 +598,10 @@ function IsaacTest:TestSetDwmWindowAttribute()
 end
 
 function IsaacTest:TestSetIcon()
-	local isaacicon = 1
-	local bypasssize = true
-	Isaac.SetIcon(isaacicon, bypasssize)
+	Isaac.SetIcon(0, false)
+	Isaac.SetIcon(1, false)
+	Isaac.SetIcon("gfx/waaaawaa.ico", true)
+	Isaac.SetIcon("gfx/waaaawaa.ico", false)
 end
 
 function IsaacTest:TestSetWindowTitle()

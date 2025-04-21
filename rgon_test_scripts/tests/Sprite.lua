@@ -12,7 +12,7 @@ end
 
 ----------
 
-local TEST_SHADER = "shaders/coloroffset_gold_test"
+local TEST_SHADER = "shaders/coloroffset_rgontest"
 
 function SpriteTest:TestSetCustomShader(sprite)
 	test.AssertFalse(sprite:HasCustomShader())

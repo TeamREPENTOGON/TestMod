@@ -219,6 +219,46 @@ function REPENTOGON_TEST.RemoveGridEntity(gridentity)
 	Game():GetRoom():Update()
 end
 
+function REPENTOGON_TEST.ResetPlayer(player)
+	if player:IsDead() then
+		player:Revive()
+	end
+	if player:GetPlayerType() ~= PlayerType.PLAYER_ISAAC then
+		player:ChangePlayerType(PlayerType.PLAYER_ISAAC)
+	end
+	player:AddSoulHearts(-999)
+	player:AddBlackHearts(-999)
+	player:AddBoneHearts(-999)
+	player:AddGoldenHearts(-999)
+	player:AddEternalHearts(-999)
+	player:AddBrokenHearts(-999)
+	player:AddRottenHearts(-999)
+	player:AddRottenHearts(-999)
+	if player:GetMaxHearts() ~= 6 then
+		player:AddMaxHearts(6 - player:GetMaxHearts())
+	end
+	player:AddHearts(player:GetMaxHearts())
+	player.ControlsEnabled = true
+	player.ControlsCooldown = 0
+	player:ResetDamageCooldown()
+	player:StopExtraAnimation()
+	for item, count in pairs(player:GetCollectiblesList()) do
+		for i=1,count do
+			player:RemoveCollectible(item)
+		end
+	end
+	for i=0,1 do
+		local t = player:GetTrinket(i)
+		if t > 0 then
+			player:TryRemoveTrinket(t)
+		end
+	end
+	for i=0,3 do
+		player:SetCard(i, 0)
+	end
+	player:AddCacheFlags(CacheFlag.CACHE_ALL, true)
+end
+
 -- A new run is started between each test FILE to ensure a clean state.
 -- We need to wait for MC_POST_GAME_STARTED to run again for things to be initialized properly,
 -- so doing this between each TEST would be too slow, but between each FILE is a good comprimise.
@@ -337,6 +377,7 @@ local function RunTestsForClass(className, classTests, functionToTest)
 		local runtest = function()
 			Log("Running test: " .. className ..".".. funcName .. "...")
 			TESTS_RAN = TESTS_RAN + 1
+			REPENTOGON_TEST.ResetPlayer(Isaac.GetPlayer())
 			REPENTOGON_TEST.RunningTest = true
 			local success, ret = pcall(function()
 				local input = beforeFunc(classTests)

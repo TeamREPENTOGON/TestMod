@@ -52,10 +52,24 @@ mod:AddCallback(ModCallbacks.MC_EVALUATE_FAMILIAR_MULTIPLIER, function(_, fam, m
 end)
 
 
+local TEARS_CAP_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST TEARS CAP ITEM")
+local STAT_MULT_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST STAT MULT ITEM")
 local HEALTHTYPE_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST HEALTH TYPE CHANGE ITEM")
 local MAXCOINS_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST MAX COINS ITEM")
 local MAXBOMBS_NULL = Isaac.GetNullItemIdByName("REPENTOGON TEST MAX BOMBS NULL")
 local MAXKEYS_TRINKET = Isaac.GetTrinketIdByName("REPENTOGON TEST MAX KEYS TRINKET")
+
+mod:AddPriorityCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, CallbackPriority.EARLY, function(_, player, cache, value)
+	if player:HasCollectible(TEARS_CAP_ITEM) then
+		return value+1
+	end
+end, "tearscap")
+
+mod:AddPriorityCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, CallbackPriority.EARLY, function(_, player, cache, value)
+	if player:HasCollectible(STAT_MULT_ITEM) then
+		return value*0.75
+	end
+end, "statmultiplier")
 
 mod:AddCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, player, cache, value)
 	if player:HasCollectible(HEALTHTYPE_ITEM) then
@@ -63,14 +77,16 @@ mod:AddCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, player, cache
 	end
 end, "healthtype")
 
-mod:AddCallback(ModCallbacks.MC_PLAYER_HEALTH_TYPE_CHANGE, function(_, player, newHealthType, oldHealthType)
-	if player:HasCollectible(HEALTHTYPE_ITEM) and newHealthType == HealthType.SOUL and player:GetMaxHearts() > 0 then
-		player:AddMaxHearts(-player:GetMaxHearts())
-		if player:GetSoulHearts() == 0 then
-			player:AddSoulHearts(1)
+if ModCallbacks.MC_PLAYER_HEALTH_TYPE_CHANGE then
+	mod:AddCallback(ModCallbacks.MC_PLAYER_HEALTH_TYPE_CHANGE, function(_, player, newHealthType, oldHealthType)
+		if player:HasCollectible(HEALTHTYPE_ITEM) and newHealthType == HealthType.SOUL and player:GetMaxHearts() > 0 then
+			player:AddMaxHearts(-player:GetMaxHearts())
+			if player:GetSoulHearts() == 0 then
+				player:AddSoulHearts(1)
+			end
 		end
-	end
-end)
+	end)
+end
 
 mod:AddCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, player, cache, value)
 	if player:HasCollectible(MAXCOINS_ITEM) or player:GetEffects():HasCollectibleEffect(MAXCOINS_ITEM) then
@@ -91,7 +107,7 @@ mod:AddCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, player, cache
 end, "maxkeys")
 
 
-mod:AddCallback(ModCallbacks.MC_PRE_RENDER_CUSTOM_CHARACTER_MENU, function()
+mod:AddCallback(ModCallbacks.MC_MAIN_MENU_RENDER, function()
 	local frame = Isaac.GetFrameCount()
 	local offset = 70 * (math.floor(frame / 2) % 5)
 	EntityConfig.GetPlayer(mod.TEST_PLAYER):GetModdedMenuPortraitSprite():GetLayer(0):SetCropOffset(Vector(offset,0))

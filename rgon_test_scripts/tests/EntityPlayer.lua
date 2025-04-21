@@ -3,30 +3,7 @@ local test = REPENTOGON_TEST
 local EntityPlayerTest = include(REPENTOGON_TEST.TestsRoot .. "Entity")
 
 function EntityPlayerTest:BeforeEach()
-	local player = Isaac.GetPlayer()
-	if player:IsDead() then
-		player:Revive()
-	end
-	if player:GetPlayerType() ~= PlayerType.PLAYER_ISAAC then
-		player:ChangePlayerType(PlayerType.PLAYER_ISAAC)
-	end
-	player:AddSoulHearts(-999)
-	player:AddBlackHearts(-999)
-	player:AddBoneHearts(-999)
-	player:AddGoldenHearts(-999)
-	player:AddEternalHearts(-999)
-	player:AddBrokenHearts(-999)
-	player:AddRottenHearts(-999)
-	player:AddRottenHearts(-999)
-	if player:GetMaxHearts() ~= 6 then
-		player:AddMaxHearts(6 - player:GetMaxHearts())
-	end
-	player:AddHearts(player:GetMaxHearts())
-	player.ControlsEnabled = true
-	player.ControlsCooldown = 0
-	player:ResetDamageCooldown()
-	player:StopExtraAnimation()
-	return player
+	return Isaac.GetPlayer()
 end
 
 function EntityPlayerTest:AfterEach(entityplayer)
@@ -174,8 +151,12 @@ function EntityPlayerTest:TestAddCostume(entityplayer)
 	entityplayer:AddCostume(item, itemstateonly)
 end
 
-function EntityPlayerTest:TestAddCurseMistEffect(entityplayer)
-	entityplayer:AddCurseMistEffect()
+function EntityPlayerTest:TestAddCurseMistEffect(player)
+	test.AssertFalse(player:HasCurseMistEffect())
+	player:AddCurseMistEffect()
+	test.AssertTrue(player:HasCurseMistEffect())
+	player:RemoveCurseMistEffect()
+	test.AssertFalse(player:HasCurseMistEffect())
 end
 
 function EntityPlayerTest:TestAddDeadEyeCharge(entityplayer)
@@ -553,9 +534,12 @@ function EntityPlayerTest:TestDischargeActiveItem(entityplayer)
 	entityplayer:DischargeActiveItem(activeslot)
 end
 
-function EntityPlayerTest:TestDonateLuck(entityplayer)
-	local luck = 1
-	entityplayer:DonateLuck(luck)
+function EntityPlayerTest:TestDonateLuck(player)
+	test.AssertEquals(player.Luck, 0)
+	player:DonateLuck(1)
+	test.AssertEquals(player.Luck, 1)
+	player:DonateLuck(-1)
+	test.AssertEquals(player.Luck, 0)
 end
 
 function EntityPlayerTest:TestDoZitEffect(entityplayer)
@@ -853,9 +837,69 @@ function EntityPlayerTest:TestGetMovementVector(entityplayer)
 	entityplayer:GetMovementVector()
 end
 
-function EntityPlayerTest:TestGetMultiShotParams(entityplayer)
-	local weapontype = 1
-	entityplayer:GetMultiShotParams(weapontype)
+function EntityPlayerTest:TestGetMultiShotParams(player)
+	-- Legacy callback: MC_POST_PLAYER_GET_MULTI_SHOT_PARAMS
+	-- Didn't pass MultiShotParams, required recursive calls to GetMultiShotParams, and only let one mod modify the params.
+	-- This callback is deprecated, but we keep it for easier backwards compatibility. It runs first.
+	test:AddCallback(ModCallbacks.MC_POST_PLAYER_GET_MULTI_SHOT_PARAMS, function(_, p)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		local retParams = player:GetMultiShotParams(WeaponType.WEAPON_TEARS)
+		test.AssertEquals(retParams:GetNumTears(), 1)
+		retParams:SetNumTears(2)
+		return retParams
+	end)
+
+	-- The legacy callback breaks on first return.
+	test:AddUnexpectedPriorityCallback(ModCallbacks.MC_POST_PLAYER_GET_MULTI_SHOT_PARAMS, CallbackPriority.LATE)
+
+	test.AssertEquals(player:GetMultiShotParams(WeaponType.WEAPON_TEARS):GetNumTears(), 2)
+
+	-- Now the reworked callback, MC_EVALUATE_MULTI_SHOT_PARAMS.
+	local boneCalls = 0
+	local tearsCalls = 0
+
+	test:AddCallback(ModCallbacks.MC_EVALUATE_MULTI_SHOT_PARAMS, function(_, p, cbParams, weaponType)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		if weaponType == WeaponType.WEAPON_BONE then
+			boneCalls = boneCalls + 1  -- Count how many times the callback runs for bone club (should only be 1)
+			test.AssertEquals(cbParams:GetNumTears(), 2)  -- Still affected by the legacy callback
+			cbParams:SetNumTears(9)
+			return cbParams
+		end
+	end)
+	test:AddCallback(ModCallbacks.MC_EVALUATE_MULTI_SHOT_PARAMS, function(_, p, cbParams, weaponType)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		if weaponType == WeaponType.WEAPON_TEARS then
+			tearsCalls = tearsCalls + 1  -- Count how many times the callback runs for tears (should only be 1)
+			test.AssertEquals(cbParams:GetNumTears(), 2)  -- Still affected by the legacy callback
+			cbParams:SetNumTears(3)  -- Modifying the provided MultiShotParams should affect the following callbacks
+		end
+	end)
+	test:AddCallback(ModCallbacks.MC_EVALUATE_MULTI_SHOT_PARAMS, function(_, p, cbParams, weaponType)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		if weaponType == WeaponType.WEAPON_TEARS then
+			test.AssertEquals(cbParams:GetNumTears(), 3)
+			-- Calling GetMultiShotParams for a different weapon should still trigger the callback for that weapon
+			test.AssertEquals(player:GetMultiShotParams(WeaponType.WEAPON_BONE):GetNumTears(), 9)
+			-- However, calling it for the same weapon type will return an unmodified, vanilla MultiShotParams to prevent infinite loops
+			local retParams = player:GetMultiShotParams(WeaponType.WEAPON_TEARS)
+			test.AssertEquals(retParams:GetNumTears(), 1)
+			retParams:SetNumTears(4)
+			return retParams  -- Returning a different MultiShotParams should still pass along to the next callback
+		end
+	end)
+	test:AddCallback(ModCallbacks.MC_EVALUATE_MULTI_SHOT_PARAMS, function(_, p, cbParams, weaponType)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		if weaponType == WeaponType.WEAPON_TEARS then
+			test.AssertEquals(cbParams:GetNumTears(), 4)
+			cbParams:SetNumTears(5)  -- Modifying the provided MultiShotParams should affect the final result
+		end
+	end)
+
+	test.AssertEquals(player:GetMultiShotParams(WeaponType.WEAPON_TEARS):GetNumTears(), 5)
+
+	test.AssertEquals(boneCalls, 1)
+	test.AssertEquals(tearsCalls, 1)
 end
 
 function EntityPlayerTest:TestGetMultiShotPositionVelocity(entityplayer)
@@ -1003,10 +1047,6 @@ function EntityPlayerTest:TestHasCollectible(entityplayer)
 	entityplayer:HasCollectible(collectible, ignoremodifiers, ignorespoof)
 end
 
-function EntityPlayerTest:TestHasCurseMistEffect(entityplayer)
-	entityplayer:HasCurseMistEffect()
-end
-
 function EntityPlayerTest:TestHasFullHearts(entityplayer)
 	entityplayer:HasFullHearts()
 end
@@ -1143,10 +1183,6 @@ end
 function EntityPlayerTest:TestRemoveCostume(entityplayer)
 	local item = Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_SAD_ONION)
 	entityplayer:RemoveCostume(item)
-end
-
-function EntityPlayerTest:TestRemoveCurseMistEffect(entityplayer)
-	entityplayer:RemoveCurseMistEffect()
 end
 
 function EntityPlayerTest:TestRemoveGoldenBomb(entityplayer)
@@ -2882,6 +2918,190 @@ function EntityPlayerTest:TestUpdate(entityplayer)
 	test:AddUnexpectedCallback(ModCallbacks.MC_POST_PLAYER_UPDATE)
 
 	entityplayer:Update()
+end
+
+function EntityPlayerTest:TestAddCandyHeartBonus(player)
+	player:AddCollectible(CollectibleType.COLLECTIBLE_CANDY_HEART)
+
+	test.AssertEquals(player.Damage, 3.5)
+	test.AssertEquals(player.MaxFireDelay, 10)
+	test.AssertEquals(player.TearRange, 260)
+	test.AssertEquals(player.ShotSpeed, 1)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddCandyHeartBonus(CacheFlag.CACHE_DAMAGE)
+	test.AssertEquals(player.Damage, 3.6)
+	test.AssertEquals(player.MaxFireDelay, 10)
+	test.AssertEquals(player.TearRange, 260)
+	test.AssertEquals(player.ShotSpeed, 1)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddCandyHeartBonus(CacheFlag.CACHE_FIREDELAY)
+	test.AssertEquals(player.Damage, 3.6)
+	test.AssertEquals(player.MaxFireDelay, 9.8081)
+	test.AssertEquals(player.TearRange, 260)
+	test.AssertEquals(player.ShotSpeed, 1)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddCandyHeartBonus(CacheFlag.CACHE_RANGE)
+	test.AssertEquals(player.Damage, 3.6)
+	test.AssertEquals(player.MaxFireDelay, 9.8081)
+	test.AssertEquals(player.TearRange, 270)
+	test.AssertEquals(player.ShotSpeed, 1)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddCandyHeartBonus(CacheFlag.CACHE_SHOTSPEED)
+	test.AssertEquals(player.Damage, 3.6)
+	test.AssertEquals(player.MaxFireDelay, 9.8081)
+	test.AssertEquals(player.TearRange, 270)
+	test.AssertEquals(player.ShotSpeed, 1.02)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddCandyHeartBonus(CacheFlag.CACHE_SPEED)
+	test.AssertEquals(player.Damage, 3.6)
+	test.AssertEquals(player.MaxFireDelay, 9.8081)
+	test.AssertEquals(player.TearRange, 270)
+	test.AssertEquals(player.ShotSpeed, 1.02)
+	test.AssertEquals(player.MoveSpeed, 1.02)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddCandyHeartBonus(CacheFlag.CACHE_LUCK)
+	test.AssertEquals(player.Damage, 3.6)
+	test.AssertEquals(player.MaxFireDelay, 9.8081)
+	test.AssertEquals(player.TearRange, 270)
+	test.AssertEquals(player.ShotSpeed, 1.02)
+	test.AssertEquals(player.MoveSpeed, 1.02)
+	test.AssertEquals(player.Luck, 0.1)
+
+	player:AddCandyHeartBonus(CacheFlag.CACHE_ALL)
+	test.AssertEquals(player.Damage, 3.7)
+	test.AssertEquals(player.MaxFireDelay, 9.6219)
+	test.AssertEquals(player.TearRange, 280)
+	test.AssertEquals(player.ShotSpeed, 1.04)
+	test.AssertEquals(player.MoveSpeed, 1.04)
+	test.AssertEquals(player.Luck, 0.2)
+
+	local bonus = player:GetCandyHeartBonus()
+	test.AssertEquals(bonus.Damage, 2)
+	test.AssertEquals(bonus.FireDelay, 2)
+	test.AssertEquals(bonus.TearRange, 2)
+	test.AssertEquals(bonus.ShotSpeed, 2)
+	test.AssertEquals(bonus.MoveSpeed, 2)
+	test.AssertEquals(bonus.Luck, 2)
+
+	player:AddCandyHeartBonus(CacheFlag.CACHE_ALL, -10)
+	test.AssertEquals(player.Damage, 3.5)
+	test.AssertEquals(player.MaxFireDelay, 10)
+	test.AssertEquals(player.TearRange, 260)
+	test.AssertEquals(player.ShotSpeed, 1)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddCandyHeartBonus(CacheFlag.CACHE_DAMAGE, 10)
+	test.AssertEquals(player.Damage, 4.5)
+	player:AddCandyHeartBonus(CacheFlag.CACHE_DAMAGE, -5)
+	test.AssertEquals(player.Damage, 4)
+	player:AddCandyHeartBonus(CacheFlag.CACHE_DAMAGE, -5)
+
+	player:AddCandyHeartBonus()
+	test.AssertTrue(player.Damage > 3.5 or player.MaxFireDelay < 10 or player.TearRange > 260 or player.ShotSpeed > 1 or player.MoveSpeed > 1 or player.Luck > 0)
+end
+
+function EntityPlayerTest:TestAddSoulLocketBonus(player)
+	player:AddCollectible(CollectibleType.COLLECTIBLE_SOUL_LOCKET)
+
+	test.AssertEquals(player.Damage, 3.5)
+	test.AssertEquals(player.MaxFireDelay, 10)
+	test.AssertEquals(player.TearRange, 260)
+	test.AssertEquals(player.ShotSpeed, 1)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddSoulLocketBonus(CacheFlag.CACHE_DAMAGE)
+	test.AssertEquals(player.Damage, 3.7)
+	test.AssertEquals(player.MaxFireDelay, 10)
+	test.AssertEquals(player.TearRange, 260)
+	test.AssertEquals(player.ShotSpeed, 1)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddSoulLocketBonus(CacheFlag.CACHE_FIREDELAY)
+	test.AssertEquals(player.Damage, 3.7)
+	test.AssertEquals(player.MaxFireDelay, 9.6219)
+	test.AssertEquals(player.TearRange, 260)
+	test.AssertEquals(player.ShotSpeed, 1)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddSoulLocketBonus(CacheFlag.CACHE_RANGE)
+	test.AssertEquals(player.Damage, 3.7)
+	test.AssertEquals(player.MaxFireDelay, 9.6219)
+	test.AssertEquals(player.TearRange, 280)
+	test.AssertEquals(player.ShotSpeed, 1)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddSoulLocketBonus(CacheFlag.CACHE_SHOTSPEED)
+	test.AssertEquals(player.Damage, 3.7)
+	test.AssertEquals(player.MaxFireDelay, 9.6219)
+	test.AssertEquals(player.TearRange, 280)
+	test.AssertEquals(player.ShotSpeed, 1.04)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddSoulLocketBonus(CacheFlag.CACHE_SPEED)
+	test.AssertEquals(player.Damage, 3.7)
+	test.AssertEquals(player.MaxFireDelay, 9.6219)
+	test.AssertEquals(player.TearRange, 280)
+	test.AssertEquals(player.ShotSpeed, 1.04)
+	test.AssertEquals(player.MoveSpeed, 1.04)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddSoulLocketBonus(CacheFlag.CACHE_LUCK)
+	test.AssertEquals(player.Damage, 3.7)
+	test.AssertEquals(player.MaxFireDelay, 9.6219)
+	test.AssertEquals(player.TearRange, 280)
+	test.AssertEquals(player.ShotSpeed, 1.04)
+	test.AssertEquals(player.MoveSpeed, 1.04)
+	test.AssertEquals(player.Luck, 0.2)
+
+	player:AddSoulLocketBonus(CacheFlag.CACHE_ALL)
+	test.AssertEquals(player.Damage, 3.9)
+	test.AssertEquals(player.MaxFireDelay, 9.265)
+	test.AssertEquals(player.TearRange, 300)
+	test.AssertEquals(player.ShotSpeed, 1.08)
+	test.AssertEquals(player.MoveSpeed, 1.08)
+	test.AssertEquals(player.Luck, 0.4)
+
+	local bonus = player:GetSoulLocketBonus()
+	test.AssertEquals(bonus.Damage, 2)
+	test.AssertEquals(bonus.FireDelay, 2)
+	test.AssertEquals(bonus.TearRange, 2)
+	test.AssertEquals(bonus.ShotSpeed, 2)
+	test.AssertEquals(bonus.MoveSpeed, 2)
+	test.AssertEquals(bonus.Luck, 2)
+
+	player:AddSoulLocketBonus(CacheFlag.CACHE_ALL, -10)
+	test.AssertEquals(player.Damage, 3.5)
+	test.AssertEquals(player.MaxFireDelay, 10)
+	test.AssertEquals(player.TearRange, 260)
+	test.AssertEquals(player.ShotSpeed, 1)
+	test.AssertEquals(player.MoveSpeed, 1)
+	test.AssertEquals(player.Luck, 0)
+
+	player:AddSoulLocketBonus(CacheFlag.CACHE_DAMAGE, 10)
+	test.AssertEquals(player.Damage, 5.5)
+	player:AddSoulLocketBonus(CacheFlag.CACHE_DAMAGE, -5)
+	test.AssertEquals(player.Damage, 4.5)
+	player:AddSoulLocketBonus(CacheFlag.CACHE_DAMAGE, -5)
+
+	player:AddSoulLocketBonus()
+	test.AssertTrue(player.Damage > 3.5 or player.MaxFireDelay < 10 or player.TearRange > 260 or player.ShotSpeed > 1 or player.MoveSpeed > 1 or player.Luck > 0)
 end
 
 

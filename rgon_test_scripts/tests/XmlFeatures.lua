@@ -3,7 +3,7 @@ local test = REPENTOGON_TEST
 local XmlFeaturesTest = {}
 
 function XmlFeaturesTest:BeforeEach()
-	
+	return Isaac.GetPlayer()
 end
 
 function XmlFeaturesTest:AfterEach()
@@ -13,8 +13,7 @@ end
 ----------
 
 
-function XmlFeaturesTest:TestPlayerStats()
-	local player = Isaac.GetPlayer()
+function XmlFeaturesTest:TestPlayerStats(player)
 	player:ChangePlayerType(test.TEST_PLAYER)
 
 	test.AssertEquals(player.MoveSpeed, 1.1)
@@ -36,10 +35,9 @@ function XmlFeaturesTest:TestNullItemLoaded()
 	test.AssertEquals(Isaac.GetItemConfig():GetNullItem(TEST_NULL).Name, "REPENTOGON TEST NULL")
 end
 
-function XmlFeaturesTest:TestNullItemCostume()
+function XmlFeaturesTest:TestNullItemCostume(player)
 	test.AssertEquals(Isaac.GetItemConfig():GetNullItem(TEST_NULL).Costume.ID, TEST_COSTUME)
 
-	local player = Isaac.GetPlayer()
 	test.AssertFalse(player:IsNullItemCostumeVisible(TEST_NULL, "head4"))
 	player:GetEffects():AddNullEffect(TEST_NULL)
 	test.AssertTrue(player:IsNullItemCostumeVisible(TEST_NULL, "head4"))
@@ -57,8 +55,7 @@ local REVIVE_NULL = Isaac.GetNullItemIdByName("REPENTOGON TEST NULL REVIVE")
 local REVIVE_NULL_HIDDEN = Isaac.GetNullItemIdByName("REPENTOGON TEST NULL HIDDEN REVIVE")
 local REVIVE_TRINKET = Isaac.GetTrinketIdByName("REPENTOGON TEST TRINKET REVIVEEFFECT")
 
-function XmlFeaturesTest:TestRevive()
-	local player = Isaac.GetPlayer()
+function XmlFeaturesTest:TestRevive(player)
 	test.AssertFalse(player:WillPlayerRevive())
 	test.AssertEquals(player:GetExtraLives(), 0)
 	player:AddCollectible(REVIVE_ITEM)
@@ -67,8 +64,7 @@ function XmlFeaturesTest:TestRevive()
 	player:RemoveCollectible(REVIVE_ITEM)
 end
 
-function XmlFeaturesTest:TestReviveEffect()
-	local player = Isaac.GetPlayer()
+function XmlFeaturesTest:TestReviveEffect(player)
 	test.AssertFalse(player:WillPlayerRevive())
 	test.AssertEquals(player:GetExtraLives(), 0)
 	player:GetEffects():AddTrinketEffect(REVIVE_TRINKET)
@@ -77,8 +73,7 @@ function XmlFeaturesTest:TestReviveEffect()
 	player:GetEffects():RemoveTrinketEffect(REVIVE_TRINKET)
 end
 
-function XmlFeaturesTest:TestNullRevive()
-	local player = Isaac.GetPlayer()
+function XmlFeaturesTest:TestNullRevive(player)
 	test.AssertFalse(player:WillPlayerRevive())
 	test.AssertEquals(player:GetExtraLives(), 0)
 	player:GetEffects():AddNullEffect(REVIVE_NULL)
@@ -87,8 +82,7 @@ function XmlFeaturesTest:TestNullRevive()
 	player:GetEffects():RemoveNullEffect(REVIVE_NULL)
 end
 
-function XmlFeaturesTest:TestHiddenRevive()
-	local player = Isaac.GetPlayer()
+function XmlFeaturesTest:TestHiddenRevive(player)
 	test.AssertFalse(player:WillPlayerRevive())
 	test.AssertEquals(player:GetExtraLives(), 0)
 	player:GetEffects():AddNullEffect(REVIVE_NULL_HIDDEN)
@@ -120,175 +114,6 @@ function XmlFeaturesTest:TestFamiliarIgnoreBffs()
 	test.AssertEquals(fam:GetMultiplier(), 2.0)
 	test.AssertEquals(testFam:GetMultiplier(), 1.0)
 	fam:Remove()
-end
-
-
-local MAXCOINS_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST MAX COINS ITEM")
-local MAXBOMBS_NULL = Isaac.GetNullItemIdByName("REPENTOGON TEST MAX BOMBS NULL")
-local MAXKEYS_TRINKET = Isaac.GetTrinketIdByName("REPENTOGON TEST MAX KEYS TRINKET")
-
-function XmlFeaturesTest:TestMaxCoinsCollectible()
-	local player = Isaac.GetPlayer()
-
-	test.AssertEquals(player:GetMaxCoins(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 99)
-
-	-- Evaluated only when triggered
-	test:AddOneTimeCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, p, cache, value)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
-		test.AssertEquals(cache, "maxcoins")
-		test.AssertEquals(value, 99)
-		return 123
-	end, "maxcoins")
-	test.AssertEquals(player:GetMaxCoins(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 99)
-	player:AddCustomCacheTag("maxcoins", true)
-	test.AssertEquals(player:GetMaxCoins(), 123)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 123)
-	player:AddCustomCacheTag("maxcoins", true)
-	test.AssertEquals(player:GetMaxCoins(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 99)
-
-	-- Triggered by AddCollectible
-	player:AddCollectible(MAXCOINS_ITEM)
-	test.AssertEquals(player:GetMaxCoins(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 9)
-
-	-- Triggered by RemoveCollectible
-	player:RemoveCollectible(MAXCOINS_ITEM)
-	test.AssertEquals(player:GetMaxCoins(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 99)
-
-	-- Not immediately triggered for TemporaryEffects, but triggers next update
-	player:GetEffects():AddCollectibleEffect(MAXCOINS_ITEM)
-	test.AssertEquals(player:GetMaxCoins(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 99)
-	player:Update()
-	test.AssertEquals(player:GetMaxCoins(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 9)
-
-	player:GetEffects():RemoveCollectibleEffect(MAXCOINS_ITEM)
-	test.AssertEquals(player:GetMaxCoins(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 9)
-	player:Update()
-	test.AssertEquals(player:GetMaxCoins(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 99)
-
-	-- Wisps trigger immediately when added/killed
-	local wisp = player:AddItemWisp(MAXCOINS_ITEM, Vector.Zero)
-	test.AssertEquals(player:GetMaxCoins(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 9)
-
-	wisp:Kill()
-	test.AssertEquals(player:GetMaxCoins(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxcoins"), 99)
-end
-
-function XmlFeaturesTest:TestMaxBombsNull()
-	local player = Isaac.GetPlayer()
-
-	test.AssertEquals(player:GetMaxBombs(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxbombs"), 99)
-
-	-- Evaluated only when triggered
-	test:AddOneTimeCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, p, cache, value)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
-		test.AssertEquals(cache, "maxbombs")
-		test.AssertEquals(value, 99)
-		return 123
-	end, "maxbombs")
-	test.AssertEquals(player:GetMaxBombs(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxbombs"), 99)
-	player:AddCustomCacheTag("maxbombs", true)
-	test.AssertEquals(player:GetMaxBombs(), 123)
-	test.AssertEquals(player:GetCustomCacheValue("maxbombs"), 123)
-	player:AddCustomCacheTag("maxbombs", true)
-	test.AssertEquals(player:GetMaxBombs(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxbombs"), 99)
-
-	-- Not immediately triggered for TemporaryEffects, but triggers next update
-	player:GetEffects():AddNullEffect(MAXBOMBS_NULL)
-	test.AssertEquals(player:GetMaxBombs(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxbombs"), 99)
-	player:Update()
-	test.AssertEquals(player:GetMaxBombs(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxbombs"), 9)
-
-	player:GetEffects():RemoveNullEffect(MAXBOMBS_NULL)
-	test.AssertEquals(player:GetMaxBombs(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxbombs"), 9)
-	player:Update()
-	test.AssertEquals(player:GetMaxBombs(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxbombs"), 99)
-end
-
-function XmlFeaturesTest:TestMaxKeysTrinket()
-	local player = Isaac.GetPlayer()
-
-	test.AssertEquals(player:GetMaxKeys(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 99)
-
-	-- Evaluated only when triggered
-	test:AddOneTimeCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, p, cache, value)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
-		test.AssertEquals(cache, "maxkeys")
-		test.AssertEquals(value, 99)
-		return 123
-	end, "maxkeys")
-	test.AssertEquals(player:GetMaxKeys(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 99)
-	player:AddCustomCacheTag("maxkeys", true)
-	test.AssertEquals(player:GetMaxKeys(), 123)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 123)
-	player:AddCustomCacheTag("maxkeys", true)
-	test.AssertEquals(player:GetMaxKeys(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 99)
-
-	-- Adding a trinket does not trigger until next update
-	player:AddTrinket(MAXKEYS_TRINKET)
-	test.AssertEquals(player:GetMaxKeys(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 99)
-	player:Update()
-	test.AssertEquals(player:GetMaxKeys(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 9)
-
-	-- Removing a trinket does not trigger until next update
-	player:TryRemoveTrinket(MAXKEYS_TRINKET)
-	test.AssertEquals(player:GetMaxKeys(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 9)
-	player:Update()
-	test.AssertEquals(player:GetMaxKeys(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 99)
-
-	-- Likewise for smelted trinkets
-	player:AddSmeltedTrinket(MAXKEYS_TRINKET)
-	test.AssertEquals(player:GetMaxKeys(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 99)
-	player:Update()
-	test.AssertEquals(player:GetMaxKeys(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 9)
-
-	player:TryRemoveTrinket(MAXKEYS_TRINKET)
-	test.AssertEquals(player:GetMaxKeys(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 9)
-	player:Update()
-	test.AssertEquals(player:GetMaxKeys(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 99)
-
-	-- Not immediately triggered for TemporaryEffects, but triggers next update
-	player:GetEffects():AddTrinketEffect(MAXKEYS_TRINKET)
-	test.AssertEquals(player:GetMaxKeys(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 99)
-	player:Update()
-	test.AssertEquals(player:GetMaxKeys(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 9)
-
-	player:GetEffects():RemoveTrinketEffect(MAXKEYS_TRINKET)
-	test.AssertEquals(player:GetMaxKeys(), 9)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 9)
-	player:Update()
-	test.AssertEquals(player:GetMaxKeys(), 99)
-	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 99)
 end
 
 

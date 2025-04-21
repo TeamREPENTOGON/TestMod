@@ -23,6 +23,7 @@ return {
 	InGame = {
 		BitSet128 = include(root.."BitSet128"),
 		Color = include(root.."Color"),
+		CustomCache = include(root.."CustomCache"),
 		Entity = include(root.."Entity"),
 		EntityBomb = include(root.."EntityBomb"),
 		EntityEffect = include(root.."EntityEffect"),
@@ -49,6 +50,7 @@ return {
 		GridEntitySpikes = include(root.."GridEntitySpikes"),
 		GridEntityTNT = include(root.."GridEntityTNT"),
 		HUD = include(root.."HUD"),
+		HUDMessage = include(root.."HUDMessage"),
 		Input = include(root.."Input"),
 		Isaac = include(root.."Isaac"),
 		ItemConfig = include(root.."ItemConfig"),
@@ -101,6 +103,7 @@ return {
 		EntityConfigPlayer = include(root.."EntityConfigPlayer"),
 		EntityDelirium = include(root.."EntityDelirium"),
 		EntitySlot = include(root.."EntitySlot"),
+		EvaluateStats = include(root.."EvaluateStats"),
 		FXParams = include(root.."FXParams"),
 		GenericPrompt = include(root.."GenericPrompt"),
 		History = include(root.."History"),

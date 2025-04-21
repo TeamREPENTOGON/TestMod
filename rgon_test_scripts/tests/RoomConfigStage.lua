@@ -87,9 +87,5 @@ function RoomConfigStageTest:TestSetXMLName(roomconfigstage)
 	roomconfigstage:SetXMLName(originalVal)
 end
 
-function RoomConfigStageTest:TestUnload(roomconfigstage)
-	roomconfigstage:Unload()
-end
-
 
 return RoomConfigStageTest
