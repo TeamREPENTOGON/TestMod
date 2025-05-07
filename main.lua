@@ -377,7 +377,9 @@ local function RunTestsForClass(className, classTests, functionToTest)
 		local runtest = function()
 			Log("Running test: " .. className ..".".. funcName .. "...")
 			TESTS_RAN = TESTS_RAN + 1
-			REPENTOGON_TEST.ResetPlayer(Isaac.GetPlayer())
+			if Isaac.IsInGame() then
+				REPENTOGON_TEST.ResetPlayer(Isaac.GetPlayer())
+			end
 			REPENTOGON_TEST.RunningTest = true
 			local success, ret = pcall(function()
 				local input = beforeFunc(classTests)
@@ -449,8 +451,13 @@ function REPENTOGON_TEST:RunTests(classToTest, functionToTest)
 	if classToTest then
 		RunTestsForClass(classToTest, tests[classToTest], functionToTest)
 	else
-		for className, classTests in pairs(tests) do
-			RunTestsForClass(className, classTests)
+		local testclasses = {}
+		for className, _ in pairs(tests) do
+			table.insert(testclasses, className)
+		end
+		table.sort(testclasses)
+		for _, className in pairs(testclasses) do
+			RunTestsForClass(className, tests[className])
 		end
 	end
 

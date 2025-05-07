@@ -13,19 +13,19 @@ end
 ----------
 
 function StatsMenuTest:TestGetSecretsMenuSprite()
-	StatsMenu.GetSecretsMenuSprite()
+	test.AssertEquals(StatsMenu.GetSecretsMenuSprite():GetFilename(), "gfx/ui/achievement/achievements.anm2")
 end
 
 function StatsMenuTest:TestGetSecretsMenuCursorLeftSprite()
-	StatsMenu.GetSecretsMenuCursorLeftSprite()
+	test.AssertEquals(StatsMenu.GetSecretsMenuCursorLeftSprite():GetFilename(), "gfx/ui/main menu/SecretsMenuComponents.anm2")
 end
 
 function StatsMenuTest:TestGetSecretsMenuCursorRightSprite()
-	StatsMenu.GetSecretsMenuCursorRightSprite()
+	test.AssertEquals(StatsMenu.GetSecretsMenuCursorRightSprite():GetFilename(), "gfx/ui/main menu/SecretsMenuComponents.anm2")
 end
 
 function StatsMenuTest:TestGetStatsMenuSprite()
-	StatsMenu.GetStatsMenuSprite()
+	test.AssertEquals(StatsMenu.GetStatsMenuSprite():GetFilename(), "gfx/ui/main menu/StatsMenu.anm2")
 end
 
 function StatsMenuTest:TestIsSecretsMenuVisible()

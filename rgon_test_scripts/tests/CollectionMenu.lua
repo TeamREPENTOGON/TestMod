@@ -13,11 +13,11 @@ end
 ----------
 
 function CollectionMenuTest:TestGetCollectionMenuSprite()
-	CollectionMenu.GetCollectionMenuSprite()
+	test.AssertEquals(CollectionMenu.GetCollectionMenuSprite():GetFilename(), "gfx/ui/main menu/CollectionMenu.anm2")
 end
 
 function CollectionMenuTest:TestGetDeathScreenSprite()
-	CollectionMenu.GetDeathScreenSprite()
+	test.AssertEquals(CollectionMenu.GetDeathScreenSprite():GetFilename(), "gfx/ui/Death Screen.anm2")
 end
 
 function CollectionMenuTest:TestSetSelectedPage()

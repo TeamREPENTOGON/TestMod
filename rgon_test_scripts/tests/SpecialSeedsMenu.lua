@@ -13,7 +13,7 @@ end
 ----------
 
 function SpecialSeedsMenuTest:TestGetSprite()
-	SpecialSeedsMenu.GetSprite()
+	test.AssertEquals(SpecialSeedsMenu.GetSprite():GetFilename(), "gfx/ui/main menu/SeedsMenu.anm2")
 end
 
 function SpecialSeedsMenuTest:TestSetSelectedElement()

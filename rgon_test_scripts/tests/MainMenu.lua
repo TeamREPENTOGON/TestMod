@@ -13,11 +13,11 @@ end
 ----------
 
 function MainMenuTest:TestGetContinueWidgetSprite()
-	MainMenu.GetContinueWidgetSprite()
+	test.AssertEquals(MainMenu.GetContinueWidgetSprite():GetFilename(), "gfx/ui/main menu/ContinueProgress_Widget.anm2")
 end
 
 function MainMenuTest:TestGetGameMenuSprite()
-	MainMenu.GetGameMenuSprite()
+	test.AssertEquals(MainMenu.GetGameMenuSprite():GetFilename(), "gfx/ui/main menu/GameMenu.anm2")
 end
 
 function MainMenuTest:TestSetSelectedElement()

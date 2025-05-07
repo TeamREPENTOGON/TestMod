@@ -17,7 +17,7 @@ function MenuManagerTest:TestGetActiveMenu()
 end
 
 function MenuManagerTest:TestGetBackWidgetSprite()
-	MenuManager.GetBackWidgetSprite()
+	test.AssertEquals(MenuManager.GetBackWidgetSprite():GetFilename() ~= "")
 end
 
 function MenuManagerTest:TestGetColorModifierLerpAmount()
@@ -29,11 +29,11 @@ function MenuManagerTest:TestGetCurrentColorModifier()
 end
 
 function MenuManagerTest:TestGetSelectWidgetSprite()
-	MenuManager.GetSelectWidgetSprite()
+	test.AssertEquals(MenuManager.GetSelectWidgetSprite():GetFilename() ~= "")
 end
 
 function MenuManagerTest:TestGetShadowSprite()
-	MenuManager.GetShadowSprite()
+	test.AssertEquals(MenuManager.GetShadowSprite():GetFilename(), "gfx/ui/main menu/MenuShadow.anm2")
 end
 
 function MenuManagerTest:TestGetTargetColorModifier()

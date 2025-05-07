@@ -13,7 +13,7 @@ end
 ----------
 
 function ControllerSelectMenuTest:TestGetSprite()
-	ControllerSelectMenu.GetSprite()
+	test.AssertEquals(ControllerSelectMenu.GetSprite():GetFilename(), "gfx/ui/main menu/ControllerSelectMenu.anm2")
 end
 
 function ControllerSelectMenuTest:TestSetSelectedElement()

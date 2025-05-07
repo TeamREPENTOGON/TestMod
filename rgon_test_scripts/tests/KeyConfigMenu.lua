@@ -13,7 +13,7 @@ end
 ----------
 
 function KeyConfigMenuTest:TestGetSprite()
-	KeyConfigMenu.GetSprite()
+	test.AssertEquals(KeyConfigMenu.GetSprite():GetFilename(), "gfx/ui/main menu/KeyConfigMenu.anm2")
 end
 
 function KeyConfigMenuTest:TestSetSelectedColumn()

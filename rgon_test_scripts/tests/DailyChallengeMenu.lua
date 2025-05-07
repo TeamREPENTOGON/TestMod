@@ -13,15 +13,15 @@ end
 ----------
 
 function DailyChallengeMenuTest:TestGetSprite()
-	DailyChallengeMenu.GetSprite()
+	test.AssertEquals(DailyChallengeMenu.GetSprite():GetFilename(), "gfx/ui/main menu/Menu_DailyRun.anm2")
 end
 
 function DailyChallengeMenuTest:TestGetLeaderboardSprite()
-	DailyChallengeMenu.GetLeaderboardSprite()
+	test.AssertEquals(DailyChallengeMenu.GetLeaderboardSprite():GetFilename(), "gfx/ui/LeaderboardMenu.anm2")
 end
 
 function DailyChallengeMenuTest:TestGetLeaderboardScoreMenuSprite()
-	DailyChallengeMenu.GetLeaderboardScoreMenuSprite()
+	test.AssertEquals(DailyChallengeMenu.GetLeaderboardScoreMenuSprite():GetFilename(), "gfx/ui/ScoreMenu.anm2")
 end
 
 function DailyChallengeMenuTest:TestGetTimeLeftHours()

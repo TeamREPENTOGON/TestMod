@@ -13,15 +13,15 @@ end
 ----------
 
 function BestiaryMenuTest:TestGetBestiaryMenuSprite()
-	BestiaryMenu.GetBestiaryMenuSprite()
+	test.AssertEquals(BestiaryMenu.GetBestiaryMenuSprite():GetFilename(), "gfx/ui/main menu/BestiaryMenu.anm2")
 end
 
 function BestiaryMenuTest:TestGetDeathScreenSprite()
-	BestiaryMenu.GetDeathScreenSprite()
+	test.AssertEquals(BestiaryMenu.GetDeathScreenSprite():GetFilename(), "gfx/ui/Death Screen.anm2")
 end
 
 function BestiaryMenuTest:TestGetEnemySprite()
-	BestiaryMenu.GetEnemySprite()
+	test.AssertEquals(BestiaryMenu.GetEnemySprite():GetFilename(), "gfx/010.000_Frowning Gaper.anm2")
 end
 
 function BestiaryMenuTest:TestGetNumBossPages()

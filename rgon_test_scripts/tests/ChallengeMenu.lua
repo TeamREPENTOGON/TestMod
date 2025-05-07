@@ -13,7 +13,7 @@ end
 ----------
 
 function ChallengeMenuTest:TestGetSprite()
-	ChallengeMenu.GetSprite()
+	test.AssertEquals(ChallengeMenu.GetSprite():GetFilename(), "gfx/ui/main menu/ChallengeMenu.anm2")
 end
 
 function ChallengeMenuTest:TestSetSelectedChallengeID()

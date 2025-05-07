@@ -13,16 +13,18 @@ end
 ----------
 
 function ModsMenuTest:TestGetSprite()
-	ModsMenu.GetSprite()
+	test.AssertEquals(ModsMenu.GetSprite():GetFilename(), "gfx/ui/main menu/ModsMenu.anm2")
 end
 
 function ModsMenuTest:TestSetSelectedElement()
-	local originalVal = ModsMenu.GetSelectedElement()
-	for _, val in pairs(test.TestInts) do
-		ModsMenu.SetSelectedElement(val)
-		test.AssertEquals(ModsMenu.GetSelectedElement(), val)
+	for _, i in ipairs({3,2,1}) do
+		ModsMenu.SetSelectedElement(i)
+		test.AssertEquals(ModsMenu.GetSelectedElement(), i)
 	end
-	ModsMenu.SetSelectedElement(originalVal)
+	ModsMenu.SetSelectedElement(0)
+	test.AssertEquals(ModsMenu.GetSelectedElement(), 1)
+	ModsMenu.SetSelectedElement(-1)
+	test.AssertEquals(ModsMenu.GetSelectedElement(), 1)
 end
 
 function ModsMenuTest:TestWasListEdited()

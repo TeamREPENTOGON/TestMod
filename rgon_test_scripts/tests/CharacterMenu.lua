@@ -13,27 +13,27 @@ end
 ----------
 
 function CharacterMenuTest:TestGetBigCharPageSprite()
-	CharacterMenu.GetBigCharPageSprite()
+	test.AssertEquals(CharacterMenu.GetBigCharPageSprite():GetFilename(), "gfx/ui/main menu/CharacterMenu.anm2")
 end
 
 function CharacterMenuTest:TestGetBGSprite()
-	CharacterMenu.GetBGSprite()
+	test.AssertEquals(CharacterMenu.GetBGSprite():GetFilename(), "gfx/ui/main menu/CharacterMenuBG.anm2")
 end
 
 function CharacterMenuTest:TestGetCharacterPortraitSprite()
-	CharacterMenu.GetCharacterPortraitSprite()
+	test.AssertEquals(CharacterMenu.GetCharacterPortraitSprite():GetFilename(), "gfx/ui/main menu/CharacterPortraits.anm2")
 end
 
 function CharacterMenuTest:TestGetDifficultyPageSprite()
-	CharacterMenu.GetDifficultyPageSprite()
+	test.AssertEquals(CharacterMenu.GetDifficultyPageSprite():GetFilename(), "gfx/ui/main menu/DifficultyWidget.anm2")
 end
 
 function CharacterMenuTest:TestGetDifficultyOverlaySprite()
-	CharacterMenu.GetDifficultyOverlaySprite()
+	test.AssertEquals(CharacterMenu.GetDifficultyOverlaySprite():GetFilename(), "gfx/ui/main menu/CharacterMenu.anm2")
 end
 
 function CharacterMenuTest:TestGetEasterEggPageSprite()
-	CharacterMenu.GetEasterEggPageSprite()
+	test.AssertEquals(CharacterMenu.GetEasterEggPageSprite():GetFilename(), "gfx/ui/main menu/SeedSelectionWidget.anm2")
 end
 
 function CharacterMenuTest:TestGetIsCharacterUnlocked()
@@ -41,7 +41,7 @@ function CharacterMenuTest:TestGetIsCharacterUnlocked()
 end
 
 function CharacterMenuTest:TestGetGreedDecoSprite()
-	CharacterMenu.GetGreedDecoSprite()
+	test.AssertEquals(CharacterMenu.GetGreedDecoSprite():GetFilename(), "gfx/ui/main menu/CharacterMenu.anm2")
 end
 
 function CharacterMenuTest:TestGetNumCharacters()
@@ -49,27 +49,27 @@ function CharacterMenuTest:TestGetNumCharacters()
 end
 
 function CharacterMenuTest:TestGetPageSwapWidgetSprite()
-	CharacterMenu.GetPageSwapWidgetSprite()
+	test.AssertEquals(CharacterMenu.GetPageSwapWidgetSprite():GetFilename(), "gfx/ui/main menu/PageSwapWidget.anm2")
 end
 
 function CharacterMenuTest:TestGetSeedEntrySprite()
-	CharacterMenu.GetSeedEntrySprite()
+	test.AssertEquals(CharacterMenu.GetSeedEntrySprite():GetFilename(), "gfx/ui/main menu/SeedEntry.anm2")
 end
 
 function CharacterMenuTest:TestGetSeedPageSprite()
-	CharacterMenu.GetSeedPageSprite()
+	test.AssertEquals(CharacterMenu.GetSeedPageSprite():GetFilename(), "gfx/ui/main menu/SeedWidget.anm2")
 end
 
 function CharacterMenuTest:TestGetSeedUnlockPageSprite()
-	CharacterMenu.GetSeedUnlockPageSprite()
+	test.AssertEquals(CharacterMenu.GetSeedUnlockPageSprite():GetFilename(), "gfx/ui/main menu/SeedUnlockPaper.anm2")
 end
 
 function CharacterMenuTest:TestGetTaintedBGDecoSprite()
-	CharacterMenu.GetTaintedBGDecoSprite()
+	test.AssertEquals(CharacterMenu.GetTaintedBGDecoSprite():GetFilename(), "gfx/ui/main menu/CharacterMenuBGExtra.anm2")
 end
 
 function CharacterMenuTest:TestGetWinStreakPageSprite()
-	CharacterMenu.GetWinStreakPageSprite()
+	test.AssertEquals(CharacterMenu.GetWinStreakPageSprite():GetFilename(), "gfx/ui/main menu/WinStreakWidget.anm2")
 end
 
 function CharacterMenuTest:TestSetActiveStatus()

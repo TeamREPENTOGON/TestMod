@@ -13,15 +13,15 @@ end
 ----------
 
 function SaveMenuTest:TestGetSaveSelectMenuSprite()
-	SaveMenu.GetSaveSelectMenuSprite()
+	test.AssertEquals(SaveMenu.GetSaveSelectMenuSprite():GetFilename(), "gfx/ui/main menu/SaveSelectMenu.anm2")
 end
 
 function SaveMenuTest:TestGetDeleteButtonSprite()
-	SaveMenu.GetDeleteButtonSprite()
+	test.AssertEquals(SaveMenu.GetDeleteButtonSprite():GetFilename(), "gfx/ui/main menu/SaveSelectMenu.anm2")
 end
 
 function SaveMenuTest:TestGetDeletePopupSprite()
-	SaveMenu.GetDeletePopupSprite()
+	test.AssertEquals(SaveMenu.GetDeletePopupSprite():GetFilename(), "gfx/ui/main menu/SaveSelectMenu.anm2")
 end
 
 function SaveMenuTest:TestIsDeleteActive()

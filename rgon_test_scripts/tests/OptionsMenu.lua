@@ -13,11 +13,11 @@ end
 ----------
 
 function OptionsMenuTest:TestGetGammaWidgetSprite()
-	OptionsMenu.GetGammaWidgetSprite()
+	test.AssertEquals(OptionsMenu.GetGammaWidgetSprite():GetFilename(), "gfx/ui/main menu/GammaMenu.anm2")
 end
 
 function OptionsMenuTest:TestGetOptionsMenuSprite()
-	OptionsMenu.GetOptionsMenuSprite()
+	test.AssertEquals(OptionsMenu.GetOptionsMenuSprite():GetFilename(), "gfx/ui/main menu/OptionsMenu.anm2")
 end
 
 function OptionsMenuTest:TestSetSelectedElement()

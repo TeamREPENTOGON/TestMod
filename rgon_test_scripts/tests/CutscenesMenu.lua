@@ -13,7 +13,7 @@ end
 ----------
 
 function CutscenesMenuTest:TestGetSprite()
-	CutscenesMenu.GetSprite()
+	test.AssertEquals(CutscenesMenu.GetSprite():GetFilename(), "gfx/ui/main menu/EndingsMenu.anm2")
 end
 
 function CutscenesMenuTest:TestSetSelectedElement()

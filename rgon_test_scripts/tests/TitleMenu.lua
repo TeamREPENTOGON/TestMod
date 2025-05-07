@@ -13,7 +13,7 @@ end
 ----------
 
 function TitleMenuTest:TestGetSprite()
-	TitleMenu.GetSprite()
+	test.AssertEquals(TitleMenu.GetSprite():GetFilename(), "gfx/ui/main menu/TitleMenu.anm2")
 end
 
 
