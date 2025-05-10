@@ -2206,6 +2206,15 @@ function EntityPlayerTest:TestSetMaggySwingCooldown(entityplayer)
 	entityplayer:SetMaggySwingCooldown(originalVal)
 end
 
+function EntityPlayerTest:TestSetRevelationCharge(entityplayer)
+	local originalVal = entityplayer:GetRevelationCharge()
+	for _, val in pairs(test.TestInts) do
+		entityplayer:SetRevelationCharge(val)
+		test.AssertEquals(entityplayer:GetRevelationCharge(), val)
+	end
+	entityplayer:SetRevelationCharge(originalVal)
+end
+
 function EntityPlayerTest:TestSetMaxBladderCharge(entityplayer)
 	local originalVal = entityplayer:GetMaxBladderCharge()
 	for _, val in pairs(test.TestInts) do
