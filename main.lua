@@ -472,3 +472,89 @@ function REPENTOGON_TEST:RunTests(classToTest, functionToTest)
 end
 
 REPENTOGON_TEST.Tests = include(REPENTOGON_TEST.Root .. "get_all_tests")
+
+-- QOL for console auto complete and such.
+function REPENTOGON_TEST:TestCommand(cmdName, argsStr)
+	local tests = REPENTOGON_TEST:GetUnitTests()
+
+	if cmdName == "testall" then
+		REPENTOGON_TEST:RunTests()
+
+	elseif cmdName == "test" then
+
+		-- Split args into table.
+		local args = {}
+		for w in argsStr:gmatch("%S+") do args[#args+1] = w end
+
+		local classToTest = args[1]
+		local functionToTest = args[2]
+
+		if not classToTest then
+			print("No class to test provided!")
+			return
+		else
+			if not functionToTest then
+				if not tests[classToTest] then
+					print("[" .. classToTest .. "] is not a valid class!")
+					return
+				end
+
+				REPENTOGON_TEST:RunTests(classToTest)
+			else
+				-- Validate that this test exists before trying to run it.
+				local classTests = tests[classToTest]
+				if not classTests then
+					print("[" .. classToTest .. "] is not a valid class!")
+					return
+				end
+
+				for funcName in pairs(classTests) do
+					if funcName:match("^Test") and funcName == functionToTest or funcName:match(functionToTest .. "$")
+							and not (classTests == "FontRenderSettings" and not REPENTANCE_PLUS) then
+						REPENTOGON_TEST:RunTests(classToTest, functionToTest)
+						return
+					end
+				end
+
+				-- No test found.
+				print("[" .. functionToTest .. "] is not a valid test of [" .. classToTest .. "]!")
+			end
+		end
+	end
+end
+REPENTOGON_TEST:AddCallback(ModCallbacks.MC_EXECUTE_CMD, REPENTOGON_TEST.TestCommand)
+
+function REPENTOGON_TEST:CommandAutocomplete(_, argsStr)
+	-- Split args into table.
+	local args = {}
+	for w in argsStr:gmatch("%S+") do args[#args+1] = w end
+
+	-- I tried making it only return auto complete for one argument
+	local returnTable = {}
+	local tests = REPENTOGON_TEST:GetUnitTests()
+	for className, classTests in pairs(tests) do
+		for funcName in pairs(classTests) do
+			if funcName:match("^Test") and not (classTests == "FontRenderSettings" and not REPENTANCE_PLUS) then
+				table.insert(returnTable, className .. " " .. funcName:sub(5))
+			end
+		end
+	end
+	return returnTable
+end
+REPENTOGON_TEST:AddCallback(ModCallbacks.MC_CONSOLE_AUTOCOMPLETE, REPENTOGON_TEST.CommandAutocomplete, "test")
+
+Console.RegisterCommand(
+	"testall",
+	"REPENTOGON: Tests every class",
+	"testall",
+	true,
+	AutocompleteType.NONE
+)
+
+Console.RegisterCommand(
+	"test",
+	"REPENTOGON: Tests a specific class or class function",
+	"test <class> <funcName?>",
+	true,
+	AutocompleteType.CUSTOM
+)
