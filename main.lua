@@ -256,6 +256,10 @@ function REPENTOGON_TEST.ResetPlayer(player)
 	for i=0,3 do
 		player:SetCard(i, 0)
 	end
+	player:GetEffects():ClearEffects()
+	if Game():GetDebugFlags() & DebugFlag.INFINITE_HP ~= 0 then
+		Isaac.ExecuteCommand("debug 3")
+	end
 	player:AddCacheFlags(CacheFlag.CACHE_ALL, true)
 end
 

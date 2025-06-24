@@ -444,5 +444,56 @@ function EntityNPCTest:TestTakeDamage(entitynpc)
 	entitynpc:TakeDamage(testdamage, testflags, testsource, testdamagecountdown)
 end
 
+function EntityNPCTest:TestTakeDamage(npc)
+	local testDamage = 3.5
+	local modifiedDamage = 2.4
+
+	local testflags = DamageFlag.DAMAGE_SPIKES | DamageFlag.DAMAGE_POOP
+	local modifiedflags = DamageFlag.DAMAGE_FIRE
+
+	local testsource = EntityRef(Isaac.GetPlayer())
+
+	local testcountdown = 7
+	local modifiedcountdown = 4
+
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(damage, testDamage)
+		test.AssertEquals(flags, testflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, testcountdown)
+		
+		return {Damage = modifiedDamage, DamageFlags = modifiedflags, DamageCountdown = modifiedcountdown}
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(damage, modifiedDamage)
+		test.AssertEquals(flags, modifiedflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, modifiedcountdown)
+	end)
+
+	npc:TakeDamage(testDamage, testflags, testsource, testcountdown)
+end
+
+function EntityNPCTest:TestPreventDamage(npc)
+	local testDamage = 3.5
+	local testflags = DamageFlag.DAMAGE_SPIKES | DamageFlag.DAMAGE_POOP
+	local testsource = EntityRef(Isaac.GetPlayer())
+	local testcountdown = 7
+
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(damage, testDamage)
+		test.AssertEquals(flags, testflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, testcountdown)
+		return false
+	end)
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG)
+
+	npc:TakeDamage(testDamage, testflags, testsource, testcountdown)
+end
 
 return EntityNPCTest

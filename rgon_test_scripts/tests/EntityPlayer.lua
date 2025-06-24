@@ -1723,11 +1723,6 @@ function EntityPlayerTest:TestGetFocusEntity(entityplayer)
 	entityplayer:GetFocusEntity()
 end
 
-function EntityPlayerTest:TestGetFootprintColor(entityplayer)
-	local leftfootprint = true
-	entityplayer:GetFootprintColor(leftfootprint)
-end
-
 function EntityPlayerTest:TestGetGlitchBabySubType(entityplayer)
 	entityplayer:GetGlitchBabySubType()
 end
@@ -2261,10 +2256,22 @@ function EntityPlayerTest:TestSetFireDelayModifier(entityplayer)
 	entityplayer:SetFireDelayModifier(originalVal)
 end
 
-function EntityPlayerTest:TestSetFootprintColor(entityplayer)
-	local color = KColor(1,1,1,1)
-	local rightfoot = true
-	entityplayer:SetFootprintColor(color, rightfoot)
+function EntityPlayerTest:TestSetFootprintColor(player)
+	local originalColor = player:GetFootprintColor()
+
+	test.AssertEquals(originalColor.Red, 0.4059)
+	test.AssertEquals(originalColor.Green, 0.2294)
+	test.AssertEquals(originalColor.Blue, 0.1906)
+	test.AssertEquals(originalColor.Alpha, 0.7)
+
+	local setColor = KColor(0.1, 0.2, 0.3, 0.4)
+	player:SetFootprintColor(setColor, true)
+
+	local newColor = player:GetFootprintColor()
+	test.AssertEquals(newColor.Red, setColor.Red)
+	test.AssertEquals(newColor.Green, setColor.Green)
+	test.AssertEquals(newColor.Blue, setColor.Blue)
+	test.AssertEquals(newColor.Alpha, originalColor.Alpha)  -- Internal SetFootprintColor function ignores alpha
 end
 
 function EntityPlayerTest:TestSetForgottenSwapFormCooldown(entityplayer)
@@ -2840,10 +2847,55 @@ function EntityPlayerTest:TestCancelPlaceBombCallbacks(player)
 end
 
 function EntityPlayerTest:TestTakeDamage(player)
+	local testDamage = 3.5
+	local initialExpectedDamage = 4
+	local modifiedDamage = 2.4
+	local finalExpectedDamage = 2
+
+	local testflags = DamageFlag.DAMAGE_SPIKES | DamageFlag.DAMAGE_POOP
+	local modifiedflags = DamageFlag.DAMAGE_FIRE
+
+	local testsource = EntityRef(Isaac.GetPlayer())
+
+	local testcountdown = 7
+	local modifiedcountdown = 4
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
+		test.AssertEquals(damage, testDamage)
+		test.AssertEquals(flags, testflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, testcountdown)
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
+		test.AssertEquals(damage, initialExpectedDamage)
+		test.AssertEquals(flags, testflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, testcountdown)
+		
+		return {Damage = modifiedDamage, DamageFlags = modifiedflags, DamageCountdown = modifiedcountdown}
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
+		test.AssertEquals(damage, finalExpectedDamage)
+		test.AssertEquals(flags, modifiedflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, modifiedcountdown)
+	end)
+
+	player:TakeDamage(testDamage, testflags, testsource, testcountdown)
+end
+
+function EntityPlayerTest:TestTakeDamageDebug(player)
 	local testdamage = 2
 	local testflags = DamageFlag.DAMAGE_SPIKES | DamageFlag.DAMAGE_POOP
 	local testsource = EntityRef(Isaac.GetPlayer())
 	local testdamagecountdown = 7
+
+	Game():AddDebugFlags(DebugFlag.INFINITE_HP)
 
 	local testfunc = function(_, entity, damage, flags, source, countdown)
 		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
@@ -2856,6 +2908,64 @@ function EntityPlayerTest:TestTakeDamage(player)
 	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_TAKE_DMG, testfunc)
 	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, testfunc)
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, testfunc)
+
+	player:TakeDamage(testdamage, testflags, testsource, testdamagecountdown)
+end
+
+function EntityPlayerTest:TestTakeRedHeartDamage(player)
+	player:AddSoulHearts(4)
+
+	local testdamage = 1
+	local newdamage = 2
+
+	local testflags = DamageFlag.DAMAGE_SPIKES | DamageFlag.DAMAGE_POOP
+	local newflags = DamageFlag.DAMAGE_RED_HEARTS
+
+	local testsource = EntityRef(Isaac.GetPlayer())
+	local testdamagecountdown = 7
+
+	local originalHealth = player:GetHearts()
+	local expectedHealth = originalHealth - newdamage
+
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
+		test.AssertEquals(damage, testdamage)
+		test.AssertEquals(flags, testflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, testdamagecountdown)
+		
+		return {Damage = newdamage, DamageFlags = newflags}
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
+		test.AssertEquals(damage, newdamage)
+		test.AssertEquals(flags, newflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, testdamagecountdown)
+	end)
+
+	player:TakeDamage(testdamage, testflags, testsource, testdamagecountdown)
+
+	test.AssertEquals(player:GetHearts(), expectedHealth)
+end
+
+function EntityPlayerTest:TestPrePlayerTakeDamage(player)
+	local testdamage = 2
+	local testflags = DamageFlag.DAMAGE_SPIKES | DamageFlag.DAMAGE_POOP
+	local testsource = EntityRef(Isaac.GetPlayer())
+	local testdamagecountdown = 7
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
+		test.AssertEquals(damage, testdamage)
+		test.AssertEquals(flags, testflags)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
+		test.AssertEquals(countdown, testdamagecountdown)
+		return false
+	end)
+	test:AddUnexpectedCallback(ModCallbacks.MC_ENTITY_TAKE_DMG)
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG)
 
 	player:TakeDamage(testdamage, testflags, testsource, testdamagecountdown)
 end

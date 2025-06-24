@@ -1,5 +1,5 @@
 # REPENTOGON Test Mod
-A test mod for The Binding of Isaac: Repentance used to create and execute tests for features of REPENTON as well as the base modding API, to help catch unintended behaviour or regressions.
+A test mod for The Binding of Isaac: Repentance used to create and execute tests for features of REPENTOGON as well as the base modding API, to help catch unintended behaviour or regressions.
 
 Intended for REPENTOGON development use only. Having this be a mod instead of being part of REPENTOGON itself allows for dummy values to be added to XMLs and stuff to aid in testing.
 
