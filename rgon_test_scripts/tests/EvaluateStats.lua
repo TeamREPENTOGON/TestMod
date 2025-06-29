@@ -14,6 +14,7 @@ end
 local ALL_STATS_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST ALL STATS UP ITEM")
 local ALL_STATS_EFFECT_TRINKET = Isaac.GetTrinketIdByName("REPENTOGON TEST ALL STATS UP TRINKET EFFECT")
 local FLAT_STATS_NULL = Isaac.GetNullItemIdByName("REPENTOGON TEST FLAT TEARS/DAMAGE NULL")
+local TEARS_DAMAGE_MULT_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST TEARS/DAMAGE MULT ITEM")
 
 
 function EvaluateStatsTest:TestTearsUp(player)
@@ -115,6 +116,27 @@ function EvaluateStatsTest:TestFlatTears(player)
 	player:AddCollectible(CollectibleType.COLLECTIBLE_EVES_MASCARA)
 	test.AssertEquals(player.MaxFireDelay, (30 / (expectedTears * 0.66)) - 1)
 	player:RemoveCollectible(CollectibleType.COLLECTIBLE_EVES_MASCARA)
+end
+
+function EvaluateStatsTest:TestTearsMult(player)
+	-- Start a tears up & and a flat tears bonus to make sure both are multiplied as expected.
+	player:AddCollectible(CollectibleType.COLLECTIBLE_SAD_ONION)
+	player:AddTrinket(TrinketType.TRINKET_CANCER)
+	player:Update()
+
+	local originalFireDelay = player.MaxFireDelay
+
+	-- Compare x0.4 tears to Dr Fetus, which should behave identically.
+	player:AddCollectible(CollectibleType.COLLECTIBLE_DR_FETUS)
+	local expectedFireDelay = player.MaxFireDelay
+	test.AssertTrue(expectedFireDelay > originalFireDelay)
+	player:RemoveCollectible(CollectibleType.COLLECTIBLE_DR_FETUS)
+	test.AssertEquals(player.MaxFireDelay, originalFireDelay)
+
+	player:AddCollectible(TEARS_DAMAGE_MULT_ITEM)
+	test.AssertEquals(player.MaxFireDelay, expectedFireDelay)
+	player:RemoveCollectible(TEARS_DAMAGE_MULT_ITEM)
+	test.AssertEquals(player.MaxFireDelay, originalFireDelay)
 end
 
 function EvaluateStatsTest:TestDamageUp(player)
@@ -229,6 +251,27 @@ function EvaluateStatsTest:TestFlatDamage(player)
 	player:AddCollectible(CollectibleType.COLLECTIBLE_CROWN_OF_LIGHT)
 	test.AssertEquals(player.Damage, expectedDamage*2)
 	player:RemoveCollectible(CollectibleType.COLLECTIBLE_CROWN_OF_LIGHT)
+end
+
+function EvaluateStatsTest:TestDamageMult(player)
+	-- Start a damage up & and a flat damage bonus to make sure both are multiplied as expected.
+	player:AddCollectible(CollectibleType.COLLECTIBLE_PENTAGRAM)
+	player:AddTrinket(TrinketType.TRINKET_CURVED_HORN)
+	player:Update()
+
+	local originalDamage = player.Damage
+
+	-- Compare x2 damage to Crown of Light, which should behave identically.
+	player:AddCollectible(CollectibleType.COLLECTIBLE_CROWN_OF_LIGHT)
+	local expectedDamage = player.Damage
+	test.AssertTrue(expectedDamage > originalDamage)
+	player:RemoveCollectible(CollectibleType.COLLECTIBLE_CROWN_OF_LIGHT)
+	test.AssertEquals(player.Damage, originalDamage)
+
+	player:AddCollectible(TEARS_DAMAGE_MULT_ITEM)
+	test.AssertEquals(player.Damage, expectedDamage)
+	player:RemoveCollectible(TEARS_DAMAGE_MULT_ITEM)
+	test.AssertEquals(player.Damage, originalDamage)
 end
 
 function EvaluateStatsTest:TestOtherStats(player)

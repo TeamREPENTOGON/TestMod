@@ -424,26 +424,6 @@ function EntityNPCTest:TestVarStateFrame(entitynpc)
 	entitynpc.StateFrame = originalVal
 end
 
-function EntityNPCTest:TestTakeDamage(entitynpc)
-	local testdamage = 3.5
-	local testflags = DamageFlag.DAMAGE_SPIKES | DamageFlag.DAMAGE_POOP
-	local testsource = EntityRef(Isaac.GetPlayer())
-	local testdamagecountdown = 7
-
-	local testfunc = function(_, entity, damage, flags, source, countdown)
-		test.AssertEquals(GetPtrHash(entity), GetPtrHash(entitynpc))
-		test.AssertEquals(damage, testdamage)
-		test.AssertEquals(flags, testflags)
-		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
-		test.AssertEquals(countdown, testdamagecountdown)
-	end
-
-	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, testfunc)
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, testfunc)
-
-	entitynpc:TakeDamage(testdamage, testflags, testsource, testdamagecountdown)
-end
-
 function EntityNPCTest:TestTakeDamage(npc)
 	local testDamage = 3.5
 	local modifiedDamage = 2.4

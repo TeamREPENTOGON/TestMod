@@ -8,6 +8,9 @@
 	<passive id="7" name="REPENTOGON TEST STAT MULT ITEM" description="Stat Multiplier" gfx="Collectibles_001_TheSadOnion.png" customcache="statmultiplier" />
 	<passive id="8" name="REPENTOGON TEST ALL STATS UP ITEM" description="Whoa" gfx="Collectibles_001_TheSadOnion.png"
 		tears="0.7" damage="1" shotspeed="0.16" speed="0.2" range="100" luck="1" />
+	<passive id="9" name="REPENTOGON TEST ALL STATS DOWN ITEM" description="Whoa" gfx="Collectibles_001_TheSadOnion.png"
+		tears="-0.7" damage="-1" shotspeed="-0.16" speed="-0.2" range="-100" luck="-1" />
+	<passive id="10" name="REPENTOGON TEST TEARS/DAMAGE MULT ITEM" description="Test" gfx="Collectibles_001_TheSadOnion.png" damagemult="2" tearsmult="0.4" />
 
 	<null id="1" name="REPENTOGON TEST NULL" persistent="true" customtags="" />
 	<null id="2" name="REPENTOGON TEST NULL REVIVE" persistent="true" customtags="revive chancerevive" />
