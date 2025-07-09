@@ -263,6 +263,14 @@ function REPENTOGON_TEST.ResetPlayer(player)
 	player:AddCacheFlags(CacheFlag.CACHE_ALL, true)
 end
 
+function REPENTOGON_TEST.CleanEntities()
+	for _, ent in pairs(Isaac.GetRoomEntities()) do
+		if ent.Type ~= EntityType.ENTITY_PLAYER then
+			ent:Remove()
+		end
+	end
+end
+
 -- A new run is started between each test FILE to ensure a clean state.
 -- We need to wait for MC_POST_GAME_STARTED to run again for things to be initialized properly,
 -- so doing this between each TEST would be too slow, but between each FILE is a good comprimise.
@@ -383,6 +391,7 @@ local function RunTestsForClass(className, classTests, functionToTest)
 			TESTS_RAN = TESTS_RAN + 1
 			if Isaac.IsInGame() then
 				REPENTOGON_TEST.ResetPlayer(Isaac.GetPlayer())
+				REPENTOGON_TEST.CleanEntities()
 			end
 			REPENTOGON_TEST.RunningTest = true
 			local success, ret = pcall(function()
