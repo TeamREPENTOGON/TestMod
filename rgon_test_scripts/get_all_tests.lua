@@ -133,6 +133,7 @@ return {
 		RoomConfigStage = include(root.."RoomConfigStage"),
 		RoomTransition = include(root.."RoomTransition"),
 		ScoreSheet = include(root.."ScoreSheet"),
+		SplitTears = include(root.."SplitTears"),
 		StageTransition = include(root.."StageTransition"),
 		Weapon = include(root.."Weapon"),
 		WeightedOutcomePicker = include(root.."WeightedOutcomePicker"),
