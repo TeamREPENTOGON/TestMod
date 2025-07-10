@@ -118,6 +118,7 @@ return {
 		MultiShotParams = include(root.."MultiShotParams"),
 		NightmareScene = include(root.."NightmareScene"),
 		NullFrame = include(root.."NullFrame"),
+		OptionsMenu = include(root.."OptionsMenu"),
 		PersistentGameData = include(root.."PersistentGameData"),
 		PlayerHUD = include(root.."PlayerHUD"),
 		PlayerHUDHeart = include(root.."PlayerHUDHeart"),

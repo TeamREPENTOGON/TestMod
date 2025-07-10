@@ -13,19 +13,19 @@ end
 ----------
 
 function PauseMenuTest:TestGetCompletionMarksSprite()
-	PauseMenu.GetCompletionMarksSprite()
+	test.AssertEquals(PauseMenu.GetCompletionMarksSprite():GetFilename(), "gfx/ui/completion_widget.anm2")
 end
 
 function PauseMenuTest:TestGetMyStuffSprite()
-	PauseMenu.GetMyStuffSprite()
+	test.AssertEquals(PauseMenu.GetMyStuffSprite():GetFilename(), "gfx/ui/Death Screen.anm2")
 end
 
 function PauseMenuTest:TestGetSprite()
-	PauseMenu.GetSprite()
+	test.AssertEquals(PauseMenu.GetSprite():GetFilename(), "gfx/ui/PauseScreen.anm2")
 end
 
 function PauseMenuTest:TestGetStatsSprite()
-	PauseMenu.GetStatsSprite()
+	test.AssertEquals(PauseMenu.GetStatsSprite():GetFilename(), "gfx/ui/PauseScreenStats.anm2")
 end
 
 function PauseMenuTest:TestSetSelectedElement()
