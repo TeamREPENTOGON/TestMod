@@ -10,6 +10,8 @@ function SplitTearsTest:TestCricketsBodyTear()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceTear, splitType)
+		test.AssertTrue(sourceTear:Exists())
+		test.AssertTrue(sourceTear:IsDead())
 		test.AssertEquals(GetPtrHash(sourceTear), GetPtrHash(tear))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceTear))
 		test.AssertEquals(splitType, SplitTearType.QUAD)
@@ -30,6 +32,8 @@ function SplitTearsTest:TestParasiteTear()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceTear, splitType)
+		test.AssertTrue(sourceTear:Exists())
+		test.AssertTrue(sourceTear:IsDead())
 		test.AssertEquals(GetPtrHash(sourceTear), GetPtrHash(tear))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceTear))
 		test.AssertEquals(splitType, SplitTearType.PARASITE)
@@ -55,6 +59,8 @@ function SplitTearsTest:TestSporeTear()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceTear, splitType)
+		test.AssertTrue(sourceTear:Exists())
+		test.AssertTrue(sourceTear:IsDead())
 		test.AssertEquals(GetPtrHash(sourceTear), GetPtrHash(tear))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceTear))
 		test.AssertEquals(splitType, SplitTearType.SPORE)
@@ -80,6 +86,8 @@ function SplitTearsTest:TestHaemoTear()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceTear, splitType)
+		test.AssertTrue(sourceTear:Exists())
+		test.AssertTrue(sourceTear:IsDead())
 		test.AssertEquals(GetPtrHash(sourceTear), GetPtrHash(tear))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceTear))
 		test.AssertEquals(splitType, SplitTearType.BURST)
@@ -101,6 +109,8 @@ function SplitTearsTest:TestBoneTear()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceTear, splitType)
+		test.AssertTrue(sourceTear:Exists())
+		test.AssertTrue(sourceTear:IsDead())
 		test.AssertEquals(GetPtrHash(sourceTear), GetPtrHash(tear))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceTear))
 		test.AssertEquals(splitType, SplitTearType.BONE)
@@ -126,6 +136,8 @@ function SplitTearsTest:TestStickyLudoTear()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceTear, splitType)
+		test.AssertTrue(sourceTear:Exists())
+		test.AssertFalse(sourceTear:IsDead())
 		test.AssertEquals(GetPtrHash(sourceTear), GetPtrHash(tear))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceTear))
 		test.AssertEquals(splitType, SplitTearType.STICKY)
@@ -149,6 +161,8 @@ function SplitTearsTest:TestCricketsBodyLaser()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(laser))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, SplitTearType.QUAD)
@@ -172,6 +186,8 @@ function SplitTearsTest:TestStickyLaser()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(laser))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, SplitTearType.STICKY)
@@ -192,6 +208,8 @@ function SplitTearsTest:TestPopLaser()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(laser))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, SplitTearType.POP)
@@ -225,6 +243,8 @@ function SplitTearsTest:TestCricketsBodyMelee()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(knife))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, SplitTearType.QUAD)
@@ -248,6 +268,8 @@ function SplitTearsTest:TestBoneMelee()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(knife))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, SplitTearType.BONE)
@@ -271,6 +293,8 @@ function SplitTearsTest:TestParasiteMelee()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(knife))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, SplitTearType.PARASITE)
@@ -294,6 +318,8 @@ function SplitTearsTest:TestHaemoMelee()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(knife))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, SplitTearType.BURST)
@@ -317,6 +343,8 @@ function SplitTearsTest:TestStickyMelee()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(knife))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, SplitTearType.STICKY)
@@ -340,6 +368,8 @@ function SplitTearsTest:TestMultidimensionalTear()
 	local copyTearRef
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(tear))
 		copyTearRef = newTear
 		test.AssertEquals(splitType, SplitTearType.MULTIDIMENSIONAL)
@@ -360,6 +390,8 @@ function SplitTearsTest:TestAngelicPrism()
 	local triggerCount = 0
 
 	test:AddCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertTrue(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(tear))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, SplitTearType.ANGELIC_PRISM)
@@ -386,6 +418,8 @@ function SplitTearsTest:TestCustomTearMinimal()
 	local vel = Vector(1,0)
 
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(tear))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, SplitTearType.GENERIC)
@@ -418,6 +452,8 @@ function SplitTearsTest:TestCustomTear()
 	local splitType = "TEST"
 
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(tear))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, splitType)
@@ -449,6 +485,8 @@ function SplitTearsTest:TestFetusTear()
 	local splitType = "TEST"
 
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(tear))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, splitType)
@@ -481,6 +519,8 @@ function SplitTearsTest:TestCustomLaser()
 	local splitType = "TEST"
 
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(laser))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, splitType)
@@ -514,6 +554,8 @@ function SplitTearsTest:TestCustomKnife()
 	local splitType = "TEST"
 
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_FIRE_SPLIT_TEAR, function(_, newTear, sourceEntity, splitType)
+		test.AssertTrue(sourceEntity:Exists())
+		test.AssertFalse(sourceEntity:IsDead())
 		test.AssertEquals(GetPtrHash(sourceEntity), GetPtrHash(knife))
 		test.AssertTrue(GetPtrHash(newTear) ~= GetPtrHash(sourceEntity))
 		test.AssertEquals(splitType, splitType)

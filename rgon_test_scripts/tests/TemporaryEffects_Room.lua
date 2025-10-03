@@ -1,78 +1,60 @@
 local test = REPENTOGON_TEST
 
-local TemporaryEffectsTest = {}
+local TemporaryEffectsRoomTest = {}
 
-function TemporaryEffectsTest:BeforeEach()
-	return Isaac.GetPlayer():GetEffects()
+function TemporaryEffectsRoomTest:BeforeEach()
+	return Game():GetRoom():GetEffects()
 end
 
-function TemporaryEffectsTest:AfterEach(effects)
+function TemporaryEffectsRoomTest:AfterEach(effects)
 	
 end
 
 ----------
 
-function TemporaryEffectsTest:TestAddCollectibleEffect(effects)
+function TemporaryEffectsRoomTest:TestAddCollectibleEffect(effects)
 	-- Callback without param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_ADD_EFFECT, function(_, player, item, addCostume, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_ADD_EFFECT, function(_, item)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_SAD_ONION)))
-		test.AssertEquals(count, 3)
-		test.AssertTrue(addCostume)
 	end)
 
 	-- Callback with param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_ADD_EFFECT, function(_, player, item, addCostume, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_ADD_EFFECT, function(_, item)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_SAD_ONION)))
-		test.AssertEquals(count, 3)
-		test.AssertTrue(addCostume)
 	end, Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_SAD_ONION))
 
 	effects:AddCollectibleEffect(CollectibleType.COLLECTIBLE_SAD_ONION, true, 3)
 end
 
-function TemporaryEffectsTest:TestAddNullEffect(effects)
+function TemporaryEffectsRoomTest:TestAddNullEffect(effects)
 	-- Callback without param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_ADD_EFFECT, function(_, player, item, addCostume, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_ADD_EFFECT, function(_, item)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetNullItem(NullItemID.ID_PUBERTY)))
-		test.AssertEquals(count, 2)
-		test.AssertFalse(addCostume)
 	end)
 
 	-- Callback with param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_ADD_EFFECT, function(_, player, item, addCostume, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_ADD_EFFECT, function(_, item)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetNullItem(NullItemID.ID_PUBERTY)))
-		test.AssertEquals(count, 2)
-		test.AssertFalse(addCostume)
 	end, Isaac.GetItemConfig():GetNullItem(NullItemID.ID_PUBERTY))
 
 	effects:AddNullEffect(NullItemID.ID_PUBERTY, false, 2)
 end
 
-function TemporaryEffectsTest:TestAddTrinketEffect(effects)
+function TemporaryEffectsRoomTest:TestAddTrinketEffect(effects)
 	-- Callback without param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_ADD_EFFECT, function(_, player, item, addCostume, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_ADD_EFFECT, function(_, item)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetTrinket(TrinketType.TRINKET_SWALLOWED_PENNY)))
-		test.AssertEquals(count, 1)
-		test.AssertTrue(addCostume)
 	end)
 
 	-- Callback with param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_ADD_EFFECT, function(_, player, item, addCostume, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_ADD_EFFECT, function(_, item)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetTrinket(TrinketType.TRINKET_SWALLOWED_PENNY)))
-		test.AssertEquals(count, 1)
-		test.AssertTrue(addCostume)
 	end, Isaac.GetItemConfig():GetTrinket(TrinketType.TRINKET_SWALLOWED_PENNY))
 
 	effects:AddTrinketEffect(TrinketType.TRINKET_SWALLOWED_PENNY, true, 1)
 end
 
-function TemporaryEffectsTest:TestGetEffectsList(effects)
+function TemporaryEffectsRoomTest:TestGetEffectsList(effects)
 	effects:AddCollectibleEffect(CollectibleType.COLLECTIBLE_SAD_ONION, true, 3)
 	effects:AddNullEffect(NullItemID.ID_PUBERTY, false, 2)
 	effects:AddTrinketEffect(TrinketType.TRINKET_SWALLOWED_PENNY, true, 1)
@@ -89,143 +71,125 @@ function TemporaryEffectsTest:TestGetEffectsList(effects)
 	test.AssertEquals(GetPtrHash(list:Get(2).Item), GetPtrHash(Isaac.GetItemConfig():GetTrinket(TrinketType.TRINKET_SWALLOWED_PENNY)))
 end
 
-function TemporaryEffectsTest:TestGetCollectibleEffect(effects)
+function TemporaryEffectsRoomTest:TestGetCollectibleEffect(effects)
 	effects:AddCollectibleEffect(CollectibleType.COLLECTIBLE_SAD_ONION, true, 3)
 	test.AssertEquals(effects:GetCollectibleEffect(CollectibleType.COLLECTIBLE_SAD_ONION).Count, 3)
 	test.AssertNil(effects:GetCollectibleEffect(CollectibleType.COLLECTIBLE_D6))
 end
 
-function TemporaryEffectsTest:TestGetCollectibleEffectNum(effects)
+function TemporaryEffectsRoomTest:TestGetCollectibleEffectNum(effects)
 	effects:AddCollectibleEffect(CollectibleType.COLLECTIBLE_SAD_ONION, true, 3)
 	test.AssertEquals(effects:GetCollectibleEffectNum(CollectibleType.COLLECTIBLE_SAD_ONION), 3)
 	test.AssertEquals(effects:GetCollectibleEffectNum(CollectibleType.COLLECTIBLE_D6), 0)
 end
 
-function TemporaryEffectsTest:TestGetNullEffect(effects)
+function TemporaryEffectsRoomTest:TestGetNullEffect(effects)
 	effects:AddNullEffect(NullItemID.ID_PUBERTY, false, 2)
 	test.AssertEquals(effects:GetNullEffect(NullItemID.ID_PUBERTY).Count, 2)
 	test.AssertNil(effects:GetNullEffect(NullItemID.ID_I_FOUND_PILLS))
 end
 
-function TemporaryEffectsTest:TestGetNullEffectNum(effects)
+function TemporaryEffectsRoomTest:TestGetNullEffectNum(effects)
 	effects:AddNullEffect(NullItemID.ID_PUBERTY, false, 2)
 	test.AssertEquals(effects:GetNullEffectNum(NullItemID.ID_PUBERTY), 2)
 	test.AssertEquals(effects:GetNullEffectNum(NullItemID.ID_I_FOUND_PILLS), 0)
 end
 
-function TemporaryEffectsTest:TestGetTrinketEffect(effects)
+function TemporaryEffectsRoomTest:TestGetTrinketEffect(effects)
 	effects:AddTrinketEffect(TrinketType.TRINKET_SWALLOWED_PENNY, true, 1)
 	test.AssertEquals(effects:GetTrinketEffect(TrinketType.TRINKET_SWALLOWED_PENNY).Count, 1)
 	test.AssertNil(effects:GetTrinketEffect(TrinketType.TRINKET_PETRIFIED_POOP))
 end
 
-function TemporaryEffectsTest:TestGetTrinketEffectNum(effects)
+function TemporaryEffectsRoomTest:TestGetTrinketEffectNum(effects)
 	effects:AddTrinketEffect(TrinketType.TRINKET_SWALLOWED_PENNY, true, 1)
 	test.AssertEquals(effects:GetTrinketEffectNum(TrinketType.TRINKET_SWALLOWED_PENNY), 1)
 	test.AssertEquals(effects:GetTrinketEffectNum(TrinketType.TRINKET_PETRIFIED_POOP), 0)
 end
 
-function TemporaryEffectsTest:TestHasCollectibleEffect(effects)
+function TemporaryEffectsRoomTest:TestHasCollectibleEffect(effects)
 	effects:AddCollectibleEffect(CollectibleType.COLLECTIBLE_SAD_ONION, true, 3)
 	test.AssertTrue(effects:HasCollectibleEffect(CollectibleType.COLLECTIBLE_SAD_ONION))
 	test.AssertFalse(effects:HasCollectibleEffect(CollectibleType.COLLECTIBLE_D6))
 end
 
-function TemporaryEffectsTest:TestHasNullEffect(effects)
+function TemporaryEffectsRoomTest:TestHasNullEffect(effects)
 	effects:AddNullEffect(NullItemID.ID_PUBERTY, false, 2)
 	test.AssertTrue(effects:HasNullEffect(NullItemID.ID_PUBERTY))
 	test.AssertFalse(effects:HasNullEffect(NullItemID.ID_I_FOUND_PILLS))
 end
 
-function TemporaryEffectsTest:TestHasTrinketEffect(effects)
+function TemporaryEffectsRoomTest:TestHasTrinketEffect(effects)
 	effects:AddTrinketEffect(TrinketType.TRINKET_SWALLOWED_PENNY, true, 1)
 	test.AssertTrue(effects:HasTrinketEffect(TrinketType.TRINKET_SWALLOWED_PENNY))
 	test.AssertFalse(effects:HasTrinketEffect(TrinketType.TRINKET_PETRIFIED_POOP))
 end
 
-function TemporaryEffectsTest:TestRemoveCollectibleEffect(effects)
+function TemporaryEffectsRoomTest:TestRemoveCollectibleEffect(effects)
 	effects:AddCollectibleEffect(CollectibleType.COLLECTIBLE_SAD_ONION, true, 3)
 
 	-- Callback without param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_TRIGGER_EFFECT_REMOVED, function(_, player, item, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_TRIGGER_EFFECT_REMOVED, function(_, item, count)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_SAD_ONION)))
-		test.AssertEquals(count, 2)
 	end)
 
 	-- Callback with param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_TRIGGER_EFFECT_REMOVED, function(_, player, item, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_TRIGGER_EFFECT_REMOVED, function(_, item, count)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_SAD_ONION)))
-		test.AssertEquals(count, 2)
 	end, Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_SAD_ONION))
 
 	effects:RemoveCollectibleEffect(CollectibleType.COLLECTIBLE_SAD_ONION, 2)
 end
 
-function TemporaryEffectsTest:TestRemoveNullEffect(effects)
+function TemporaryEffectsRoomTest:TestRemoveNullEffect(effects)
 	effects:AddNullEffect(NullItemID.ID_PUBERTY, false, 2)
 
 	-- Callback without param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_TRIGGER_EFFECT_REMOVED, function(_, player, item, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_TRIGGER_EFFECT_REMOVED, function(_, item, count)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetNullItem(NullItemID.ID_PUBERTY)))
-		test.AssertEquals(count, 1)
 	end)
 
 	-- Callback with param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_TRIGGER_EFFECT_REMOVED, function(_, player, item, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_TRIGGER_EFFECT_REMOVED, function(_, item, count)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetNullItem(NullItemID.ID_PUBERTY)))
-		test.AssertEquals(count, 1)
 	end, Isaac.GetItemConfig():GetNullItem(NullItemID.ID_PUBERTY))
 
 	effects:RemoveNullEffect(NullItemID.ID_PUBERTY, 1)
 end
 
-function TemporaryEffectsTest:TestRemoveTrinketEffect(effects)
+function TemporaryEffectsRoomTest:TestRemoveTrinketEffect(effects)
 	effects:AddTrinketEffect(TrinketType.TRINKET_SWALLOWED_PENNY, true, 1)
 
 	-- Callback without param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_TRIGGER_EFFECT_REMOVED, function(_, player, item, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_TRIGGER_EFFECT_REMOVED, function(_, item, count)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetTrinket(TrinketType.TRINKET_SWALLOWED_PENNY)))
-		test.AssertEquals(count, 1)
 	end)
 
 	-- Callback with param
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_TRIGGER_EFFECT_REMOVED, function(_, player, item, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_TRIGGER_EFFECT_REMOVED, function(_, item, count)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetTrinket(TrinketType.TRINKET_SWALLOWED_PENNY)))
-		test.AssertEquals(count, 1)
 	end, Isaac.GetItemConfig():GetTrinket(TrinketType.TRINKET_SWALLOWED_PENNY))
 
 	effects:RemoveTrinketEffect(TrinketType.TRINKET_SWALLOWED_PENNY, 1)
 end
 
-function TemporaryEffectsTest:TestClearEffects(effects)
+function TemporaryEffectsRoomTest:TestClearEffects(effects)
 	effects:AddCollectibleEffect(CollectibleType.COLLECTIBLE_SAD_ONION, true, 3)
 	effects:AddNullEffect(NullItemID.ID_PUBERTY, false, 2)
 	effects:AddTrinketEffect(TrinketType.TRINKET_SWALLOWED_PENNY, true, 1)
 
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_TRIGGER_EFFECT_REMOVED, function(_, player, item, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_TRIGGER_EFFECT_REMOVED, function(_, item, count)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_SAD_ONION)))
-		test.AssertEquals(count, 3)
 	end, Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_SAD_ONION))
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_TRIGGER_EFFECT_REMOVED, function(_, player, item, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_TRIGGER_EFFECT_REMOVED, function(_, item, count)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetNullItem(NullItemID.ID_PUBERTY)))
-		test.AssertEquals(count, 2)
 	end, Isaac.GetItemConfig():GetNullItem(NullItemID.ID_PUBERTY))
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_TRIGGER_EFFECT_REMOVED, function(_, player, item, count)
-		test.AssertEquals(GetPtrHash(player), GetPtrHash(Isaac.GetPlayer()))
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ROOM_TRIGGER_EFFECT_REMOVED, function(_, item, count)
 		test.AssertEquals(GetPtrHash(item), GetPtrHash(Isaac.GetItemConfig():GetTrinket(TrinketType.TRINKET_SWALLOWED_PENNY)))
-		test.AssertEquals(count, 1)
 	end, Isaac.GetItemConfig():GetTrinket(TrinketType.TRINKET_SWALLOWED_PENNY))
 
 	effects:ClearEffects()
 end
 
 
-return TemporaryEffectsTest
+return TemporaryEffectsRoomTest

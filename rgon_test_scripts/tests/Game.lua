@@ -40,40 +40,133 @@ function GameTest:TestAddTreasureRoomsVisited(game)
 end
 
 function GameTest:TestBombDamage(game)
-	local position = Vector(1,1)
-	local damage = 1
-	local radius = 1
+	local pos = Vector(100, 50)
+	local damage = 12
+	local radius = 30
 	local linecheck = true
-	local source = Isaac.Spawn(EntityType.ENTITY_GAPER, 0, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil)
-	local tearflags = BitSet128()
-	local damageflags = 1
+	local source = Isaac.GetPlayer()
+	local tearflags = TearFlags.TEAR_POISON
+	local damageflags = DamageFlag.DAMAGE_ACID
 	local damagesource = true
-	game:BombDamage(position, damage, radius, linecheck, source, tearflags, damageflags, damagesource)
-	source:Remove()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cdamage, damage)
+		test.AssertEquals(cradius, radius)
+		test.AssertTrue(clinecheck)
+		test.AssertEquals(GetPtrHash(csource), GetPtrHash(source))
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertEquals(cdamageflags, damageflags)
+		test.AssertTrue(cdamagesource)
+	end, EntityType.ENTITY_PLAYER)
+
+	game:BombDamage(pos, damage, radius, linecheck, source, tearflags, damageflags, damagesource)
+
+	linecheck = false
+	source = nil
+	damagesource = false
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cdamage, damage)
+		test.AssertEquals(cradius, radius)
+		test.AssertFalse(clinecheck)
+		test.AssertNil(csource)
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertEquals(cdamageflags, damageflags)
+		test.AssertFalse(cdamagesource)
+	end)
+
+	game:BombDamage(pos, damage, radius, linecheck, source, tearflags, damageflags, damagesource)
 end
 
 function GameTest:TestBombExplosionEffects(game)
-	local position = Vector(1,1)
-	local damage = 1
-	local tearflags = BitSet128()
-	local color = Color(1,1,1,1)
-	local source = Isaac.Spawn(EntityType.ENTITY_GAPER, 0, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil)
-	local radiusmult = 1
+	local pos = Vector(100, 50)
+	local damage = 12
+	local tearflags = TearFlags.TEAR_POISON
+	local color = Color(1,2,3,0.5)
+	local source = Isaac.GetPlayer()
+	local radiusmult = 1.5
+	local expectedradius = 112.5
 	local linecheck = true
 	local damagesource = true
-	local damageflags = 1
-	game:BombExplosionEffects(position, damage, tearflags, color, source, radiusmult, linecheck, damagesource, damageflags)
-	source:Remove()
+	local damageflags = DamageFlag.DAMAGE_ACID
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cdamage, damage)
+		test.AssertEquals(cradius, expectedradius)
+		test.AssertTrue(clinecheck)
+		test.AssertEquals(GetPtrHash(csource), GetPtrHash(source))
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertEquals(cdamageflags, damageflags)
+		test.AssertTrue(cdamagesource)
+	end, EntityType.ENTITY_PLAYER)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cradius, expectedradius)
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertEquals(GetPtrHash(csource), GetPtrHash(source))
+		test.AssertEquals(cradiusmult, radiusmult)
+	end, EntityType.ENTITY_PLAYER)
+
+	game:BombExplosionEffects(pos, damage, tearflags, color, source, radiusmult, linecheck, damagesource, damageflags)
+
+	source = nil
+	linecheck = false
+	damagesource = false
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cdamage, damage)
+		test.AssertEquals(cradius, expectedradius)
+		test.AssertFalse(clinecheck)
+		test.AssertNil(csource)
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertEquals(cdamageflags, damageflags)
+		test.AssertFalse(cdamagesource)
+	end)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cradius, expectedradius)
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertNil(csource)
+		test.AssertEquals(cradiusmult, radiusmult)
+	end)
+
+	game:BombExplosionEffects(pos, damage, tearflags, color, source, radiusmult, linecheck, damagesource, damageflags)
 end
 
 function GameTest:TestBombTearflagEffects(game)
-	local position = Vector(1,1)
-	local radius = 1
-	local tearflags = BitSet128()
-	local source = Isaac.Spawn(EntityType.ENTITY_GAPER, 0, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil)
-	local radiusmult = 1
-	game:BombTearflagEffects(position, radius, tearflags, source, radiusmult)
-	source:Remove()
+	local pos = Vector(100, 50)
+	local radius = 30
+	local tearflags = TearFlags.TEAR_POISON
+	local source = Isaac.GetPlayer()
+	local radiusmult = 1.5
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cradius, radius)
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertEquals(GetPtrHash(csource), GetPtrHash(source))
+		test.AssertEquals(cradiusmult, radiusmult)
+	end, EntityType.ENTITY_PLAYER)
+
+	game:BombTearflagEffects(pos, radius, tearflags, source, radiusmult)
+
+	source = nil
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cradius, radius)
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertNil(csource)
+		test.AssertEquals(cradiusmult, radiusmult)
+	end)
+
+	game:BombTearflagEffects(pos, radius, tearflags, source, radiusmult)
 end
 
 function GameTest:TestButterBeanFart(game)

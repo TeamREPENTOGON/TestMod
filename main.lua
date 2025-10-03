@@ -238,6 +238,7 @@ function REPENTOGON_TEST.ResetPlayer(player)
 		player:AddMaxHearts(6 - player:GetMaxHearts())
 	end
 	player:AddHearts(player:GetMaxHearts())
+	player:SetBagOfCraftingContent({})
 	player.ControlsEnabled = true
 	player.ControlsCooldown = 0
 	player:ResetDamageCooldown()
@@ -257,6 +258,7 @@ function REPENTOGON_TEST.ResetPlayer(player)
 		player:SetCard(i, 0)
 	end
 	player:GetEffects():ClearEffects()
+	Game():GetRoom():GetEffects():ClearEffects()
 	if Game():GetDebugFlags() & DebugFlag.INFINITE_HP ~= 0 then
 		Isaac.ExecuteCommand("debug 3")
 	end
@@ -371,7 +373,7 @@ local function RunTestsForClass(className, classTests, functionToTest)
 	-- Sort tests by name for the sake of determinism.
 	local sortedTests = {}
 	for funcName, func in pairs(classTests) do
-		if funcName:match("^Test") and (not functionToTest or funcName:match(functionToTest .. "$"))
+		if funcName:match("^Test") and (not functionToTest or (funcName:match("^" .. functionToTest) or funcName:match("^Test" .. functionToTest)))
 				and not (className == "FontRenderSettings" and not REPENTANCE_PLUS) then
 			table.insert(sortedTests, {Name = funcName, Func = func})
 		end
@@ -522,7 +524,7 @@ function REPENTOGON_TEST:TestCommand(cmdName, argsStr)
 				end
 
 				for funcName in pairs(classTests) do
-					if funcName:match("^Test") and funcName == functionToTest or funcName:match(functionToTest .. "$")
+					if funcName:match("^Test") and (funcName:match("^" .. functionToTest) or funcName:match("^Test" .. functionToTest))
 							and not (classTests == "FontRenderSettings" and not REPENTANCE_PLUS) then
 						REPENTOGON_TEST:RunTests(classToTest, functionToTest)
 						return

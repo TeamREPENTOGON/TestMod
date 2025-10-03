@@ -476,4 +476,123 @@ function EntityNPCTest:TestPreventDamage(npc)
 	npc:TakeDamage(testDamage, testflags, testsource, testcountdown)
 end
 
+function EntityNPCTest:TestApplyTearflagEffectsBasic(npc)
+	local testpos = Vector(2.1, 3.2)
+	local testflags = TearFlags.TEAR_POISON | TearFlags.TEAR_PIERCING
+	local testsource = Isaac.GetPlayer()
+	local testdamage = 1.23
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_APPLY_TEARFLAG_EFFECTS, function(_, entity, pos, flags, source, damage)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(pos, testpos)
+		test.AssertEquals(flags, testflags)
+		test.AssertEquals(GetPtrHash(source), GetPtrHash(testsource))
+		test.AssertEquals(damage, testdamage)
+	end, testsource.Type)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_APPLY_TEARFLAG_EFFECTS, function(_, entity, pos, flags, source, damage)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(pos, testpos)
+		test.AssertEquals(flags, testflags)
+		test.AssertEquals(GetPtrHash(source), GetPtrHash(testsource))
+		test.AssertEquals(damage, testdamage)
+	end, testsource.Type)
+
+	npc:ApplyTearflagEffects(testpos, testflags, testsource, testdamage)
+end
+
+function EntityNPCTest:TestApplyTearflagEffectsNilParams(npc)
+	local testpos = Vector(2.1, 3.2)
+	local testflags = TearFlags.TEAR_POISON | TearFlags.TEAR_PIERCING
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_APPLY_TEARFLAG_EFFECTS, function(_, entity, pos, flags, source, damage)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(pos, testpos)
+		test.AssertEquals(flags, testflags)
+		test.AssertNil(source)
+		test.AssertEquals(damage, 3.5)
+	end)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_APPLY_TEARFLAG_EFFECTS, function(_, entity, pos, flags, source, damage)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(pos, testpos)
+		test.AssertEquals(flags, testflags)
+		test.AssertNil(source)
+		test.AssertEquals(damage, 3.5)
+	end)
+
+	npc:ApplyTearflagEffects(testpos, testflags)
+end
+
+function EntityNPCTest:TestApplyTearflagEffectsReturnFalse(npc)
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_APPLY_TEARFLAG_EFFECTS, function(_, entity, pos, flags, source, damage)
+		return false
+	end)
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_APPLY_TEARFLAG_EFFECTS)
+
+	npc:ApplyTearflagEffects(Vector.Zero, TearFlags.TEAR_POISON)
+end
+
+function EntityNPCTest:TestApplyTearflagEffectsReturnTable(npc)
+	local tear = Isaac.Spawn(EntityType.ENTITY_TEAR, 0, 0, Vector.Zero, Vector.Zero, player):ToTear()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_APPLY_TEARFLAG_EFFECTS, function(_, entity, pos, flags, source, damage)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(pos, Vector(1,1))
+		test.AssertEquals(flags, TearFlags.TEAR_SPECTRAL)
+		test.AssertEquals(GetPtrHash(source), GetPtrHash(tear))
+		test.AssertEquals(damage, 1)
+		return {
+			Position = Vector(2,2),
+			TearFlags = TearFlags.TEAR_PIERCING,
+			Damage = 2,
+		}
+	end, EntityType.ENTITY_TEAR)
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_APPLY_TEARFLAG_EFFECTS, function(_, entity, pos, flags, source, damage)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(pos, Vector(2,2))
+		test.AssertEquals(flags, TearFlags.TEAR_PIERCING)
+		test.AssertEquals(GetPtrHash(source), GetPtrHash(tear))
+		test.AssertEquals(damage, 2)
+		return {
+			Position = Vector(3,3),
+			TearFlags = TearFlags.TEAR_HOMING,
+			Damage = 3,
+		}
+	end, EntityType.ENTITY_TEAR)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_APPLY_TEARFLAG_EFFECTS, function(_, entity, pos, flags, source, damage)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(pos, Vector(3,3))
+		test.AssertEquals(flags, TearFlags.TEAR_HOMING)
+		test.AssertEquals(GetPtrHash(source), GetPtrHash(tear))
+		test.AssertEquals(damage, 3)
+	end, EntityType.ENTITY_TEAR)
+
+	npc:ApplyTearflagEffects(Vector(1,1), TearFlags.TEAR_SPECTRAL, tear, 1)
+end
+
+function EntityNPCTest:TestApplyTearflagEffectsForceCollide(npc)
+	local tear = Isaac.Spawn(EntityType.ENTITY_TEAR, 0, 0, Vector.Zero, Vector.Zero, Isaac.GetPlayer()):ToTear()
+	tear.TearFlags = TearFlags.TEAR_SLOW | TearFlags.TEAR_PIERCING
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_APPLY_TEARFLAG_EFFECTS, function(_, entity, pos, flags, source, damage)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(pos, tear.Position)
+		test.AssertEquals(flags, tear.TearFlags)
+		test.AssertEquals(GetPtrHash(source), GetPtrHash(tear))
+		test.AssertEquals(damage, tear.CollisionDamage)
+		return {
+			TearFlags = flags | TearFlags.TEAR_POISON,
+			Damage = 1.23,
+		}
+	end, EntityType.ENTITY_TEAR)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_APPLY_TEARFLAG_EFFECTS, function(_, entity, pos, flags, source, damage)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(pos, tear.Position)
+		test.AssertEquals(flags, tear.TearFlags | TearFlags.TEAR_POISON)
+		test.AssertEquals(GetPtrHash(source), GetPtrHash(tear))
+		test.AssertEquals(damage, 1.23)
+	end, EntityType.ENTITY_TEAR)
+
+	tear:ForceCollide(npc)
+end
+
 return EntityNPCTest

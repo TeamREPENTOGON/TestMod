@@ -106,6 +106,37 @@ function CustomCacheTest:TestMaxBombsNull(player)
 	test.AssertEquals(player:GetCustomCacheValue("maxbombs"), 99)
 end
 
+function CustomCacheTest:TestMaxBombsPlaceBombs(player)
+	test:AddCallback(ModCallbacks.MC_EVALUATE_CUSTOM_CACHE, function(_, p, cache, value)
+		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
+		test.AssertEquals(cache, "maxbombs")
+		test.AssertEquals(value, 99)
+		return 150
+	end, "maxbombs")
+	player:AddCustomCacheTag("maxbombs", true)
+
+	local forceBombInput = function(_, player, hook, action)
+		if action == ButtonAction.ACTION_BOMB then
+			return true
+		end
+	end
+	test:AddCallback(ModCallbacks.MC_INPUT_ACTION, forceBombInput, InputHook.IS_ACTION_TRIGGERED)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_USE_BOMB, function(_, p)
+		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
+	end)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_PLAYER_USE_BOMB, function(_, p, b)
+		test.AssertEquals(GetPtrHash(player), GetPtrHash(p))
+		test.AssertEquals(b.Type, EntityType.ENTITY_BOMB)
+	end)
+
+	player:AddBombs(999)
+	test.AssertEquals(player:GetNumBombs(), 150)
+	player:SetBombPlaceDelay(0)
+	player:Update()
+	test.AssertEquals(player:GetNumBombs(), 149)
+end
+
 function CustomCacheTest:TestMaxKeysTrinket(player)
 	test.AssertEquals(player:GetMaxKeys(), 99)
 	test.AssertEquals(player:GetCustomCacheValue("maxkeys"), 99)

@@ -2526,10 +2526,171 @@ function EntityPlayerTest:TestTriggerRoomClear(entityplayer)
 	entityplayer:TriggerRoomClear()
 end
 
-function EntityPlayerTest:TestTryAddToBagOfCrafting(entityplayer)
-	local pickup = Isaac.Spawn(EntityType.ENTITY_PICKUP, 20, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil):ToPickup()
-	entityplayer:TryAddToBagOfCrafting(pickup)
-	pickup:Remove()
+function EntityPlayerTest:TestTryAddToBagOfCraftingBasic(player)
+	local coin = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COIN, CoinSubType.COIN_PENNY, Vector.Zero, Vector.Zero, nil):ToPickup()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_TRY_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup, tab)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(coin))
+		test.AssertEquals(tab[1], BagOfCraftingPickup.BOC_PENNY)
+		test.AssertNil(tab[2])
+	end, PickupVariant.PICKUP_COIN)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(coin))
+	end, PickupVariant.PICKUP_COIN)
+
+	test.AssertTrue(player:TryAddToBagOfCrafting(coin))
+	test.AssertEquals(player:GetBagOfCraftingSlot(0), BagOfCraftingPickup.BOC_PENNY)
+	test.AssertEquals(player:GetBagOfCraftingSlot(1), BagOfCraftingPickup.BOC_NONE)
+end
+
+function EntityPlayerTest:TestTryAddToBagOfCraftingMulti(player)
+	local blendedheart = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_HEART, HeartSubType.HEART_BLENDED, Vector.Zero, Vector.Zero, nil):ToPickup()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_TRY_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup, tab)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(blendedheart))
+		test.AssertEquals(tab[1], BagOfCraftingPickup.BOC_SOUL_HEART)
+		test.AssertEquals(tab[2], BagOfCraftingPickup.BOC_RED_HEART)
+		test.AssertNil(tab[3])
+	end, PickupVariant.PICKUP_HEART)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(blendedheart))
+	end, PickupVariant.PICKUP_HEART)
+
+	test.AssertTrue(player:TryAddToBagOfCrafting(blendedheart))
+	test.AssertEquals(player:GetBagOfCraftingSlot(0), BagOfCraftingPickup.BOC_SOUL_HEART)
+	test.AssertEquals(player:GetBagOfCraftingSlot(1), BagOfCraftingPickup.BOC_RED_HEART)
+	test.AssertEquals(player:GetBagOfCraftingSlot(2), BagOfCraftingPickup.BOC_NONE)
+end
+
+function EntityPlayerTest:TestTryAddToBagOfCraftingNone(player)
+	local redbomb = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_THROWABLEBOMB, 0, Vector.Zero, Vector.Zero, nil):ToPickup()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_TRY_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup, tab)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(redbomb))
+		test.AssertNil(tab[1])
+	end, PickupVariant.PICKUP_THROWABLEBOMB)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_ADD_TO_BAG_OF_CRAFTING)
+
+	test.AssertFalse(player:TryAddToBagOfCrafting(redbomb))
+	test.AssertEquals(player:GetBagOfCraftingSlot(0), BagOfCraftingPickup.BOC_NONE)
+end
+
+function EntityPlayerTest:TestTryAddToBagOfCraftingReturn(player)
+	local redbomb = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_THROWABLEBOMB, 0, Vector.Zero, Vector.Zero, nil):ToPickup()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_TRY_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup, tab)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(redbomb))
+		test.AssertNil(tab[1])
+		return {BagOfCraftingPickup.BOC_RED_HEART}
+	end, PickupVariant.PICKUP_THROWABLEBOMB)
+	test:AddOneTimeCallback(ModCallbacks.MC_TRY_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup, tab)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(redbomb))
+		test.AssertEquals(tab[1], BagOfCraftingPickup.BOC_RED_HEART)
+		return {BagOfCraftingPickup.BOC_SOUL_HEART}
+	end, PickupVariant.PICKUP_THROWABLEBOMB)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(redbomb))
+	end, PickupVariant.PICKUP_THROWABLEBOMB)
+
+	test.AssertTrue(player:TryAddToBagOfCrafting(redbomb))
+	test.AssertEquals(player:GetBagOfCraftingSlot(0), BagOfCraftingPickup.BOC_SOUL_HEART)
+	test.AssertEquals(player:GetBagOfCraftingSlot(1), BagOfCraftingPickup.BOC_NONE)
+end
+
+function EntityPlayerTest:TestTryAddToBagOfCraftingReturnMultiple(player)
+	local coin = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COIN, CoinSubType.COIN_PENNY, Vector.Zero, Vector.Zero, nil):ToPickup()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_TRY_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup, tab)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(coin))
+		test.AssertEquals(tab[1], BagOfCraftingPickup.BOC_PENNY)
+		test.AssertNil(tab[2])
+		return {
+			BagOfCraftingPickup.BOC_RED_HEART,
+			BagOfCraftingPickup.BOC_SOUL_HEART,
+			BagOfCraftingPickup.BOC_BLACK_HEART,
+			BagOfCraftingPickup.BOC_ETERNAL_HEART,
+			BagOfCraftingPickup.BOC_GOLD_HEART,
+			BagOfCraftingPickup.BOC_BONE_HEART,
+			BagOfCraftingPickup.BOC_ROTTEN_HEART,
+			BagOfCraftingPickup.BOC_POOP,
+		}
+	end, PickupVariant.PICKUP_COIN)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(coin))
+	end, PickupVariant.PICKUP_COIN)
+
+	test.AssertTrue(player:TryAddToBagOfCrafting(coin))
+	test.AssertEquals(player:GetBagOfCraftingSlot(0), BagOfCraftingPickup.BOC_RED_HEART)
+	test.AssertEquals(player:GetBagOfCraftingSlot(1), BagOfCraftingPickup.BOC_SOUL_HEART)
+	test.AssertEquals(player:GetBagOfCraftingSlot(2), BagOfCraftingPickup.BOC_BLACK_HEART)
+	test.AssertEquals(player:GetBagOfCraftingSlot(3), BagOfCraftingPickup.BOC_ETERNAL_HEART)
+	test.AssertEquals(player:GetBagOfCraftingSlot(4), BagOfCraftingPickup.BOC_GOLD_HEART)
+	test.AssertEquals(player:GetBagOfCraftingSlot(5), BagOfCraftingPickup.BOC_BONE_HEART)
+	test.AssertEquals(player:GetBagOfCraftingSlot(6), BagOfCraftingPickup.BOC_ROTTEN_HEART)
+	test.AssertEquals(player:GetBagOfCraftingSlot(7), BagOfCraftingPickup.BOC_POOP)
+end
+
+function EntityPlayerTest:TestTryAddToBagOfCraftingReturnCancel(player)
+	local blendedheart = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_HEART, HeartSubType.HEART_BLENDED, Vector.Zero, Vector.Zero, nil):ToPickup()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_TRY_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup, tab)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(blendedheart))
+		test.AssertEquals(tab[1], BagOfCraftingPickup.BOC_SOUL_HEART)
+		test.AssertEquals(tab[2], BagOfCraftingPickup.BOC_RED_HEART)
+		test.AssertNil(tab[3])
+		return false
+	end, PickupVariant.PICKUP_HEART)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_ADD_TO_BAG_OF_CRAFTING)
+
+	test.AssertFalse(player:TryAddToBagOfCrafting(blendedheart))
+	test.AssertEquals(player:GetBagOfCraftingSlot(0), BagOfCraftingPickup.BOC_NONE)
+end
+
+function EntityPlayerTest:TestTryAddToBagOfCraftingReturnZero(player)
+	local coin = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COIN, CoinSubType.COIN_PENNY, Vector.Zero, Vector.Zero, nil):ToPickup()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_TRY_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup, tab)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(coin))
+		test.AssertEquals(tab[1], BagOfCraftingPickup.BOC_PENNY)
+		test.AssertNil(tab[2])
+		return {BagOfCraftingPickup.BOC_NONE}
+	end, PickupVariant.PICKUP_COIN)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_ADD_TO_BAG_OF_CRAFTING)
+
+	test.AssertFalse(player:TryAddToBagOfCrafting(coin))
+	test.AssertEquals(player:GetBagOfCraftingSlot(0), BagOfCraftingPickup.BOC_NONE)
+end
+
+function EntityPlayerTest:TestTryAddToBagOfCraftingReturnEmpty(player)
+	local coin = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COIN, CoinSubType.COIN_PENNY, Vector.Zero, Vector.Zero, nil):ToPickup()
+
+	test:AddOneTimeCallback(ModCallbacks.MC_TRY_ADD_TO_BAG_OF_CRAFTING, function(_, plr, pickup, tab)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(GetPtrHash(pickup), GetPtrHash(coin))
+		test.AssertEquals(tab[1], BagOfCraftingPickup.BOC_PENNY)
+		test.AssertNil(tab[2])
+		return {}
+	end, PickupVariant.PICKUP_COIN)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_ADD_TO_BAG_OF_CRAFTING)
+
+	test.AssertFalse(player:TryAddToBagOfCrafting(coin))
+	test.AssertEquals(player:GetBagOfCraftingSlot(0), BagOfCraftingPickup.BOC_NONE)
 end
 
 function EntityPlayerTest:TestTryDecreaseGlowingHourglassUses(entityplayer)

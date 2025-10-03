@@ -80,6 +80,7 @@ return {
 		TearParams = include(root.."TearParams"),
 		TemporaryEffect = include(root.."TemporaryEffect"),
 		TemporaryEffects = include(root.."TemporaryEffects"),
+		TemporaryEffects_Room = include(root.."TemporaryEffects_Room"),
 		Vector = include(root.."Vector"),
 		Ambush = include(root.."Ambush"),
 		AnimationData = include(root.."AnimationData"),
