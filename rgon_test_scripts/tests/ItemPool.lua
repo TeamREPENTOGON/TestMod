@@ -23,11 +23,6 @@ function ItemPoolTest:TestAddRoomBlacklist(itempool)
 	itempool:AddRoomBlacklist(item)
 end
 
-function ItemPoolTest:TestForceAddPillEffect(itempool)
-	local id = 1
-	itempool:ForceAddPillEffect(id)
-end
-
 function ItemPoolTest:TestGetCard(itempool)
 	local seed = 1
 	local playing = true
@@ -50,12 +45,6 @@ function ItemPoolTest:TestGetPill(itempool)
 	itempool:GetPill(seed)
 end
 
-function ItemPoolTest:TestGetPillEffect(itempool)
-	local pillcolor = 1
-	local player = Isaac.GetPlayer()
-	itempool:GetPillEffect(pillcolor, player)
-end
-
 function ItemPoolTest:TestGetPoolForRoom(itempool)
 	local roomtype = 1
 	local seed = 1
@@ -65,16 +54,6 @@ end
 function ItemPoolTest:TestGetTrinket(itempool)
 	local dontadvancerng = true
 	itempool:GetTrinket(dontadvancerng)
-end
-
-function ItemPoolTest:TestIdentifyPill(itempool)
-	local pillcolor = 1
-	itempool:IdentifyPill(pillcolor)
-end
-
-function ItemPoolTest:TestIsPillIdentified(itempool)
-	local pillcolor = 1
-	itempool:IsPillIdentified(pillcolor)
 end
 
 function ItemPoolTest:TestRemoveCollectible(itempool)
@@ -185,9 +164,57 @@ function ItemPoolTest:TestSetLastPool(itempool)
 	itempool:SetLastPool(1)
 end
 
-function ItemPoolTest:TestUnidentifyPill(itempool)
-	local pill = 1
-	itempool:UnidentifyPill(pill)
+function ItemPoolTest:TestIdentifyPill(itempool)
+	-- Test valid PillColors
+	for pillColor = PillColor.PILL_NULL, PillColor.PILL_GOLD do
+		test.AssertFalse(itempool:IsPillIdentified(pillColor))
+		itempool:IdentifyPill(pillColor)
+		test.AssertTrue(itempool:IsPillIdentified(pillColor))
+		itempool:UnidentifyPill(pillColor)
+		test.AssertFalse(itempool:IsPillIdentified(pillColor))
+
+		local pillEffect = itempool:GetPillEffect(pillColor)
+		if pillColor == PillColor.PILL_NULL then
+			test.AssertEquals(pillEffect, PillEffect.PILLEFFECT_NULL)
+		else
+			test.AssertTrue(pillEffect > PillEffect.PILLEFFECT_NULL and pillEffect < #Isaac.GetItemConfig():GetPillEffects())
+		end
+	end
+
+	-- Test invalid PillColors
+	for i = 0, 10 do
+		for _, pillColor in ipairs({-1-i, PillColor.NUM_PILLS+i}) do
+			test.AssertFalse(itempool:IsPillIdentified(pillColor))
+			itempool:IdentifyPill(pillColor)
+			test.AssertFalse(itempool:IsPillIdentified(PillColor.PILL_GOLD))
+			test.AssertFalse(itempool:IsPillIdentified(pillColor))
+			itempool:UnidentifyPill(pillColor)
+			test.AssertFalse(itempool:IsPillIdentified(pillColor))
+
+			test.AssertEquals(itempool:GetPillEffect(pillColor), PillEffect.PILLEFFECT_NULL)
+		end
+	end
+end
+
+function ItemPoolTest:TestGetPillEffect(itempool)
+	local player = Isaac.GetPlayer()
+	test.AssertEquals(itempool:GetPillEffect(PillColor.PILL_NULL, player), PillEffect.PILLEFFECT_NULL)
+	for pillColor = PillColor.PILL_BLUE_BLUE, PillColor.PILL_GOLD do
+		local pillEffect = itempool:GetPillEffect(pillColor, player)
+		test.AssertTrue(pillEffect > PillEffect.PILLEFFECT_NULL and pillEffect < #Isaac.GetItemConfig():GetPillEffects())
+	end
+	test.AssertEquals(itempool:GetPillEffect(PillColor.NUM_PILLS, player), PillEffect.PILLEFFECT_NULL)
+
+	local tearsDownPillColor = itempool:ForceAddPillEffect(PillEffect.PILLEFFECT_TEARS_DOWN)
+	test.AssertEquals(itempool:GetPillEffect(tearsDownPillColor, player), PillEffect.PILLEFFECT_TEARS_DOWN)
+	player:AddCollectible(CollectibleType.COLLECTIBLE_PHD)
+	test.AssertEquals(itempool:GetPillEffect(tearsDownPillColor, player), PillEffect.PILLEFFECT_TEARS_UP)
+end
+
+function ItemPoolTest:TestForceAddPillEffect(itempool)
+	for _, pillEffect in ipairs({PillEffect.PILLEFFECT_BAD_GAS, PillEffect.PILLEFFECT_RETRO_VISION, PillEffect.PILLEFFECT_EXPERIMENTAL}) do
+		test.AssertEquals(itempool:GetPillEffect(itempool:ForceAddPillEffect(pillEffect)), pillEffect)
+	end
 end
 
 

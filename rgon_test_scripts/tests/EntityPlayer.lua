@@ -846,8 +846,27 @@ function EntityPlayerTest:TestGetHeadDirection(entityplayer)
 	entityplayer:GetHeadDirection()
 end
 
-function EntityPlayerTest:TestGetHeartLimit(entityplayer)
-	entityplayer:GetHeartLimit()
+function EntityPlayerTest:TestGetHeartLimit(player)
+	test:AddOneTimeCallback(ModCallbacks.MC_PLAYER_GET_HEART_LIMIT, function(_, p, limit, isKeeper)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(limit, 24)
+		test.AssertEquals(isKeeper, false)
+	end)
+	test.AssertEquals(player:GetHeartLimit(), 24)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PLAYER_GET_HEART_LIMIT, function(_, p, limit, isKeeper)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(limit, 24)
+		test.AssertEquals(isKeeper, true)
+		return 12
+	end)
+	test:AddOneTimeCallback(ModCallbacks.MC_PLAYER_GET_HEART_LIMIT, function(_, p, limit, isKeeper)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(limit, 12)
+		test.AssertEquals(isKeeper, true)
+		return 14
+	end)
+	test.AssertEquals(player:GetHeartLimit(true), 14)
 end
 
 function EntityPlayerTest:TestGetJarFlies(entityplayer)
@@ -1456,33 +1475,306 @@ function EntityPlayerTest:TestUpdateCanShoot(entityplayer)
 	entityplayer:UpdateCanShoot()
 end
 
-function EntityPlayerTest:TestUseActiveItem(entityplayer)
-	local item = 1
-	local showanim = true
-	local keepactiveitem = true
-	local allownonmainplayer = true
-	local toaddcostume = true
-	local slot = 1
-	local customvardata = 1
-	entityplayer:UseActiveItem(item, showanim, keepactiveitem, allownonmainplayer, toaddcostume, slot, customvardata)
+function EntityPlayerTest:TestUseActiveItem(player)
+	local testcallback = function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, 0)
+		test.AssertEquals(slot, -1)
+		test.AssertEquals(vardata, 0)
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_ITEM, testcallback)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, testcallback)
+
+	test.AssertEquals(player:UseActiveItem(CollectibleType.COLLECTIBLE_D6), UseActiveItemResultFlag.DISCHARGE)
+	test.AssertFalse(player:IsExtraAnimationFinished())
 end
 
-function EntityPlayerTest:TestUseCard(entityplayer)
-	local id = 1
-	local useflags = 1
-	entityplayer:UseCard(id, useflags)
+function EntityPlayerTest:TestUseActiveItemFull(player)
+	local testcallback = function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, UseFlag.USE_NOANIM)
+		test.AssertEquals(slot, 1)
+		test.AssertEquals(vardata, 6)
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_ITEM, testcallback)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, testcallback)
+
+	test.AssertEquals(player:UseActiveItem(CollectibleType.COLLECTIBLE_D6, UseFlag.USE_NOANIM, 1, 6), UseActiveItemResultFlag.DISCHARGE)
+	test.AssertTrue(player:IsExtraAnimationFinished())
 end
 
-function EntityPlayerTest:TestUsePill(entityplayer)
-	local id = 1
-	local pillcolor = 1
-	local useflags = 1
-	entityplayer:UsePill(id, pillcolor, useflags)
+function EntityPlayerTest:TestUseActiveItemCancel(player)
+	local testcallback = function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, 0)
+		test.AssertEquals(slot, -1)
+		test.AssertEquals(vardata, 0)
+		return true
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_ITEM, testcallback)
+	test:AddUnexpectedCallback(ModCallbacks.MC_USE_ITEM)
+
+	test.AssertEquals(player:UseActiveItem(CollectibleType.COLLECTIBLE_D6), UseActiveItemResultFlag.DISCHARGE)
 end
 
-function EntityPlayerTest:TestUsePoopSpell(entityplayer)
-	local poopspelltype = 1
-	entityplayer:UsePoopSpell(poopspelltype)
+function EntityPlayerTest:TestUseActiveItemReturnFlags(player)
+	test.AssertEquals(player:UseActiveItem(CollectibleType.COLLECTIBLE_D6), UseActiveItemResultFlag.DISCHARGE)
+	test.AssertEquals(player:UseActiveItem(CollectibleType.COLLECTIBLE_NOTCHED_AXE), 0)
+	test.AssertEquals(player:UseActiveItem(CollectibleType.COLLECTIBLE_BLUE_BOX), UseActiveItemResultFlag.DISCHARGE)
+	test.AssertEquals(player:UseActiveItem(CollectibleType.COLLECTIBLE_BLUE_BOX, UseFlag.USE_OWNED), UseActiveItemResultFlag.DISCHARGE | UseActiveItemResultFlag.REMOVE)
+end
+
+function EntityPlayerTest:TestUseActiveItemReturnFlagsCallback(player)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, 0)
+		test.AssertEquals(slot, -1)
+		test.AssertEquals(vardata, 0)
+		return {
+			Discharge = false,
+			Remove = true,
+		}
+	end)
+
+	test.AssertEquals(player:UseActiveItem(CollectibleType.COLLECTIBLE_D6), UseActiveItemResultFlag.REMOVE)
+end
+
+function EntityPlayerTest:TestUseActiveItemReturnFlagsCallbackBothFlags(player)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_NOTCHED_AXE)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, 0)
+		test.AssertEquals(slot, -1)
+		test.AssertEquals(vardata, 0)
+		return {
+			Discharge = true,
+			Remove = true,
+			ShowAnim = true,
+		}
+	end)
+
+	test.AssertEquals(player:UseActiveItem(CollectibleType.COLLECTIBLE_NOTCHED_AXE), UseActiveItemResultFlag.DISCHARGE | UseActiveItemResultFlag.REMOVE)
+	test.AssertFalse(player:IsExtraAnimationFinished())
+end
+
+function EntityPlayerTest:TestUseActiveItemLegacyRepWrapper(player)
+	local testcallback = function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, 0)
+		test.AssertEquals(slot, 1)
+		test.AssertEquals(vardata, 0)
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_ITEM, testcallback)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, testcallback)
+
+	player:UseActiveItem(CollectibleType.COLLECTIBLE_D6, 0, 1)
+end
+
+function EntityPlayerTest:TestUseActiveItemLegacyAbpWrapper(player)
+	local testcallback = function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, 0)
+		test.AssertEquals(slot, -1)
+		test.AssertEquals(vardata, 0)
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_ITEM, testcallback)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, testcallback)
+
+	player:UseActiveItem(CollectibleType.COLLECTIBLE_D6, "hi", 1)
+end
+
+function EntityPlayerTest:TestUseActiveItemLegacyShowAnim(player)
+	local testcallback = function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, UseFlag.USE_NOANIM)
+		test.AssertEquals(slot, -1)
+		test.AssertEquals(vardata, 0)
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_ITEM, testcallback)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, testcallback)
+
+	player:UseActiveItem(CollectibleType.COLLECTIBLE_D6, false)
+	test.AssertTrue(player:IsExtraAnimationFinished())
+end
+
+function EntityPlayerTest:TestUseActiveItemLegacyKeepActive(player)
+	local testcallback = function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, UseFlag.USE_REMOVEACTIVE)
+		test.AssertEquals(slot, -1)
+		test.AssertEquals(vardata, 0)
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_ITEM, testcallback)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, testcallback)
+
+	test.AssertEquals(player:UseActiveItem(CollectibleType.COLLECTIBLE_D6, nil, false), UseActiveItemResultFlag.DISCHARGE)
+	test.AssertFalse(player:IsExtraAnimationFinished())
+end
+
+function EntityPlayerTest:TestUseActiveItemLegacyNonBooleans(player)
+	local testcallback = function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, UseFlag.USE_ALLOWNONMAIN)
+		test.AssertEquals(slot, 0)
+		test.AssertEquals(vardata, 0)
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_ITEM, testcallback)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, testcallback)
+
+	player:UseActiveItem(CollectibleType.COLLECTIBLE_D6, "hi", 0, 0, 0, 0)
+end
+
+function EntityPlayerTest:TestUseActiveItemLegacyTrues(player)
+	local testcallback = function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, UseFlag.USE_ALLOWNONMAIN | UseFlag.USE_CUSTOMVARDATA)
+		test.AssertEquals(slot, 1)
+		test.AssertEquals(vardata, 1)
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_ITEM, testcallback)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, testcallback)
+
+	player:UseActiveItem(CollectibleType.COLLECTIBLE_D6, true, true, true, true, 1, 1)
+end
+
+function EntityPlayerTest:TestUseActiveItemLegacyFalses(player)
+	local testcallback = function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, UseFlag.USE_NOANIM | UseFlag.USE_NOCOSTUME | UseFlag.USE_REMOVEACTIVE)
+		test.AssertEquals(slot, -1)
+		test.AssertEquals(vardata, 0)
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_ITEM, testcallback)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, testcallback)
+
+	player:UseActiveItem(CollectibleType.COLLECTIBLE_D6, false, false, false, false, false, false)
+end
+
+function EntityPlayerTest:TestUseCard(player)
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_CARD, function(_, card, plr, useFlags)
+		test.AssertEquals(card, Card.CARD_MAGICIAN)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, UseFlag.USE_NOANIM)
+	end, Card.CARD_MAGICIAN)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_CARD, function(_, card, plr, useFlags)
+		test.AssertEquals(card, Card.CARD_MAGICIAN)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, UseFlag.USE_NOANIM)
+	end, Card.CARD_MAGICIAN)
+	player:UseCard(Card.CARD_MAGICIAN, UseFlag.USE_NOANIM)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_CARD, function(_, card, plr, useFlags)
+		test.AssertEquals(card, Card.CARD_HIGH_PRIESTESS)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, 0)
+		return true
+	end, Card.CARD_HIGH_PRIESTESS)
+	test:AddUnexpectedCallback(ModCallbacks.MC_USE_CARD)
+	player:UseCard(Card.CARD_HIGH_PRIESTESS)
+end
+
+function EntityPlayerTest:TestUsePill(player)
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_PILL, function(_, pillEffect, pillColor, plr, useFlags)
+		test.AssertEquals(pillEffect, PillEffect.PILLEFFECT_BAD_GAS)
+		test.AssertEquals(pillColor, PillColor.PILL_BLUE_BLUE)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, UseFlag.USE_NOANIM)
+	end, PillEffect.PILLEFFECT_BAD_GAS)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_PILL, function(_, pillEffect, plr, useFlags, pillColor)
+		test.AssertEquals(pillEffect, PillEffect.PILLEFFECT_BAD_GAS)
+		test.AssertEquals(pillColor, PillColor.PILL_BLUE_BLUE)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, UseFlag.USE_NOANIM)
+	end, PillEffect.PILLEFFECT_BAD_GAS)
+	player:UsePill(PillEffect.PILLEFFECT_BAD_GAS, PillColor.PILL_BLUE_BLUE, UseFlag.USE_NOANIM)
+	test.AssertTrue(Game():GetItemPool():IsPillIdentified(PillColor.PILL_BLUE_BLUE))
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_PILL, function(_, pillEffect, pillColor, plr, useFlags)
+		test.AssertEquals(pillEffect, PillEffect.PILLEFFECT_I_FOUND_PILLS)
+		test.AssertEquals(pillColor, PillColor.PILL_GOLD)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, 0)
+	end, PillEffect.PILLEFFECT_I_FOUND_PILLS)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_PILL, function(_, pillEffect, plr, useFlags, pillColor)
+		test.AssertEquals(pillEffect, PillEffect.PILLEFFECT_I_FOUND_PILLS)
+		test.AssertEquals(pillColor, PillColor.PILL_GOLD)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, 0)
+	end, PillEffect.PILLEFFECT_I_FOUND_PILLS)
+	player:UsePill(PillEffect.PILLEFFECT_I_FOUND_PILLS, PillColor.PILL_GOLD)
+	test.AssertFalse(Game():GetItemPool():IsPillIdentified(PillColor.PILL_GOLD))
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_PILL, function(_, pillEffect, pillColor, plr, useFlags)
+		test.AssertEquals(pillEffect, PillEffect.PILLEFFECT_NULL)
+		test.AssertEquals(pillColor, PillColor.PILL_NULL)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, 0)
+	end, PillEffect.PILLEFFECT_NULL)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_PILL, function(_, pillEffect, plr, useFlags, pillColor)
+		test.AssertEquals(pillEffect, PillEffect.PILLEFFECT_NULL)
+		test.AssertEquals(pillColor, PillColor.PILL_NULL)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, 0)
+	end, PillEffect.PILLEFFECT_NULL)
+	player:UsePill(PillEffect.PILLEFFECT_NULL, PillColor.PILL_NULL)
+	test.AssertFalse(Game():GetItemPool():IsPillIdentified(PillColor.PILL_GOLD))
+	test.AssertTrue(Game():GetItemPool():IsPillIdentified(PillColor.PILL_NULL))
+
+	local invalidPillEffect = 222
+	local invalidPillColor = 111
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_PILL, function(_, pillEffect, pillColor, plr, useFlags)
+		test.AssertEquals(pillEffect, invalidPillEffect)
+		test.AssertEquals(pillColor, invalidPillColor)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, 0)
+	end, PillEffect.PILLEFFECT_NULL)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_PILL, function(_, pillEffect, plr, useFlags, pillColor)
+		test.AssertEquals(pillEffect, invalidPillEffect)
+		test.AssertEquals(pillColor, invalidPillColor)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, 0)
+	end, invalidPillEffect)
+	player:UsePill(invalidPillEffect, invalidPillColor)
+	test.AssertFalse(Game():GetItemPool():IsPillIdentified(PillColor.PILL_GOLD))
+	test.AssertFalse(Game():GetItemPool():IsPillIdentified(invalidPillColor))
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_PILL, function(_, pillEffect, pillColor, plr, useFlags)
+		test.AssertEquals(pillEffect, PillEffect.PILLEFFECT_EXPERIMENTAL)
+		test.AssertEquals(pillColor, PillColor.PILL_WHITE_BLUE)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(useFlags, UseFlag.USE_OWNED | UseFlag.USE_NOHUD)
+		return true
+	end, PillEffect.PILLEFFECT_EXPERIMENTAL)
+	test:AddUnexpectedCallback(ModCallbacks.MC_USE_PILL)
+	player:UsePill(PillEffect.PILLEFFECT_EXPERIMENTAL, PillColor.PILL_WHITE_BLUE, UseFlag.USE_OWNED | UseFlag.USE_NOHUD)
+	test.AssertFalse(Game():GetItemPool():IsPillIdentified(PillColor.PILL_WHITE_BLUE))
+end
+
+function EntityPlayerTest:TestUsePoopSpell(player)
+	player:UsePoopSpell(PoopSpellType.SPELL_FART)
 end
 
 function EntityPlayerTest:TestWillPlayerRevive(entityplayer)

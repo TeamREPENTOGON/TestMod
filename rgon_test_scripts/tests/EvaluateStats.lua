@@ -16,6 +16,14 @@ local ALL_STATS_EFFECT_TRINKET = Isaac.GetTrinketIdByName("REPENTOGON TEST ALL S
 local FLAT_STATS_NULL = Isaac.GetNullItemIdByName("REPENTOGON TEST FLAT TEARS/DAMAGE NULL")
 local TEARS_DAMAGE_MULT_ITEM = Isaac.GetItemIdByName("REPENTOGON TEST TEARS/DAMAGE MULT ITEM")
 
+local function FireDelayToTears(fireDelay)
+	return 30 / (fireDelay + 1)
+end
+
+local function TearsToFireDelay(tears)
+	return math.max((30 / tears) - 1, -0.75)
+end
+
 
 function EvaluateStatsTest:TestTearsUp(player)
 	local originalFireDelay = player.MaxFireDelay
@@ -66,7 +74,7 @@ end
 
 function EvaluateStatsTest:TestFlatTears(player)
 	local originalFireDelay = player.MaxFireDelay
-	local originalTears = 30 / (originalFireDelay + 1)
+	local originalTears = FireDelayToTears(originalFireDelay)
 
 	-- Compare +0.5 flat tears to Pisces, which should behave identically.
 	test:AddOneTimeCallback(ModCallbacks.MC_EVALUATE_STAT, function(_, p, stage, tears)
@@ -77,7 +85,7 @@ function EvaluateStatsTest:TestFlatTears(player)
 
 	player:AddCollectible(CollectibleType.COLLECTIBLE_PISCES)
 	local expectedFireDelay = player.MaxFireDelay
-	local expectedTears = 30 / (expectedFireDelay + 1)
+	local expectedTears = FireDelayToTears(expectedFireDelay)
 	test.AssertTrue(expectedFireDelay < originalFireDelay)
 
 	player:RemoveCollectible(CollectibleType.COLLECTIBLE_PISCES)
@@ -114,7 +122,7 @@ function EvaluateStatsTest:TestFlatTears(player)
 
 	-- Verify the flat tears bonus is affected by vanilla multipliers.
 	player:AddCollectible(CollectibleType.COLLECTIBLE_EVES_MASCARA)
-	test.AssertEquals(player.MaxFireDelay, (30 / (expectedTears * 0.66)) - 1)
+	test.AssertEquals(player.MaxFireDelay, TearsToFireDelay(expectedTears * 0.66))
 	player:RemoveCollectible(CollectibleType.COLLECTIBLE_EVES_MASCARA)
 end
 
@@ -129,12 +137,18 @@ function EvaluateStatsTest:TestTearsMult(player)
 	-- Compare x0.4 tears to Dr Fetus, which should behave identically.
 	player:AddCollectible(CollectibleType.COLLECTIBLE_DR_FETUS)
 	local expectedFireDelay = player.MaxFireDelay
+	local expectedTears = FireDelayToTears(expectedFireDelay)
 	test.AssertTrue(expectedFireDelay > originalFireDelay)
 	player:RemoveCollectible(CollectibleType.COLLECTIBLE_DR_FETUS)
 	test.AssertEquals(player.MaxFireDelay, originalFireDelay)
 
 	player:AddCollectible(TEARS_DAMAGE_MULT_ITEM)
 	test.AssertEquals(player.MaxFireDelay, expectedFireDelay)
+
+	player:AddCollectible(TEARS_DAMAGE_MULT_ITEM)
+	test.AssertEquals(player.MaxFireDelay, TearsToFireDelay(expectedTears * 0.4))
+
+	player:RemoveCollectible(TEARS_DAMAGE_MULT_ITEM)
 	player:RemoveCollectible(TEARS_DAMAGE_MULT_ITEM)
 	test.AssertEquals(player.MaxFireDelay, originalFireDelay)
 end
@@ -270,6 +284,13 @@ function EvaluateStatsTest:TestDamageMult(player)
 
 	player:AddCollectible(TEARS_DAMAGE_MULT_ITEM)
 	test.AssertEquals(player.Damage, expectedDamage)
+
+	player:AddCollectible(TEARS_DAMAGE_MULT_ITEM)
+	player:AddCollectible(TEARS_DAMAGE_MULT_ITEM)
+	test.AssertEquals(player.Damage, expectedDamage * 4)
+
+	player:RemoveCollectible(TEARS_DAMAGE_MULT_ITEM)
+	player:RemoveCollectible(TEARS_DAMAGE_MULT_ITEM)
 	player:RemoveCollectible(TEARS_DAMAGE_MULT_ITEM)
 	test.AssertEquals(player.Damage, originalDamage)
 end

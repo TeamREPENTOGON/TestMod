@@ -263,6 +263,9 @@ function REPENTOGON_TEST.ResetPlayer(player)
 		Isaac.ExecuteCommand("debug 3")
 	end
 	player:AddCacheFlags(CacheFlag.CACHE_ALL, true)
+	for pillColor = PillColor.PILL_NULL, PillColor.PILL_GOLD do
+		Game():GetItemPool():UnidentifyPill(pillColor)
+	end
 end
 
 function REPENTOGON_TEST.CleanEntities()
