@@ -1673,6 +1673,54 @@ function EntityPlayerTest:TestUseActiveItemLegacyFalses(player)
 	player:UseActiveItem(CollectibleType.COLLECTIBLE_D6, false, false, false, false, false, false)
 end
 
+function EntityPlayerTest:TestUseActiveItemMMorph(player)
+	player:AddCollectible(CollectibleType.COLLECTIBLE_D6)
+	test.AssertTrue(player:HasCollectible(CollectibleType.COLLECTIBLE_D6))
+
+	player:AddTrinket(TrinketType.TRINKET_M)
+	test.AssertTrue(player:HasTrinket(TrinketType.TRINKET_M))
+
+	local testcallback = function(_, item, rng, p, flags, slot, vardata)
+		test.AssertEquals(item, CollectibleType.COLLECTIBLE_D6)
+		test.AssertTrue(rng:GetSeed() > 0)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertEquals(flags, UseFlag.USE_OWNED)
+		test.AssertEquals(slot, ActiveSlot.SLOT_PRIMARY)
+		test.AssertEquals(vardata, 0)
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_ITEM, testcallback, CollectibleType.COLLECTIBLE_D6)
+	test:AddOneTimeCallback(ModCallbacks.MC_USE_ITEM, testcallback, CollectibleType.COLLECTIBLE_D6)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_M_MORPH_ACTIVE, function(_, p, item)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertTrue(item > 0)
+		return 0
+	end)
+
+	test:AddCallback(ModCallbacks.MC_INPUT_ACTION, function(_, player, hook, action)
+		if action == ButtonAction.ACTION_ITEM then
+			return true
+		end
+	end, InputHook.IS_ACTION_TRIGGERED)
+
+	player:FullCharge()
+	player:Update()
+
+	test.AssertTrue(player:HasCollectible(CollectibleType.COLLECTIBLE_D6))
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_M_MORPH_ACTIVE, function(_, p, item)
+		test.AssertEquals(GetPtrHash(p), GetPtrHash(player))
+		test.AssertTrue(item > 0)
+		return CollectibleType.COLLECTIBLE_TAMMYS_HEAD
+	end)
+
+	player:FullCharge()
+	player:Update()
+
+	test.AssertFalse(player:HasCollectible(CollectibleType.COLLECTIBLE_D6))
+	test.AssertTrue(player:HasCollectible(CollectibleType.COLLECTIBLE_TAMMYS_HEAD))
+end
+
 function EntityPlayerTest:TestUseCard(player)
 	test:AddOneTimeCallback(ModCallbacks.MC_PRE_USE_CARD, function(_, card, plr, useFlags)
 		test.AssertEquals(card, Card.CARD_MAGICIAN)
@@ -2656,7 +2704,7 @@ end
 
 function EntityPlayerTest:TestSetRevelationCharge(entityplayer)
 	local originalVal = entityplayer:GetRevelationCharge()
-	for _, val in pairs(test.TestInts) do
+	for _, val in pairs(test.TestUnsignedInts) do
 		entityplayer:SetRevelationCharge(val)
 		test.AssertEquals(entityplayer:GetRevelationCharge(), val)
 	end

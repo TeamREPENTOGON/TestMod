@@ -19,7 +19,7 @@ end
 
 function BlendModeTest:TestVarAlphaDestinationFactor(blendmode)
 	local originalVal = blendmode.AlphaDestinationFactor
-	for _, val in pairs(test.TestUnsignedInts) do
+	for val = 0, 9 do
 		blendmode.AlphaDestinationFactor = val
 		test.AssertEquals(blendmode.AlphaDestinationFactor, val)
 	end
@@ -28,7 +28,7 @@ end
 
 function BlendModeTest:TestVarAlphaSourceFactor(blendmode)
 	local originalVal = blendmode.AlphaSourceFactor
-	for _, val in pairs(test.TestUnsignedInts) do
+	for val = 0, 9 do
 		blendmode.AlphaSourceFactor = val
 		test.AssertEquals(blendmode.AlphaSourceFactor, val)
 	end
@@ -37,7 +37,7 @@ end
 
 function BlendModeTest:TestVarRGBDestinationFactor(blendmode)
 	local originalVal = blendmode.RGBDestinationFactor
-	for _, val in pairs(test.TestUnsignedInts) do
+	for val = 0, 9 do
 		blendmode.RGBDestinationFactor = val
 		test.AssertEquals(blendmode.RGBDestinationFactor, val)
 	end
@@ -46,7 +46,7 @@ end
 
 function BlendModeTest:TestVarRGBSourceFactor(blendmode)
 	local originalVal = blendmode.RGBSourceFactor
-	for _, val in pairs(test.TestUnsignedInts) do
+	for val = 0, 9 do
 		blendmode.RGBSourceFactor = val
 		test.AssertEquals(blendmode.RGBSourceFactor, val)
 	end

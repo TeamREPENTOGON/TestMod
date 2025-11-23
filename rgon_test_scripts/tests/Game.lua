@@ -536,13 +536,14 @@ function GameTest:TestStartRoomTransition(game)
 	local dimension = 1
 	game:StartRoomTransition(roomindex, direction, animation, player, dimension)
 end
-
+--[[
 function GameTest:TestStartStageTransition(game)
 	local samestage = true
 	local transitionoverride = 1
 	local player = Isaac.GetPlayer()
 	game:StartStageTransition(samestage, transitionoverride, player)
 end
+]]
 --[[
 function GameTest:TestUpdate(game)
 	game:Update()

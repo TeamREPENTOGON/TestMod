@@ -13,8 +13,7 @@ end
 ----------
 
 function RoomDescriptorTest:TestAddRestrictedGridIndex(roomdescriptor)
-	local gridindex = 1
-	roomdescriptor:AddRestrictedGridIndex(gridindex)
+	roomdescriptor:AddRestrictedGridIndex(1)
 end
 
 function RoomDescriptorTest:TestGetDecoSaveState(roomdescriptor)
@@ -25,12 +24,82 @@ function RoomDescriptorTest:TestGetDimension(roomdescriptor)
 	roomdescriptor:GetDimension()
 end
 
-function RoomDescriptorTest:TestGetEntitiesSaveState(roomdescriptor)
-	roomdescriptor:GetEntitiesSaveState()
+function RoomDescriptorTest:TestGetEntitiesSaveState()
+	Isaac.Spawn(5, 100, 1, Vector.Zero, Vector.Zero, nil)
+	Isaac.Spawn(4, 0, 0, Vector.Zero, Vector.Zero, nil)
+	Isaac.Spawn(5, 70, 2, Vector.Zero, Vector.Zero, nil)
+
+	Game():ChangeRoom(Game():GetLevel():GetStartingRoomIndex())
+
+	local desc = Game():GetLevel():GetCurrentRoomDesc()
+	local ssvec = desc:GetEntitiesSaveState()
+	test.AssertEquals(#ssvec, 3)
+	local ss0 = ssvec:Get(0)
+	test.AssertEquals(ss0:GetType(), 5)
+	test.AssertEquals(ss0:GetVariant(), 100)
+	test.AssertEquals(ss0:GetSubType(), 1)
+	local ss1 = ssvec:Get(1)
+	test.AssertEquals(ss1:GetType(), 4)
+	test.AssertEquals(ss1:GetVariant(), 0)
+	test.AssertEquals(ss1:GetSubType(), 0)
+	local ss2 = ssvec:Get(2)
+	test.AssertEquals(ss2:GetType(), 5)
+	test.AssertEquals(ss2:GetVariant(), 70)
+	test.AssertEquals(ss2:GetSubType(), 2)
+
+	local bombs = ssvec:GetByType(4)
+	test.AssertEquals(#bombs, 1)
+	test.AssertEquals(bombs[1]:GetType(), 4)
+	test.AssertEquals(bombs[1]:GetVariant(), 0)
+	test.AssertEquals(bombs[1]:GetSubType(), 0)
+
+	test.AssertEquals(#ssvec:GetByType(5), 0)
+
+	local pickups = ssvec:GetByType(5, -1, -1)
+	test.AssertEquals(#pickups, 2)
+	test.AssertEquals(pickups[1]:GetType(), 5)
+	test.AssertEquals(pickups[1]:GetVariant(), 100)
+	test.AssertEquals(pickups[1]:GetSubType(), 1)
+	test.AssertEquals(pickups[2]:GetType(), 5)
+	test.AssertEquals(pickups[2]:GetVariant(), 70)
+	test.AssertEquals(pickups[2]:GetSubType(), 2)
+
+	pickups[1]:SetVariant(70)
+
+	local pickups2 = ssvec:GetByType(5, 70, -1)
+	test.AssertEquals(#pickups, 2)
+	test.AssertEquals(pickups[1]:GetType(), 5)
+	test.AssertEquals(pickups[1]:GetVariant(), 70)
+	test.AssertEquals(pickups[1]:GetSubType(), 1)
+	test.AssertEquals(pickups[2]:GetType(), 5)
+	test.AssertEquals(pickups[2]:GetVariant(), 70)
+	test.AssertEquals(pickups[2]:GetSubType(), 2)
 end
 
-function RoomDescriptorTest:TestGetGridEntitiesSaveState(roomdescriptor)
-	roomdescriptor:GetGridEntitiesSaveState()
+function RoomDescriptorTest:TestGetGridEntitiesSaveState()
+	local rock1seed = test.SpawnGridEntity(GridEntityType.GRID_SPIKES, 1).Desc.SpawnSeed
+	local rock2seed = test.SpawnGridEntity(GridEntityType.GRID_SPIKES, 2).Desc.SpawnSeed
+	local pitseed = test.SpawnGridEntity(GridEntityType.GRID_SPIDERWEB, 0).Desc.SpawnSeed
+
+	Game():ChangeRoom(Game():GetLevel():GetStartingRoomIndex())
+
+	local desc = Game():GetLevel():GetCurrentRoomDesc()
+	local ssvec = desc:GetGridEntitiesSaveState()
+
+	local spikes = ssvec:GetByType(GridEntityType.GRID_SPIKES)
+	test.AssertEquals(#spikes, 2)
+	test.AssertEquals(spikes[1].Type, GridEntityType.GRID_SPIKES)
+	test.AssertEquals(spikes[1].Variant, 1)
+	test.AssertEquals(spikes[1].SpawnSeed, rock1seed)
+	test.AssertEquals(spikes[2].Type, GridEntityType.GRID_SPIKES)
+	test.AssertEquals(spikes[2].Variant, 2)
+	test.AssertEquals(spikes[2].SpawnSeed, rock2seed)
+
+	local webs = ssvec:GetByType(GridEntityType.GRID_SPIDERWEB)
+	test.AssertEquals(#webs, 1)
+	test.AssertEquals(webs[1].Type, GridEntityType.GRID_SPIDERWEB)
+	test.AssertEquals(webs[1].Variant, 0)
+	test.AssertEquals(webs[1].SpawnSeed, pitseed)
 end
 
 function RoomDescriptorTest:TestGetNeighboringRooms(roomdescriptor)
