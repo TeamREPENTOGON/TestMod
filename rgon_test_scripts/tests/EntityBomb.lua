@@ -57,22 +57,85 @@ function EntityBombTest:TestIsPrismTouched(entitybomb)
 	entitybomb:IsPrismTouched()
 end
 
-function EntityBombTest:TestSetFallingSpeed(entitybomb)
-	local originalVal = entitybomb:GetFallingSpeed()
-	for _, val in pairs(test.TestFloats) do
-		entitybomb:SetFallingSpeed(val)
-		test.AssertEquals(entitybomb:GetFallingSpeed(), val)
-	end
-	entitybomb:SetFallingSpeed(originalVal)
+function EntityBombTest:TestSetFallSpeedAcceleration(bomb)
+	bomb.PositionOffset.Y = -5
+	bomb:SetFallSpeed(-3)
+	bomb:SetFallAcceleration(2)
+
+	test.AssertEquals(bomb:GetFallSpeed(), -3)
+	test.AssertEquals(bomb:GetFallAcceleration(), 2)
+
+	bomb:Update()
+	test.AssertEquals(bomb.PositionOffset.Y, -8)
+	test.AssertEquals(bomb:GetFallSpeed(), -1)
+
+	bomb:Update()
+	test.AssertEquals(bomb.PositionOffset.Y, -9)
+	test.AssertEquals(bomb:GetFallSpeed(), 1)
+
+	bomb:Update()
+	test.AssertEquals(bomb.PositionOffset.Y, -8)
+	test.AssertEquals(bomb:GetFallSpeed(), 3)
+
+	bomb:Update()
+	test.AssertEquals(bomb.PositionOffset.Y, -5)
+	test.AssertEquals(bomb:GetFallSpeed(), 5)
+
+	bomb:Update()
+	test.AssertEquals(bomb.PositionOffset.Y, 0)
+	test.AssertEquals(bomb:GetFallSpeed(), 0)
+
+	test.AssertEquals(bomb:GetFallAcceleration(), 2)
 end
 
-function EntityBombTest:TestSetHeight(entitybomb)
-	local originalVal = entitybomb:GetHeight()
-	for _, val in pairs(test.TestFloats) do
-		entitybomb:SetHeight(val)
-		test.AssertEquals(entitybomb:GetHeight(), val)
-	end
-	entitybomb:SetHeight(originalVal)
+-- Deprecated old function names that were incorrect
+-- Height -> FallSpeed
+-- FallingSpeed -> FallAcceleration
+function EntityBombTest:TestDeprecatedFallSpeedAcceleration(bomb)
+	bomb:SetFallSpeed(-6)
+	bomb:SetFallAcceleration(3)
+
+	test.AssertEquals(bomb:GetHeight(), -6)
+	test.AssertEquals(bomb:GetFallSpeed(), -6)
+	test.AssertEquals(bomb:GetFallingSpeed(), 3)
+	test.AssertEquals(bomb:GetFallAcceleration(), 3)
+
+	bomb.PositionOffset.Y = -5
+	bomb:SetHeight(-3)
+	bomb:SetFallingSpeed(2)
+
+	test.AssertEquals(bomb:GetHeight(), -3)
+	test.AssertEquals(bomb:GetFallSpeed(), -3)
+	test.AssertEquals(bomb:GetFallingSpeed(), 2)
+	test.AssertEquals(bomb:GetFallAcceleration(), 2)
+
+	bomb:Update()
+	test.AssertEquals(bomb.PositionOffset.Y, -8)
+	test.AssertEquals(bomb:GetHeight(), -1)
+	test.AssertEquals(bomb:GetFallingSpeed(), 2)
+
+	bomb:Update()
+	test.AssertEquals(bomb.PositionOffset.Y, -9)
+	test.AssertEquals(bomb:GetHeight(), 1)
+	test.AssertEquals(bomb:GetFallingSpeed(), 2)
+
+	bomb:Update()
+	test.AssertEquals(bomb.PositionOffset.Y, -8)
+	test.AssertEquals(bomb:GetHeight(), 3)
+	test.AssertEquals(bomb:GetFallingSpeed(), 2)
+
+	bomb:Update()
+	test.AssertEquals(bomb.PositionOffset.Y, -5)
+	test.AssertEquals(bomb:GetHeight(), 5)
+	test.AssertEquals(bomb:GetFallingSpeed(), 2)
+
+	bomb:Update()
+	test.AssertEquals(bomb.PositionOffset.Y, 0)
+	test.AssertEquals(bomb:GetHeight(), 0)
+	test.AssertEquals(bomb:GetFallingSpeed(), 2)
+
+	test.AssertEquals(bomb:GetFallingSpeed(), 2)
+	test.AssertEquals(bomb:GetFallAcceleration(), 2)
 end
 
 function EntityBombTest:TestSetLoadCostumes(bomb)
