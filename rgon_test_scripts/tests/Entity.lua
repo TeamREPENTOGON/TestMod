@@ -426,12 +426,67 @@ function EntityTest:TestRenderShadowLayer(entity)
 end
 
 function EntityTest:TestSetColor(entity)
-	local color = Color(1,1,1,1)
-	local duration = 1
-	local priority = 1
-	local fadeout = true
-	local share = true
-	entity:SetColor(color, duration, priority, fadeout, share)
+	local testcolor = Color(0.1, 0.2, 0.3, 0.4)
+	local testduration = 31
+	local testpriority = 111
+	local testfadeout = true
+	local testshare = false
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_ENTITY_SET_COLOR, function(_, ent, color, duration, priority, fadeout, share)
+		test.AssertEquals(GetPtrHash(ent), GetPtrHash(entity))
+		test.AssertEquals(color, testcolor)
+		test.AssertEquals(duration, testduration)
+		test.AssertEquals(priority, testpriority)
+		test.AssertEquals(fadeout, testfadeout)
+		test.AssertEquals(share, testshare)
+	end, entity.Type)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_SET_COLOR, function(_, ent, color, duration, priority, fadeout, share)
+		test.AssertEquals(GetPtrHash(ent), GetPtrHash(entity))
+		test.AssertEquals(color, testcolor)
+		test.AssertEquals(duration, testduration)
+		test.AssertEquals(priority, testpriority)
+		test.AssertEquals(fadeout, testfadeout)
+		test.AssertEquals(share, testshare)
+	end, entity.Type)
+
+	entity:SetColor(testcolor, testduration, testpriority, testfadeout, testshare)
+
+	-- Test changing it
+	local testcolor2 = Color(0.9, 0.8, 0.7, 0.6)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_ENTITY_SET_COLOR, function(_, ent, color, duration, priority, fadeout, share)
+		test.AssertEquals(GetPtrHash(ent), GetPtrHash(entity))
+		test.AssertEquals(color, testcolor)
+		test.AssertEquals(duration, testduration)
+		test.AssertEquals(priority, testpriority)
+		test.AssertEquals(fadeout, testfadeout)
+		test.AssertEquals(share, testshare)
+		return testcolor2
+	end, entity.Type)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_SET_COLOR, function(_, ent, color, duration, priority, fadeout, share)
+		test.AssertEquals(GetPtrHash(ent), GetPtrHash(entity))
+		test.AssertEquals(color, testcolor2)
+		test.AssertEquals(duration, testduration)
+		test.AssertEquals(priority, testpriority)
+		test.AssertEquals(fadeout, testfadeout)
+		test.AssertEquals(share, testshare)
+	end, entity.Type)
+
+	entity:SetColor(testcolor, testduration, testpriority, testfadeout, testshare)
+
+	-- Test canceling it
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_ENTITY_SET_COLOR, function(_, ent, color, duration, priority, fadeout, share)
+		test.AssertEquals(GetPtrHash(ent), GetPtrHash(entity))
+		test.AssertEquals(color, testcolor)
+		test.AssertEquals(duration, testduration)
+		test.AssertEquals(priority, testpriority)
+		test.AssertEquals(fadeout, testfadeout)
+		test.AssertEquals(share, testshare)
+		return false
+	end, entity.Type)
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_ENTITY_SET_COLOR)
+
+	entity:SetColor(testcolor, testduration, testpriority, testfadeout, testshare)
 end
 
 function EntityTest:TestSetSize(entity)
