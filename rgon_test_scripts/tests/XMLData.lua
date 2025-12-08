@@ -63,5 +63,37 @@ function XMLDataTest:TestGetNumEntries()
 	XMLData.GetNumEntries(nodetype)
 end
 
+function XMLDataTest:TestValidateItems()
+	local itemConfig = Isaac.GetItemConfig()
+	for i=1, #itemConfig:GetCollectibles()-1 do
+		local conf = itemConfig:GetCollectible(i)
+		if conf then
+			local xml = XMLData.GetEntryById(XMLNode.ITEM, i)
+			test.AssertEquals(conf.Name, xml.untranslatedname or xml.name)
+		end
+	end
+end
+
+function XMLDataTest:TestValidateTrinkets()
+	local itemConfig = Isaac.GetItemConfig()
+	for i=1, #itemConfig:GetTrinkets()-1 do
+		local conf = itemConfig:GetTrinket(i)
+		if conf then
+			local xml = XMLData.GetEntryById(XMLNode.TRINKET, i)
+			test.AssertEquals(conf.Name, xml.untranslatedname or xml.name)
+		end
+	end
+end
+
+function XMLDataTest:TestValidateNullItems()
+	local itemConfig = Isaac.GetItemConfig()
+	for i=1, #itemConfig:GetNullItems()-1 do
+		local conf = itemConfig:GetNullItem(i)
+		if conf and conf.Name ~= "" then
+			test.AssertEquals(conf.Name, XMLData.GetEntryById(XMLNode.NULLITEM, i).name)
+		end
+	end
+end
+
 
 return XMLDataTest

@@ -1,0 +1,3 @@
+<backdrops gfxroot="gfx/backdrop/" gridgfxroot="gfx/grid/" effectsgfxroot="gfx/effects/">
+    <backdrop name="test" gfx="0E_Arcade.png" walls="1" wallvariants="4" floors="1" floorvariants="6" />
+</backdrops>

@@ -1,0 +1,5 @@
+<sounds root="sounds/">
+    <sound name="REPENTOGON TEST SOUND">
+        <sample weight="1" path="zombie walker kid 2.wav" />
+    </sound>
+</sounds>

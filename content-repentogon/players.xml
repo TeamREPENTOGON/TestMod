@@ -2,9 +2,10 @@
 		 portraitroot="gfx/ui/" 
 		 nameimageroot="gfx/ui/"
 		 bigportraitroot="gfx/ui/">
-	<player name="CONTENT" skin="costumes/character_001_isaac_red.png" hp="4" healthtype="4"
+	<player name="Testsaac" skin="costumes/character_001_isaac_red.png" hp="4" healthtype="4"
           nameimage="playername_testsaac.png" 
           portrait="playerportrait_testsaac.png" 
+		  extraportrait="repentomega.anm2"
           bskinColor="3"
 		  birthright="not done"
 		  noshake="true"

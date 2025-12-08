@@ -145,5 +145,6 @@ return {
 		BlendMode = include(root.."BlendMode"),
 		Point = include(root.."Point"),
 		XmlFeatures = include(root.."XmlFeatures"),
+		RepentogonFolders = include(root.."RepentogonFolders"),
 	}
 }

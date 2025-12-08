@@ -1,0 +1,12 @@
+<ItemPools>
+	<Pool Name="treasure">
+		<Item Name="REPENTOGON TEST REVIVE" Weight="1" DecreaseBy="1" RemoveOn="0.1"/>
+	</Pool>
+	<Pool Name="repentogon test pool">
+		<Item Name="REPENTOGON TEST ITEM" Weight="1" DecreaseBy="1" RemoveOn="0.1"/>
+		<Item Name="REPENTOGON TEST REVIVE" Weight="1" DecreaseBy="1" RemoveOn="0.1"/>
+		<Item Name="REPENTOGON TEST MAX COINS ITEM" Weight="1" DecreaseBy="1" RemoveOn="0.1"/>
+		<Item Name="REPENTOGON TEST FAMILIAR MULT ITEM" Weight="1" DecreaseBy="1" RemoveOn="0.1"/>
+		<Item Name="REPENTOGON TEST HEALTH TYPE CHANGE ITEM" Weight="1" DecreaseBy="1" RemoveOn="0.1"/>
+	</Pool>
+</ItemPools>

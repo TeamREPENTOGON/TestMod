@@ -1,0 +1,4 @@
+<pocketitems>
+	<card type="tarot" pickup="1" name="REPENTOGON TEST CARD" hud="REPENTOGON TEST CARD" description="test" announcer="165" announcerdelay="0" mimiccharge="6" />
+	<pilleffect name="REPENTOGON TEST PILL" class="3+" mimiccharge="3" announcer="165" announcer2="577" announcerdelay="0" />
+</pocketitems>

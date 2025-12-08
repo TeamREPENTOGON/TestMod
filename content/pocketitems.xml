@@ -1,0 +1,4 @@
+<pocketitems>
+	<card type="tarot" pickup="1" name="CONTENT" hud="CONTENT" description="test" mimiccharge="1" />
+	<pilleffect name="CONTENT" class="0" mimiccharge="1" />
+</pocketitems>

@@ -1,0 +1,5 @@
+<cutscenes root="gfx/cutscenes/">
+	<cutscene name="CONTENT">
+		<videopart file="test.ogv" />
+	</cutscene>
+</cutscenes>
