@@ -14,7 +14,7 @@ end
 
 function RepentogonTest:TestMeetsVersion(repentogon)
 	local version = "hello"
-	repentogon:MeetsVersion(version)
+	repentogon.MeetsVersion(version)
 end
 
 

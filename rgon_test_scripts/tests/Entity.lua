@@ -261,6 +261,92 @@ function EntityTest:TestAddKnockback(entity)
 	end
 end
 
+function EntityTest:TestGetStatusEffectTarget()
+	local entity1 = Isaac.Spawn(EntityType.ENTITY_GUSHER, 1, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil)
+	local entity2 = Isaac.Spawn(EntityType.ENTITY_GAPER, 1, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil)
+
+	local numcalls = 0
+
+	test:AddCallback(ModCallbacks.MC_GET_STATUS_EFFECT_TARGET, function(_, e)
+		test.AssertEquals(GetPtrHash(e), GetPtrHash(entity1))
+		numcalls = numcalls + 1
+		return entity2
+	end, entity1.Type)
+
+	local TryTriggerGetStatusEffectTarget = function(func)
+		local prevcalls = numcalls
+		func()
+		return numcalls == prevcalls + 1
+	end
+
+	local playerRef = EntityRef(Isaac.GetPlayer())
+	local duration = 11
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddBaited(playerRef, duration) end))
+	test.AssertEquals(entity1:GetBaitedCountdown(), 0)
+	test.AssertEquals(entity2:GetBaitedCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddBleeding(playerRef, duration) end))
+	test.AssertEquals(entity1:GetBleedingCountdown(), 0)
+	test.AssertEquals(entity2:GetBleedingCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddBrimstoneMark(playerRef, duration) end))
+	test.AssertEquals(entity1:GetBrimstoneMarkCountdown(), 0)
+	test.AssertEquals(entity2:GetBrimstoneMarkCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddBurn(playerRef, duration, 1.0) end))
+	test.AssertEquals(entity1:GetBurnCountdown(), 0)
+	test.AssertEquals(entity2:GetBurnCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddCharmed(playerRef, duration) end))
+	test.AssertEquals(entity1:GetCharmedCountdown(), 0)
+	test.AssertEquals(entity2:GetCharmedCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddConfusion(playerRef, duration) end))
+	test.AssertEquals(entity1:GetConfusionCountdown(), 0)
+	test.AssertEquals(entity2:GetConfusionCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddFear(playerRef, duration) end))
+	test.AssertEquals(entity1:GetFearCountdown(), 0)
+	test.AssertEquals(entity2:GetFearCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddFreeze(playerRef, duration) end))
+	test.AssertEquals(entity1:GetFreezeCountdown(), 0)
+	test.AssertEquals(entity2:GetFreezeCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddIce(playerRef, duration) end))
+	test.AssertEquals(entity1:GetIceCountdown(), 0)
+	test.AssertEquals(entity2:GetIceCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddKnockback(playerRef, Vector.One, duration) end))
+	test.AssertEquals(entity1:GetKnockbackCountdown(), 0)
+	test.AssertEquals(entity2:GetKnockbackCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddMagnetized(playerRef, duration) end))
+	test.AssertEquals(entity1:GetMagnetizedCountdown(), 0)
+	test.AssertEquals(entity2:GetMagnetizedCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddMidasFreeze(playerRef, duration) end))
+	test.AssertEquals(entity1:GetMidasFreezeCountdown(), 0)
+	test.AssertEquals(entity2:GetMidasFreezeCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddPoison(playerRef, duration, 1.0) end))
+	test.AssertEquals(entity1:GetPoisonCountdown(), 0)
+	test.AssertEquals(entity2:GetPoisonCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddShrink(playerRef, duration) end))
+	test.AssertEquals(entity1:GetShrinkCountdown(), 0)
+	test.AssertEquals(entity2:GetShrinkCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddSlowing(playerRef, duration, 1.0, Color.Default) end))
+	test.AssertEquals(entity1:GetSlowingCountdown(), 0)
+	test.AssertEquals(entity2:GetSlowingCountdown(), duration)
+
+	test.AssertTrue(TryTriggerGetStatusEffectTarget(function() entity1:AddWeakness(playerRef, duration) end))
+	test.AssertEquals(entity1:GetWeaknessCountdown(), 0)
+	test.AssertEquals(entity2:GetWeaknessCountdown(), duration)
+end
+
 
 function EntityTest:TestAddEntityFlags(entity)
 	local flags = 1
