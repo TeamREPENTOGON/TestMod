@@ -49,6 +49,16 @@ function GameTest:TestBombDamage(game)
 	local damageflags = DamageFlag.DAMAGE_ACID
 	local damagesource = true
 
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cdamage, damage)
+		test.AssertEquals(cradius, radius)
+		test.AssertTrue(clinecheck)
+		test.AssertEquals(GetPtrHash(csource), GetPtrHash(source))
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertEquals(cdamageflags, damageflags)
+		test.AssertTrue(cdamagesource)
+	end, EntityType.ENTITY_PLAYER)
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
 		test.AssertEquals(cpos, pos)
 		test.AssertEquals(cdamage, damage)
@@ -66,7 +76,13 @@ function GameTest:TestBombDamage(game)
 	source = nil
 	damagesource = false
 
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
+	local newPosition = pos + Vector(10, 15)
+	local newDamage = damage * 2
+	local newRadius = radius * 2
+	local newTearFlags = TearFlags.TEAR_SPECTRAL
+	local newDamageFlags = DamageFlag.DAMAGE_NOKILL
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
 		test.AssertEquals(cpos, pos)
 		test.AssertEquals(cdamage, damage)
 		test.AssertEquals(cradius, radius)
@@ -75,7 +91,41 @@ function GameTest:TestBombDamage(game)
 		test.AssertEquals(ctearflags, tearflags)
 		test.AssertEquals(cdamageflags, damageflags)
 		test.AssertFalse(cdamagesource)
+		return {
+			Position = newPosition,
+			Damage = newDamage,
+			Radius = newRadius,
+			TearFlags = newTearFlags,
+			DamageFlags = newDamageFlags,
+		}
 	end)
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
+		test.AssertEquals(cpos, newPosition)
+		test.AssertEquals(cdamage, newDamage)
+		test.AssertEquals(cradius, newRadius)
+		test.AssertFalse(clinecheck)
+		test.AssertNil(csource)
+		test.AssertEquals(ctearflags, newTearFlags)
+		test.AssertEquals(cdamageflags, newDamageFlags)
+		test.AssertFalse(cdamagesource)
+	end)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
+		test.AssertEquals(cpos, newPosition)
+		test.AssertEquals(cdamage, newDamage)
+		test.AssertEquals(cradius, newRadius)
+		test.AssertFalse(clinecheck)
+		test.AssertNil(csource)
+		test.AssertEquals(ctearflags, newTearFlags)
+		test.AssertEquals(cdamageflags, newDamageFlags)
+		test.AssertFalse(cdamagesource)
+	end)
+
+	game:BombDamage(pos, damage, radius, linecheck, source, tearflags, damageflags, damagesource)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
+		return false
+	end)
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_BOMB_DAMAGE)
 
 	game:BombDamage(pos, damage, radius, linecheck, source, tearflags, damageflags, damagesource)
 end
@@ -92,6 +142,16 @@ function GameTest:TestBombExplosionEffects(game)
 	local damagesource = true
 	local damageflags = DamageFlag.DAMAGE_ACID
 
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cdamage, damage)
+		test.AssertEquals(cradius, expectedradius)
+		test.AssertTrue(clinecheck)
+		test.AssertEquals(GetPtrHash(csource), GetPtrHash(source))
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertEquals(cdamageflags, damageflags)
+		test.AssertTrue(cdamagesource)
+	end, EntityType.ENTITY_PLAYER)
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
 		test.AssertEquals(cpos, pos)
 		test.AssertEquals(cdamage, damage)
@@ -103,6 +163,13 @@ function GameTest:TestBombExplosionEffects(game)
 		test.AssertTrue(cdamagesource)
 	end, EntityType.ENTITY_PLAYER)
 
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cradius, expectedradius)
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertEquals(GetPtrHash(csource), GetPtrHash(source))
+		test.AssertEquals(cradiusmult, radiusmult)
+	end, EntityType.ENTITY_PLAYER)
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
 		test.AssertEquals(cpos, pos)
 		test.AssertEquals(cradius, expectedradius)
@@ -117,6 +184,16 @@ function GameTest:TestBombExplosionEffects(game)
 	linecheck = false
 	damagesource = false
 
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cdamage, damage)
+		test.AssertEquals(cradius, expectedradius)
+		test.AssertFalse(clinecheck)
+		test.AssertNil(csource)
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertEquals(cdamageflags, damageflags)
+		test.AssertFalse(cdamagesource)
+	end)
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_DAMAGE, function(_, cpos, cdamage, cradius, clinecheck, csource, ctearflags, cdamageflags, cdamagesource)
 		test.AssertEquals(cpos, pos)
 		test.AssertEquals(cdamage, damage)
@@ -128,6 +205,13 @@ function GameTest:TestBombExplosionEffects(game)
 		test.AssertFalse(cdamagesource)
 	end)
 
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cradius, expectedradius)
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertNil(csource)
+		test.AssertEquals(cradiusmult, radiusmult)
+	end)
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
 		test.AssertEquals(cpos, pos)
 		test.AssertEquals(cradius, expectedradius)
@@ -146,6 +230,13 @@ function GameTest:TestBombTearflagEffects(game)
 	local source = Isaac.GetPlayer()
 	local radiusmult = 1.5
 
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
+		test.AssertEquals(cpos, pos)
+		test.AssertEquals(cradius, radius)
+		test.AssertEquals(ctearflags, tearflags)
+		test.AssertEquals(GetPtrHash(csource), GetPtrHash(source))
+		test.AssertEquals(cradiusmult, radiusmult)
+	end, EntityType.ENTITY_PLAYER)
 	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
 		test.AssertEquals(cpos, pos)
 		test.AssertEquals(cradius, radius)
@@ -158,13 +249,45 @@ function GameTest:TestBombTearflagEffects(game)
 
 	source = nil
 
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
+	local newPosition = pos + Vector(10, 15)
+	local newRadius = radius * 2
+	local newTearFlags = TearFlags.TEAR_SPECTRAL
+	local newRadiusMult = radiusmult * 2
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
 		test.AssertEquals(cpos, pos)
 		test.AssertEquals(cradius, radius)
 		test.AssertEquals(ctearflags, tearflags)
 		test.AssertNil(csource)
 		test.AssertEquals(cradiusmult, radiusmult)
+		return {
+			Position = newPosition,
+			Radius = newRadius,
+			TearFlags = newTearFlags,
+			RadiusMult = newRadiusMult,
+		}
 	end)
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
+		test.AssertEquals(cpos, newPosition)
+		test.AssertEquals(cradius, newRadius)
+		test.AssertEquals(ctearflags, newTearFlags)
+		test.AssertNil(csource)
+		test.AssertEquals(cradiusmult, newRadiusMult)
+	end)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
+		test.AssertEquals(cpos, newPosition)
+		test.AssertEquals(cradius, newRadius)
+		test.AssertEquals(ctearflags, newTearFlags)
+		test.AssertNil(csource)
+		test.AssertEquals(cradiusmult, newRadiusMult)
+	end)
+
+	game:BombTearflagEffects(pos, radius, tearflags, source, radiusmult)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_BOMB_TEARFLAG_EFFECTS, function(_, cpos, cradius, ctearflags, csource, cradiusmult)
+		return false
+	end)
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_BOMB_TEARFLAG_EFFECTS)
 
 	game:BombTearflagEffects(pos, radius, tearflags, source, radiusmult)
 end
