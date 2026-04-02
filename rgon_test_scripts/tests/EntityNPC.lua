@@ -436,22 +436,24 @@ function EntityNPCTest:TestTakeDamage(npc)
 	local testcountdown = 7
 	local modifiedcountdown = 4
 
-	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown, extraSource)
 		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
 		test.AssertEquals(damage, testDamage)
 		test.AssertEquals(flags, testflags)
 		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
 		test.AssertEquals(countdown, testcountdown)
+		test.AssertNil(extraSource)
 		
 		return {Damage = modifiedDamage, DamageFlags = modifiedflags, DamageCountdown = modifiedcountdown}
 	end)
 
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown, extraSource)
 		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
 		test.AssertEquals(damage, modifiedDamage)
 		test.AssertEquals(flags, modifiedflags)
 		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
 		test.AssertEquals(countdown, modifiedcountdown)
+		test.AssertNil(extraSource)
 	end)
 
 	npc:TakeDamage(testDamage, testflags, testsource, testcountdown)

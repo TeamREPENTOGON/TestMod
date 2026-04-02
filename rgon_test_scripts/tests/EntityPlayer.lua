@@ -2,12 +2,23 @@ local test = REPENTOGON_TEST
 
 local EntityPlayerTest = include(REPENTOGON_TEST.TestsRoot .. "Entity")
 
-function EntityPlayerTest:BeforeEach()
-	return Isaac.GetPlayer()
+local groupKey = "hello"
+local otherGroupKey = "hello2"
+
+local function ClearInnateItems(player)
+	player:ClearInnateItemGroup("")
+	player:ClearInnateItemGroup(groupKey)
+	player:ClearInnateItemGroup(otherGroupKey)
 end
 
-function EntityPlayerTest:AfterEach(entityplayer)
-	
+function EntityPlayerTest:BeforeEach()
+	local player = Isaac.GetPlayer()
+	ClearInnateItems(player)
+	return player
+end
+
+function EntityPlayerTest:AfterEach(player)
+	ClearInnateItems(player)
 end
 
 ----------
@@ -260,11 +271,13 @@ function EntityPlayerTest:TestAddHearts(entityplayer)
 	test.AssertEquals(entityplayer:GetHearts(), entityplayer:GetMaxHearts())
 end
 
-function EntityPlayerTest:TestAddItemWisp(entityplayer)
-	local collectible = 1
-	local position = Vector(1,1)
-	local adjustorbitlayer = true
-	entityplayer:AddItemWisp(collectible, position, adjustorbitlayer)
+function EntityPlayerTest:TestAddItemWisp(player)
+	local collectible = CollectibleType.COLLECTIBLE_SAD_ONION
+	test.AssertFalse(player:HasCollectible(collectible))
+	local wisp = player:AddItemWisp(collectible, Vector(1,1), true)
+	test.AssertTrue(player:HasCollectible(collectible))
+	wisp:Kill()
+	test.AssertFalse(player:HasCollectible(collectible))
 end
 
 function EntityPlayerTest:TestAddJarFlies(entityplayer)
@@ -1886,10 +1899,510 @@ function EntityPlayerTest:TestAddCustomCacheTag(entityplayer)
 	entityplayer:AddCustomCacheTag(string, evaluateitems)
 end
 
-function EntityPlayerTest:TestAddInnateCollectible(entityplayer)
-	local collectible = 1
-	local amount = 1
-	entityplayer:AddInnateCollectible(collectible, amount)
+
+local function _ExpectInnateItemCallback(callbackid, player, expectedID, expectedAmount, expectedKey, expectedDuration)
+	for _, param in ipairs({expectedID, expectedKey}) do
+		test:AddOneTimeCallback(callbackid, function(_, plr, id, key, amount, duration)
+			test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+			test.AssertEquals(id, expectedID)
+			test.AssertEquals(key, expectedKey)
+			test.AssertEquals(amount, expectedAmount)
+			test.AssertEquals(duration, expectedDuration)
+		end, param)
+	end
+end
+local function _ExpectInnateCollectibleAdded(...)
+	_ExpectInnateItemCallback(ModCallbacks.MC_POST_ADD_INNATE_COLLECTIBLE, ...)
+end
+local function _ExpectInnateTrinketAdded(...)
+	_ExpectInnateItemCallback(ModCallbacks.MC_POST_ADD_INNATE_TRINKET, ...)
+end
+local function _ExpectInnateCollectibleRemoved(...)
+	_ExpectInnateItemCallback(ModCallbacks.MC_POST_REMOVE_INNATE_COLLECTIBLE, ...)
+end
+local function _ExpectInnateTrinketRemoved(...)
+	_ExpectInnateItemCallback(ModCallbacks.MC_POST_REMOVE_INNATE_TRINKET, ...)
+end
+
+function EntityPlayerTest:TestAddInnateCollectible(player)
+	local id = 1
+	test.AssertFalse(player:HasCollectible(id))
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TRIGGER_COLLECTIBLE_ADDED, function(_, plr, cid, firsttime, wispOrInnate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, id)
+		test.AssertFalse(firsttime)
+		test.AssertTrue(wispOrInnate)
+	end, id)
+	_ExpectInnateCollectibleAdded(player, id, 1, "", -1)
+
+	player:AddInnateCollectible(id, 1)
+
+	test.AssertTrue(player:HasCollectible(id))
+	test.AssertFalse(player:HasCollectible(id, true))
+	test.AssertFalse(player:HasCollectible(id, false, true))
+	test.AssertEquals(player:GetCollectibleNum(id), 1)
+	test.AssertEquals(player:GetInnateCollectibleCount(id), 1)
+	test.AssertEquals(player:GetInnateCollectibleCount(id, groupKey), 0)
+
+	test:AddUnexpectedCallback(ModCallbacks.MC_POST_TRIGGER_COLLECTIBLE_REMOVED)
+	_ExpectInnateCollectibleRemoved(player, id, 1, "", false)
+
+	player:AddInnateCollectible(id, -1)  -- legacy
+
+	test.AssertFalse(player:HasCollectible(id))
+end
+
+function EntityPlayerTest:TestAddInnateCollectibleToGroup(player)
+	local id = 1
+	test.AssertFalse(player:HasCollectible(id))
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TRIGGER_COLLECTIBLE_ADDED, function(_, plr, cid, firsttime, wispOrInnate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, id)
+		test.AssertFalse(firsttime)
+		test.AssertTrue(wispOrInnate)
+	end, id)
+	_ExpectInnateCollectibleAdded(player, id, 1, groupKey, -1)
+
+	player:AddInnateCollectible(id, 1, groupKey)
+
+	test.AssertTrue(player:HasCollectible(id))
+	test.AssertFalse(player:HasCollectible(id, true))
+	test.AssertFalse(player:HasCollectible(id, false, true))
+	test.AssertEquals(player:GetCollectibleNum(id), 1)
+	test.AssertEquals(player:GetInnateCollectibleCount(id), 0)
+	test.AssertEquals(player:GetInnateCollectibleCount(id, otherGroupKey), 0)
+	test.AssertEquals(player:GetInnateCollectibleCount(id, groupKey), 1)
+
+	player:AddInnateCollectible(id, -1)  -- legacy
+	test.AssertEquals(player:RemoveInnateCollectible(id, 1), 0)
+	test.AssertEquals(player:RemoveInnateCollectible(id, 1, otherGroupKey), 0)
+	test.AssertTrue(player:HasCollectible(id))
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TRIGGER_COLLECTIBLE_REMOVED, function(_, plr, cid, removeFromPlayerForm, wispOrInnate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, id)
+		test.AssertFalse(removeFromPlayerForm)
+		test.AssertTrue(wispOrInnate)
+	end, id)
+	_ExpectInnateCollectibleRemoved(player, id, 1, groupKey, false)
+
+	test.AssertEquals(player:RemoveInnateCollectible(id, 2, groupKey), 1)
+	test.AssertFalse(player:HasCollectible(id))
+end
+
+function EntityPlayerTest:TestAddTemporaryInnateCollectible(player)
+	local id = 1
+
+	test.AssertFalse(player:HasCollectible(id))
+
+	local addedTriggers = 0
+
+	test:AddCallback(ModCallbacks.MC_POST_TRIGGER_COLLECTIBLE_ADDED, function(_, plr, cid, firsttime, wispOrInnate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, id)
+		test.AssertFalse(firsttime)
+		test.AssertTrue(wispOrInnate)
+
+		addedTriggers = addedTriggers + 1
+	end, id)
+
+	local removedTriggers = 0
+
+	test:AddCallback(ModCallbacks.MC_POST_TRIGGER_COLLECTIBLE_REMOVED, function(_, plr, cid, removeFromPlayerForm, wispOrInnate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, id)
+		test.AssertFalse(removeFromPlayerForm)
+		test.AssertTrue(wispOrInnate)
+
+		removedTriggers = removedTriggers + 1
+	end, id)
+
+	_ExpectInnateCollectibleAdded(player, id, 2, groupKey, 1)
+	player:AddInnateCollectible(id, 2, groupKey, 1)
+
+	_ExpectInnateCollectibleAdded(player, id, 4, groupKey, 1)
+	player:AddInnateCollectible(id, 4, groupKey, 1)
+
+	_ExpectInnateCollectibleAdded(player, id, 1, groupKey, 2)
+	player:AddInnateCollectible(id, 1, groupKey, 2)
+	
+	_ExpectInnateCollectibleAdded(player, id, 1, otherGroupKey, 1)
+	player:AddInnateCollectible(id, 1, otherGroupKey, 1)
+
+	test.AssertEquals(REPENTOGON_TEST:ClearOneTimeCallbacks(), 0)
+	test.AssertEquals(addedTriggers, 4)
+	test.AssertEquals(removedTriggers, 0)
+
+	test.AssertTrue(player:HasCollectible(id))
+	test.AssertFalse(player:HasCollectible(id, true))
+	test.AssertFalse(player:HasCollectible(id, false, true))
+	test.AssertEquals(player:GetCollectibleNum(id), 8)
+	test.AssertEquals(player:GetInnateCollectibleCount(id), 0)
+	test.AssertEquals(player:GetInnateCollectibleCount(id, otherGroupKey), 1)
+	test.AssertEquals(player:GetInnateCollectibleCount(id, groupKey), 7)
+
+	_ExpectInnateCollectibleRemoved(player, id, 3, groupKey, false)
+	test.AssertEquals(player:RemoveInnateCollectible(id, 3, groupKey), 3)
+	test.AssertEquals(REPENTOGON_TEST:ClearOneTimeCallbacks(), 0)
+	test.AssertEquals(addedTriggers, 4)
+	test.AssertEquals(removedTriggers, 1)
+
+	_ExpectInnateCollectibleRemoved(player, id, 3, groupKey, true)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_REMOVE_INNATE_COLLECTIBLE, function(_, plr, cid, key, amount, expiredDuration)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, id)
+		test.AssertEquals(key, otherGroupKey)
+		test.AssertEquals(amount, 1)
+		test.AssertTrue(expiredDuration)
+	end, otherGroupKey)
+	player:Update()
+	test.AssertEquals(REPENTOGON_TEST:ClearOneTimeCallbacks(), 0)
+	test.AssertEquals(addedTriggers, 4)
+	test.AssertEquals(removedTriggers, 2)
+
+	_ExpectInnateCollectibleRemoved(player, id, 1, groupKey, true)
+	player:Update()
+	test.AssertEquals(REPENTOGON_TEST:ClearOneTimeCallbacks(), 0)
+	test.AssertEquals(addedTriggers, 4)
+	test.AssertEquals(removedTriggers, 3)
+
+	test.AssertFalse(player:HasCollectible(id))
+end
+
+function EntityPlayerTest:TestAddInnateCollectibleCostume(player)
+	local id = 1
+	local layer = "head1"
+
+	test.AssertFalse(player:HasCollectible(id))
+	test.AssertFalse(player:IsCollectibleCostumeVisible(id, layer))
+
+	player:AddInnateCollectible(id, 1, groupKey, -1)
+	test.AssertTrue(player:IsCollectibleCostumeVisible(id, layer))
+
+	test.AssertEquals(player:RemoveInnateCollectible(id, 1, groupKey), 1)
+	test.AssertFalse(player:IsCollectibleCostumeVisible(id, layer))
+
+	player:AddInnateCollectible(id, 1, groupKey, -1, false)
+	test.AssertFalse(player:IsCollectibleCostumeVisible(id, layer))
+
+	test.AssertEquals(player:RemoveInnateCollectible(id, 1, groupKey), 1)
+end
+
+function EntityPlayerTest:TestSetInnateCollectibleCount(player)
+	local id = 1
+	local duration = 1
+
+	test.AssertFalse(player:HasCollectible(id))
+
+	player:AddInnateCollectible(id, 1, groupKey)
+	player:AddInnateCollectible(id, 1, groupKey, duration)
+
+	test.AssertTrue(player:HasCollectible(id))
+
+	local addedTriggers = 0
+
+	test:AddCallback(ModCallbacks.MC_POST_TRIGGER_COLLECTIBLE_ADDED, function(_, plr, cid, firsttime, wispOrInnate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, id)
+		test.AssertFalse(firsttime)
+		test.AssertTrue(wispOrInnate)
+
+		addedTriggers = addedTriggers + 1
+	end, id)
+
+	local removedTriggers = 0
+
+	test:AddCallback(ModCallbacks.MC_POST_TRIGGER_COLLECTIBLE_REMOVED, function(_, plr, cid, removeFromPlayerForm, wispOrInnate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, id)
+		test.AssertFalse(removeFromPlayerForm)
+		test.AssertTrue(wispOrInnate)
+
+		removedTriggers = removedTriggers + 1
+	end, id)
+
+	test.AssertEquals(player:GetCollectibleNum(id), 2)
+	test.AssertEquals(player:GetInnateCollectibleCount(id), 0)
+	test.AssertEquals(player:GetInnateCollectibleCount(id, groupKey), 2)
+
+	_ExpectInnateCollectibleAdded(player, id, 1, groupKey, -1)
+
+	test.AssertEquals(player:SetInnateCollectibleCount(id, 3, groupKey), 1)
+	test.AssertEquals(player:GetCollectibleNum(id), 3)
+	test.AssertEquals(player:GetInnateCollectibleCount(id, groupKey), 3)
+
+	_ExpectInnateCollectibleRemoved(player, id, 2, groupKey, false)
+
+	test.AssertEquals(player:SetInnateCollectibleCount(id, 1, groupKey), -2)
+	test.AssertEquals(player:GetCollectibleNum(id), 1)
+	test.AssertEquals(player:GetInnateCollectibleCount(id, groupKey), 1)
+
+	_ExpectInnateCollectibleRemoved(player, id, 1, groupKey, false)
+
+	test.AssertEquals(player:SetInnateCollectibleCount(id, 0, groupKey), -1)
+	test.AssertEquals(player:GetCollectibleNum(id), 0)
+	test.AssertEquals(player:GetInnateCollectibleCount(id, groupKey), 0)
+
+	test.AssertEquals(addedTriggers, 1)
+	test.AssertEquals(removedTriggers, 2)
+end
+
+function EntityPlayerTest:TestSetInnateCollectibleGroup(player)
+	player:AddInnateCollectible(CollectibleType.COLLECTIBLE_SAD_ONION, 1, groupKey)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TRIGGER_COLLECTIBLE_ADDED, function(_, plr, id, firsttime, wispOrInnate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(id, CollectibleType.COLLECTIBLE_INNER_EYE)
+		test.AssertFalse(firsttime)
+		test.AssertTrue(wispOrInnate)
+	end, CollectibleType.COLLECTIBLE_INNER_EYE)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TRIGGER_COLLECTIBLE_ADDED, function(_, plr, id, firsttime, wispOrInnate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(id, CollectibleType.COLLECTIBLE_SPOON_BENDER)
+		test.AssertFalse(firsttime)
+		test.AssertTrue(wispOrInnate)
+	end, CollectibleType.COLLECTIBLE_SPOON_BENDER)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TRIGGER_COLLECTIBLE_REMOVED, function(_, plr, id, removeFromPlayerForm, wispOrInnate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(id, CollectibleType.COLLECTIBLE_SAD_ONION)
+		test.AssertFalse(removeFromPlayerForm)
+		test.AssertTrue(wispOrInnate)
+	end, CollectibleType.COLLECTIBLE_SAD_ONION)
+
+	_ExpectInnateCollectibleAdded(player, CollectibleType.COLLECTIBLE_INNER_EYE, 2, groupKey, -1)
+	_ExpectInnateCollectibleRemoved(player, CollectibleType.COLLECTIBLE_SAD_ONION, 1, groupKey, false)
+
+	player:SetInnateCollectibleGroup(groupKey, {
+		[CollectibleType.COLLECTIBLE_INNER_EYE] = 2,
+		[CollectibleType.COLLECTIBLE_SPOON_BENDER] = 3,
+	})
+
+	test.AssertEquals(player:GetCollectibleNum(CollectibleType.COLLECTIBLE_SAD_ONION), 0)
+	test.AssertEquals(player:GetCollectibleNum(CollectibleType.COLLECTIBLE_INNER_EYE), 2)
+	test.AssertEquals(player:GetCollectibleNum(CollectibleType.COLLECTIBLE_SPOON_BENDER), 3)
+
+	local tab = player:GetInnateCollectibleGroup(groupKey)
+	test.AssertNil(tab[CollectibleType.COLLECTIBLE_SAD_ONION])
+	test.AssertEquals(tab[CollectibleType.COLLECTIBLE_INNER_EYE], 2)
+	test.AssertEquals(tab[CollectibleType.COLLECTIBLE_SPOON_BENDER], 3)
+end
+
+function EntityPlayerTest:TestGetSpoofedCollectiblesList(player)
+	player:AddInnateCollectible(CollectibleType.COLLECTIBLE_SAD_ONION, 1)
+	player:AddInnateCollectible(CollectibleType.COLLECTIBLE_INNER_EYE, 2, groupKey)
+	player:BlockCollectible(CollectibleType.COLLECTIBLE_INNER_EYE)
+	player:BlockCollectible(CollectibleType.COLLECTIBLE_CRICKETS_HEAD)
+	player:AddInnateCollectible(CollectibleType.COLLECTIBLE_SAD_ONION, 3, groupKey, 10)
+	local tab = player:GetSpoofedCollectiblesList()
+	player:UnblockCollectible(CollectibleType.COLLECTIBLE_INNER_EYE)
+	player:UnblockCollectible(CollectibleType.COLLECTIBLE_CRICKETS_HEAD)
+	test.AssertEquals(tab[CollectibleType.COLLECTIBLE_SAD_ONION].CollectibleID, CollectibleType.COLLECTIBLE_SAD_ONION)
+	test.AssertEquals(tab[CollectibleType.COLLECTIBLE_SAD_ONION].AppendedCount, 4)
+	test.AssertEquals(tab[CollectibleType.COLLECTIBLE_SAD_ONION].IsBlocked, false)
+	test.AssertEquals(tab[CollectibleType.COLLECTIBLE_INNER_EYE].CollectibleID, CollectibleType.COLLECTIBLE_INNER_EYE)
+	test.AssertEquals(tab[CollectibleType.COLLECTIBLE_INNER_EYE].AppendedCount, 2)
+	test.AssertEquals(tab[CollectibleType.COLLECTIBLE_INNER_EYE].IsBlocked, true)
+	test.AssertNil(tab[CollectibleType.COLLECTIBLE_SPOON_BENDER])
+	test.AssertEquals(tab[CollectibleType.COLLECTIBLE_CRICKETS_HEAD].CollectibleID, CollectibleType.COLLECTIBLE_CRICKETS_HEAD)
+	test.AssertEquals(tab[CollectibleType.COLLECTIBLE_CRICKETS_HEAD].AppendedCount, 0)
+	test.AssertEquals(tab[CollectibleType.COLLECTIBLE_CRICKETS_HEAD].IsBlocked, true)
+end
+
+function EntityPlayerTest:TestAddInnateTrinket(player)
+	local id = 1
+	local goldenid = 1 | TrinketType.TRINKET_GOLDEN_FLAG
+
+	test.AssertFalse(player:HasTrinket(id))
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TRIGGER_TRINKET_ADDED, function(_, plr, cid, firsttime, innate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, id)
+		test.AssertFalse(firsttime)
+		test.AssertTrue(innate)
+	end, id)
+
+	_ExpectInnateTrinketAdded(player, id, 1, "", -1)
+
+	player:AddInnateTrinket(id, 1)
+	test.AssertTrue(player:HasTrinket(id))
+	test.AssertFalse(player:HasTrinket(id, true))
+	test.AssertFalse(player:HasGoldenTrinket(id))
+	test.AssertEquals(player:GetTrinketMultiplier(id), 1)
+	test.AssertEquals(player:GetInnateTrinketCount(id), 1)
+	test.AssertEquals(player:GetInnateTrinketCount(id, groupKey), 0)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TRIGGER_TRINKET_ADDED, function(_, plr, cid, firsttime, innate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, goldenid)
+		test.AssertFalse(firsttime)
+		test.AssertTrue(innate)
+	end, goldenid)
+
+	_ExpectInnateTrinketAdded(player, goldenid, 2, "", -1)
+
+	player:AddInnateTrinket(goldenid, 2)
+	test.AssertTrue(player:HasTrinket(id))
+	test.AssertFalse(player:HasTrinket(id, true))
+	test.AssertTrue(player:HasGoldenTrinket(id))
+	test.AssertFalse(player:HasGoldenTrinket(id, true))
+	test.AssertEquals(player:GetTrinketMultiplier(id), 5)
+	test.AssertEquals(player:GetInnateTrinketCount(id), 1)
+	test.AssertEquals(player:GetInnateTrinketCount(goldenid), 2)
+
+	test.AssertEquals(player:RemoveInnateTrinket(id, 1, groupKey), 0)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TRIGGER_TRINKET_REMOVED, function(_, plr, cid, innate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, id)
+		test.AssertTrue(innate)
+	end, id)
+
+	test.AssertEquals(player:RemoveInnateTrinket(id, 2), 1)
+
+	test.AssertTrue(player:HasTrinket(id))
+	test.AssertEquals(player:GetTrinketMultiplier(id), 4)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_TRIGGER_TRINKET_REMOVED, function(_, plr, cid, innate)
+		test.AssertEquals(GetPtrHash(plr), GetPtrHash(player))
+		test.AssertEquals(cid, goldenid)
+		test.AssertTrue(innate)
+	end, goldenid)
+
+	_ExpectInnateTrinketRemoved(player, goldenid, 2, "", false)
+
+	test.AssertEquals(player:RemoveInnateTrinket(goldenid, 3, ""), 2)
+	test.AssertFalse(player:HasTrinket(id))
+end
+
+function EntityPlayerTest:TestAddInnateTrinketToGroup(player)
+	local id = 1
+	test.AssertFalse(player:HasTrinket(id))
+	player:AddInnateTrinket(id, 1, groupKey)
+
+	test.AssertTrue(player:HasTrinket(id))
+	test.AssertFalse(player:HasTrinket(id, true))
+	test.AssertEquals(player:GetTrinketMultiplier(id), 1)
+	test.AssertEquals(player:GetInnateTrinketCount(id), 0)
+	test.AssertEquals(player:GetInnateTrinketCount(id, otherGroupKey), 0)
+	test.AssertEquals(player:GetInnateTrinketCount(id, groupKey), 1)
+
+	test.AssertEquals(player:RemoveInnateTrinket(id, 1), 0)
+	test.AssertEquals(player:RemoveInnateTrinket(id, 1, otherGroupKey), 0)
+	test.AssertTrue(player:HasTrinket(id))
+
+	test.AssertEquals(player:RemoveInnateTrinket(id, 1, groupKey), 1)
+	test.AssertFalse(player:HasTrinket(id))
+end
+
+function EntityPlayerTest:TestAddTemporaryInnateTrinket(player)
+	local id = 1
+	local goldenid = 1 | TrinketType.TRINKET_GOLDEN_FLAG
+	local duration = 1
+	test.AssertFalse(player:HasTrinket(id))
+	player:AddInnateTrinket(id, 3, groupKey, duration)
+	player:AddInnateTrinket(goldenid, 1, groupKey, duration)
+
+	test.AssertTrue(player:HasTrinket(id))
+	test.AssertFalse(player:HasTrinket(id, true))
+	test.AssertEquals(player:GetTrinketMultiplier(id), 5)
+	test.AssertEquals(player:GetInnateTrinketCount(id), 0)
+	test.AssertEquals(player:GetInnateTrinketCount(id, otherGroupKey), 0)
+	test.AssertEquals(player:GetInnateTrinketCount(id, groupKey), 3)
+	test.AssertEquals(player:GetInnateTrinketCount(goldenid, groupKey), 1)
+
+	player:Update()
+
+	test.AssertFalse(player:HasTrinket(id))
+end
+
+function EntityPlayerTest:TestAddInnateTrinketCostume(player)
+	local id = TrinketType.TRINKET_TICK
+
+	local function HasTickCostume()
+		local idx = player:GetCostumeLayerMap()[8].costumeIndex
+		if idx > -1 then
+			local desc = player:GetCostumeSpriteDescs()[idx+1]
+			if desc then
+				local item = desc:GetItemConfig()
+				return item ~= nil and item:IsTrinket() and item.ID == id
+			end
+		end
+		return false
+	end
+
+	test.AssertFalse(player:HasTrinket(id))
+	test.AssertFalse(HasTickCostume())
+
+	player:AddInnateTrinket(id, 1, groupKey, -1)
+	test.AssertTrue(HasTickCostume())
+
+	test.AssertEquals(player:RemoveInnateTrinket(id, 1, groupKey), 1)
+	test.AssertFalse(HasTickCostume())
+
+	player:AddInnateTrinket(id, 1, groupKey, -1, false)
+	test.AssertFalse(HasTickCostume())
+
+	test.AssertEquals(player:RemoveInnateTrinket(id, 1, groupKey), 1)
+end
+
+function EntityPlayerTest:TestSetInnateTrinketCount(player)
+	local id = 1
+	local goldenid = 1 | TrinketType.TRINKET_GOLDEN_FLAG
+	local duration = 1
+
+	test.AssertFalse(player:HasTrinket(id))
+
+	player:AddInnateTrinket(id, 1, groupKey)
+	player:AddInnateTrinket(id, 1, groupKey, duration)
+
+	test.AssertEquals(player:GetTrinketMultiplier(id), 2)
+	test.AssertEquals(player:GetInnateTrinketCount(id), 0)
+	test.AssertEquals(player:GetInnateTrinketCount(id, groupKey), 2)
+
+	player:SetInnateTrinketCount(goldenid, 1, groupKey)
+
+	test.AssertEquals(player:GetTrinketMultiplier(id), 4)
+	test.AssertEquals(player:GetInnateTrinketCount(id), 0)
+	test.AssertEquals(player:GetInnateTrinketCount(id, groupKey), 2)
+	test.AssertEquals(player:GetInnateTrinketCount(goldenid), 0)
+	test.AssertEquals(player:GetInnateTrinketCount(goldenid, groupKey), 1)
+
+	test.AssertEquals(player:SetInnateTrinketCount(id, 0, groupKey), -2)
+	test.AssertEquals(player:GetTrinketMultiplier(id), 2)
+	test.AssertEquals(player:GetInnateTrinketCount(id, groupKey), 0)
+	test.AssertEquals(player:GetInnateTrinketCount(goldenid, groupKey), 1)
+
+	test.AssertEquals(player:SetInnateTrinketCount(goldenid, 0, groupKey), -1)
+	test.AssertEquals(player:GetTrinketMultiplier(id), 0)
+end
+
+function EntityPlayerTest:TestSetInnateTrinketGroup(player)
+	player:AddInnateTrinket(TrinketType.TRINKET_SWALLOWED_PENNY, 1, groupKey)
+	player:AddInnateTrinket(TrinketType.TRINKET_SWALLOWED_PENNY | TrinketType.TRINKET_GOLDEN_FLAG, 1, groupKey)
+	player:AddInnateTrinket(TrinketType.TRINKET_PETRIFIED_POOP | TrinketType.TRINKET_GOLDEN_FLAG, 1, groupKey)
+
+	player:SetInnateTrinketGroup(groupKey, {
+		[TrinketType.TRINKET_SWALLOWED_PENNY | TrinketType.TRINKET_GOLDEN_FLAG] = 1,
+		[TrinketType.TRINKET_PETRIFIED_POOP] = 2,
+		[TrinketType.TRINKET_AAA_BATTERY] = 3,
+		[TrinketType.TRINKET_AAA_BATTERY | TrinketType.TRINKET_GOLDEN_FLAG] = 1,
+	})
+
+	test.AssertEquals(player:GetTrinketMultiplier(TrinketType.TRINKET_SWALLOWED_PENNY), 2)
+	test.AssertEquals(player:GetTrinketMultiplier(TrinketType.TRINKET_PETRIFIED_POOP), 2)
+	test.AssertEquals(player:GetTrinketMultiplier(TrinketType.TRINKET_AAA_BATTERY), 5)
+
+	local tab = player:GetInnateTrinketGroup(groupKey)
+	test.AssertNil(tab[TrinketType.TRINKET_SWALLOWED_PENNY])
+	test.AssertEquals(tab[TrinketType.TRINKET_SWALLOWED_PENNY | TrinketType.TRINKET_GOLDEN_FLAG], 1)
+	test.AssertEquals(tab[TrinketType.TRINKET_PETRIFIED_POOP], 2)
+	test.AssertNil(tab[TrinketType.TRINKET_PETRIFIED_POOP | TrinketType.TRINKET_GOLDEN_FLAG])
+	test.AssertEquals(tab[TrinketType.TRINKET_AAA_BATTERY], 3)
+	test.AssertEquals(tab[TrinketType.TRINKET_AAA_BATTERY | TrinketType.TRINKET_GOLDEN_FLAG], 1)
 end
 
 function EntityPlayerTest:TestAddLeprosy(entityplayer)
@@ -1907,9 +2420,14 @@ function EntityPlayerTest:TestAddUrnSouls(entityplayer)
 	entityplayer:AddUrnSouls(count)
 end
 
-function EntityPlayerTest:TestBlockCollectible(entityplayer)
-	local collectible = 1
-	entityplayer:BlockCollectible(collectible)
+function EntityPlayerTest:TestBlockCollectible(player)
+	local id = 1
+	player:AddCollectible(id)
+	test.AssertTrue(player:HasCollectible(id))
+	player:BlockCollectible(id)
+	test.AssertFalse(player:HasCollectible(id))
+	player:UnblockCollectible(id)
+	test.AssertTrue(player:HasCollectible(id))
 end
 
 function EntityPlayerTest:TestCanAddCollectibleToInventory(entityplayer)
@@ -2225,10 +2743,6 @@ end
 function EntityPlayerTest:TestGetSpecialGridCollision(entityplayer)
 	local position = Vector(1,1)
 	entityplayer:GetSpecialGridCollision(position)
-end
-
-function EntityPlayerTest:TestGetSpoofedCollectiblesList(entityplayer)
-	entityplayer:GetSpoofedCollectiblesList()
 end
 
 function EntityPlayerTest:TestGetTearDisplacement(entityplayer)
@@ -3052,11 +3566,6 @@ function EntityPlayerTest:TestTryPreventDeath(entityplayer)
 	entityplayer:TryPreventDeath()
 end
 
-function EntityPlayerTest:TestUnblockCollectible(entityplayer)
-	local collectible = 1
-	entityplayer:UnblockCollectible(collectible)
-end
-
 function EntityPlayerTest:TestUpdateIsaacPregnancy(entityplayer)
 	local updatecambion = true
 	entityplayer:UpdateIsaacPregnancy(updatecambion)
@@ -3369,22 +3878,24 @@ function EntityPlayerTest:TestTakeDamage(player)
 		test.AssertEquals(countdown, testcountdown)
 	end)
 
-	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown, extraSource)
 		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
 		test.AssertEquals(damage, initialExpectedDamage)
 		test.AssertEquals(flags, testflags)
 		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
 		test.AssertEquals(countdown, testcountdown)
+		test.AssertNil(extraSource)
 		
 		return {Damage = modifiedDamage, DamageFlags = modifiedflags, DamageCountdown = modifiedcountdown}
 	end)
 
-	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, function(_, entity, damage, flags, source, countdown, extraSource)
 		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
 		test.AssertEquals(damage, finalExpectedDamage)
 		test.AssertEquals(flags, modifiedflags)
 		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(testsource.Entity))
 		test.AssertEquals(countdown, modifiedcountdown)
+		test.AssertNil(extraSource)
 	end)
 
 	player:TakeDamage(testDamage, testflags, testsource, testcountdown)
@@ -3871,6 +4382,16 @@ function EntityPlayerTest:TestAddSoulLocketBonus(player)
 
 	player:AddSoulLocketBonus()
 	test.AssertTrue(player.Damage > 3.5 or player.MaxFireDelay < 10 or player.TearRange > 260 or player.ShotSpeed > 1 or player.MoveSpeed > 1 or player.Luck > 0)
+end
+
+function EntityPlayerTest:TestGetRUAWizardTimer(player)
+	test.AssertEquals(player:GetRUAWizardTimer(), 0)
+
+	player:UsePill(PillEffect.PILLEFFECT_WIZARD, PillColor.PILL_BLUE_BLUE, UseFlag.USE_NOANIM)
+	test.AssertEquals(player:GetRUAWizardTimer(), 900)
+
+	player:SetRUAWizardTimer(123)
+	test.AssertEquals(player:GetRUAWizardTimer(), 123)
 end
 
 

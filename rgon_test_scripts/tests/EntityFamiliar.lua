@@ -459,5 +459,49 @@ function EntityFamiliarTest:TestUpdate(entityfamiliar)
 	entityfamiliar:Update()
 end
 
+function EntityFamiliarTest:TestTakeDmgExtraSource()
+	local player = Isaac.GetPlayer()
+
+	local centerPos = Game():GetRoom():GetCenterPos()
+	local npc = Isaac.Spawn(EntityType.ENTITY_GUSHER, 1, 0, centerPos, Vector.Zero, nil):ToNPC()
+	local fireplace = Isaac.Spawn(EntityType.ENTITY_FIREPLACE, 0, 0, centerPos, Vector.Zero, nil):ToNPC()
+
+	local fam = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, FamiliarVariant.UMBILICAL_BABY, 0, centerPos, Vector.Zero, nil):ToFamiliar()
+
+	local npcCallback = function(_, entity, damage, flags, source, countdown, extraSource)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(damage, 10.5)
+		test.AssertEquals(flags, 0)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(player))
+		test.AssertEquals(countdown, 30)
+
+		test.AssertTrue(extraSource ~= nil)
+		test.AssertEquals(GetPtrHash(extraSource.Entity), GetPtrHash(fam))
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, npcCallback, EntityType.ENTITY_GUSHER)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, npcCallback, EntityType.ENTITY_GUSHER)
+
+	local fireplaceCallback = function(_, entity, damage, flags, source, countdown, extraSource)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(fireplace))
+		test.AssertEquals(damage, 1000)  -- yeah, this is right
+		test.AssertEquals(flags, 0)
+		test.AssertNil(source.Entity)
+		test.AssertEquals(countdown, 30)
+
+		test.AssertTrue(extraSource ~= nil)
+		test.AssertEquals(GetPtrHash(extraSource.Entity), GetPtrHash(fam))
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, fireplaceCallback, EntityType.ENTITY_FIREPLACE)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, fireplaceCallback, EntityType.ENTITY_FIREPLACE)
+
+	Game():GetRoom():Update()
+	Game():GetRoom():Update()
+	fam:Update()
+	fam:Update()
+	fam:Update()
+	fam.Position = centerPos
+	fam:Update()
+end
+
 
 return EntityFamiliarTest

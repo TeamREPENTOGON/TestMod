@@ -22,12 +22,16 @@ function EntityKnifeTest:TestClearTearFlags(entityknife)
 	entityknife:ClearTearFlags(flags)
 end
 
-function EntityKnifeTest:TestGetKnifeDistance(entityknife)
-	entityknife:GetKnifeDistance()
+function EntityKnifeTest:TestSetKnifeDistance(knife)
+	test.AssertEquals(knife:GetKnifeDistance(), 0)
+	knife:SetKnifeDistance(1.23)
+	test.AssertEquals(knife:GetKnifeDistance(), 1.23)
 end
 
-function EntityKnifeTest:TestGetKnifeVelocity(entityknife)
-	entityknife:GetKnifeVelocity()
+function EntityKnifeTest:TestSetKnifeVelocity(knife)
+	test.AssertEquals(knife:GetKnifeVelocity(), 0)
+	knife:SetKnifeVelocity(2.34)
+	test.AssertEquals(knife:GetKnifeVelocity(), 2.34)
 end
 
 function EntityKnifeTest:TestGetRenderZ(entityknife)
@@ -190,6 +194,50 @@ function EntityKnifeTest:TestUpdate(entityknife)
 	test:AddUnexpectedCallback(ModCallbacks.MC_POST_KNIFE_UPDATE)
 
 	entityknife:Update()
+end
+
+function EntityKnifeTest:TestTakeDmgExtraSource()
+	local player = Isaac.GetPlayer()
+
+	local centerPos = Game():GetRoom():GetCenterPos()
+	local npc = Isaac.Spawn(EntityType.ENTITY_GUSHER, 1, 0, centerPos, Vector.Zero, nil):ToNPC()
+	local fireplace = Isaac.Spawn(EntityType.ENTITY_FIREPLACE, 0, 0, centerPos, Vector.Zero, nil):ToNPC()
+
+	local knife = Isaac.Spawn(EntityType.ENTITY_KNIFE, KnifeVariant.SPIRIT_SWORD, KnifeSubType.CLUB_HITBOX, centerPos + Vector(0, -30), Vector.Zero, nil):ToKnife()
+	knife:ClearEntityFlags(EntityFlag.FLAG_APPEAR)
+	knife:SetIsSwinging(true)
+	knife.Parent = player
+	knife.SpawnerEntity = player
+
+	local npcCallback = function(_, entity, damage, flags, source, countdown, extraSource)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(damage, 69.5)
+		test.AssertEquals(flags, 0)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(player))
+		test.AssertEquals(countdown, 30)
+
+		test.AssertTrue(extraSource ~= nil)
+		test.AssertEquals(GetPtrHash(extraSource.Entity), GetPtrHash(knife))
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, npcCallback, EntityType.ENTITY_GUSHER)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, npcCallback, EntityType.ENTITY_GUSHER)
+
+	local fireplaceCallback = function(_, entity, damage, flags, source, countdown, extraSource)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(fireplace))
+		test.AssertEquals(damage, 1000)  -- yeah, this is right
+		test.AssertEquals(flags, 0)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(player))
+		test.AssertEquals(countdown, 30)
+
+		test.AssertTrue(extraSource ~= nil)
+		test.AssertEquals(GetPtrHash(extraSource.Entity), GetPtrHash(knife))
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, fireplaceCallback, EntityType.ENTITY_FIREPLACE)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, fireplaceCallback, EntityType.ENTITY_FIREPLACE)
+
+	Game():GetRoom():Update()
+	knife:Update()
+	knife:Update()
 end
 
 return EntityKnifeTest

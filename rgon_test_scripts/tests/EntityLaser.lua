@@ -445,5 +445,91 @@ function EntityLaserTest:TestUpdate(entitylaser)
 	entitylaser:Update()
 end
 
+function EntityLaserTest:TestTakeDmgExtraSource()
+	local player = Isaac.GetPlayer()
+	local npc = Isaac.Spawn(EntityType.ENTITY_GUSHER, 1, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil):ToNPC()
+
+	player.Position = Game():GetRoom():GetCenterPos() + Vector(-40, 0)
+	npc.Position = player.Position + Vector(80, 0)
+
+	local laser = player:FireTechLaser(player.Position, 0, Vector(1,0), false, true, player)
+
+	local testCallback = function(_, entity, damage, flags, source, countdown, extraSource)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(npc))
+		test.AssertEquals(damage, 3.5)
+		test.AssertEquals(flags, DamageFlag.DAMAGE_LASER)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(player))
+		test.AssertEquals(countdown, 30)
+
+		test.AssertTrue(extraSource ~= nil)
+		test.AssertEquals(GetPtrHash(extraSource.Entity), GetPtrHash(laser))
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, testCallback)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, testCallback)
+
+	laser:Update()
+end
+
+function EntityLaserTest:TestTakeDmgExtraSource()
+	local centerPos = Game():GetRoom():GetCenterPos()
+
+	local player = Isaac.GetPlayer()
+	player.Position = centerPos + Vector(-40, 0)
+	local npc = Isaac.Spawn(EntityType.ENTITY_GUSHER, 1, 0, centerPos + Vector(40, 0), Vector.Zero, nil):ToNPC()
+	local fireplace = Isaac.Spawn(EntityType.ENTITY_FIREPLACE, 0, 0, centerPos + Vector(40, 0), Vector.Zero, nil):ToNPC()
+
+	local laser = player:FireTechLaser(player.Position, 0, Vector(1,0), false, true, player)
+
+	for _, testEntity in pairs({npc, fireplace}) do
+		local testCallback = function(_, entity, damage, flags, source, countdown, extraSource)
+			test.AssertEquals(GetPtrHash(entity), GetPtrHash(testEntity))
+			test.AssertEquals(damage, 3.5)
+			test.AssertEquals(flags, DamageFlag.DAMAGE_LASER)
+			test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(player))
+			test.AssertEquals(countdown, 30)
+
+			test.AssertTrue(extraSource ~= nil)
+			test.AssertEquals(GetPtrHash(extraSource.Entity), GetPtrHash(laser))
+		end
+		test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, testCallback, testEntity.Type)
+		test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, testCallback, testEntity.Type)
+	end
+
+	laser:Update()
+end
+
+function EntityLaserTest:TestTakeDmgExtraSourcePlayer()
+	local centerPos = Game():GetRoom():GetCenterPos()
+
+	local player = Isaac.GetPlayer()
+	player.Position = centerPos + Vector(40, 0)
+	local npc = Isaac.Spawn(EntityType.ENTITY_GUSHER, 1, 0, centerPos - Vector(40, 0), Vector.Zero, nil):ToNPC()
+
+	local laser = EntityLaser.ShootAngle(LaserVariant.THIN_RED, npc.Position, 0, 10, Vector.Zero, npc)
+
+	local testCallback = function(_, entity, damage, flags, source, countdown, extraSource)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
+		test.AssertEquals(damage, 1)
+		test.AssertEquals(flags, DamageFlag.DAMAGE_LASER)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(npc))
+		test.AssertEquals(countdown, 30)
+
+		test.AssertTrue(extraSource ~= nil)
+		test.AssertEquals(GetPtrHash(extraSource.Entity), GetPtrHash(laser))
+	end
+	test:AddOneTimeCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, testCallback, EntityType.ENTITY_PLAYER)
+	test:AddOneTimeCallback(ModCallbacks.MC_POST_ENTITY_TAKE_DMG, testCallback, EntityType.ENTITY_PLAYER)
+
+	test:AddOneTimeCallback(ModCallbacks.MC_PRE_PLAYER_TAKE_DMG, function(_, entity, damage, flags, source, countdown)
+		test.AssertEquals(GetPtrHash(entity), GetPtrHash(player))
+		test.AssertEquals(damage, 1)
+		test.AssertEquals(flags, DamageFlag.DAMAGE_LASER)
+		test.AssertEquals(GetPtrHash(source.Entity), GetPtrHash(npc))
+		test.AssertEquals(countdown, 30)
+	end)
+
+	laser:Update()
+end
+
 
 return EntityLaserTest
