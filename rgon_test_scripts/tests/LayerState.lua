@@ -13,6 +13,7 @@ end
 ----------
 
 local TEST_SHADER = "shaders/coloroffset_rgontest"
+local TEST_CHAMPION_SHADER = "shaders/coloroffset_rgontest_champion"
 
 function LayerStateTest:TestCustomShader(layerstate)
 	test.AssertFalse(layerstate:HasCustomShader())
@@ -33,19 +34,19 @@ end
 
 function LayerStateTest:TestCustomChampionShader(layerstate)
 	test.AssertFalse(layerstate:HasCustomChampionShader())
-	test.AssertFalse(layerstate:HasCustomChampionShader(TEST_SHADER))
+	test.AssertFalse(layerstate:HasCustomChampionShader(TEST_CHAMPION_SHADER))
 
-	layerstate:SetCustomChampionShader(TEST_SHADER)
+	layerstate:SetCustomChampionShader(TEST_CHAMPION_SHADER)
 
 	test.AssertTrue(layerstate:HasCustomChampionShader())
-	test.AssertTrue(layerstate:HasCustomChampionShader(TEST_SHADER))
+	test.AssertTrue(layerstate:HasCustomChampionShader(TEST_CHAMPION_SHADER))
 	test.AssertFalse(layerstate:HasCustomChampionShader("notshader"))
 	test.AssertFalse(layerstate:HasCustomShader())
 
 	layerstate:ClearCustomChampionShader()
 
 	test.AssertFalse(layerstate:HasCustomChampionShader())
-	test.AssertFalse(layerstate:HasCustomChampionShader(TEST_SHADER))
+	test.AssertFalse(layerstate:HasCustomChampionShader(TEST_CHAMPION_SHADER))
 end
 
 function LayerStateTest:TestGetBlendMode(layerstate)

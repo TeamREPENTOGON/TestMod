@@ -13,6 +13,7 @@ end
 ----------
 
 local TEST_SHADER = "shaders/coloroffset_rgontest"
+local TEST_CHAMPION_SHADER = "shaders/coloroffset_rgontest_champion"
 
 function SpriteTest:TestSetCustomShader(sprite)
 	test.AssertFalse(sprite:HasCustomShader())
@@ -33,19 +34,19 @@ end
 
 function SpriteTest:TestSetCustomChampionShader(sprite)
 	test.AssertFalse(sprite:HasCustomChampionShader())
-	test.AssertFalse(sprite:HasCustomChampionShader(TEST_SHADER))
+	test.AssertFalse(sprite:HasCustomChampionShader(TEST_CHAMPION_SHADER))
 
-	sprite:SetCustomChampionShader(TEST_SHADER)
+	sprite:SetCustomChampionShader(TEST_CHAMPION_SHADER)
 
 	test.AssertTrue(sprite:HasCustomChampionShader())
-	test.AssertTrue(sprite:HasCustomChampionShader(TEST_SHADER))
+	test.AssertTrue(sprite:HasCustomChampionShader(TEST_CHAMPION_SHADER))
 	test.AssertFalse(sprite:HasCustomChampionShader("notshader"))
 	test.AssertFalse(sprite:HasCustomShader())
 
 	sprite:ClearCustomChampionShader()
 
 	test.AssertFalse(sprite:HasCustomChampionShader())
-	test.AssertFalse(sprite:HasCustomChampionShader(TEST_SHADER))
+	test.AssertFalse(sprite:HasCustomChampionShader(TEST_CHAMPION_SHADER))
 end
 
 function SpriteTest:TestGetAnimation(sprite)

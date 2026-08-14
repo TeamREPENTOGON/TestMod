@@ -190,33 +190,37 @@ function EntityEffectTest:TestUpdate(entityeffect)
 	entityeffect:Update()
 end
 
-function EntityEffectTest:TestAquariusCreep()
+function EntityEffectTest:TestTearFlags()
 	local poof = Isaac.Spawn(EntityType.ENTITY_EFFECT, EffectVariant.POOF01, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil):ToEffect()
-	test.AssertNil(poof:GetAquariusTearFlags())
+	test.AssertNil(poof:GetTearFlags())
 
 	local creep = Isaac.Spawn(EntityType.ENTITY_EFFECT, EffectVariant.PLAYER_CREEP_HOLYWATER_TRAIL, 0, Game():GetRoom():GetCenterPos(), Vector.Zero, nil):ToEffect()
-	test.AssertEquals(creep:GetAquariusTearFlags(), TearFlags.TEAR_NORMAL)
-	test.AssertFalse(creep:HasAquariusTearFlags(TearFlags.TEAR_POISON))
+	test.AssertEquals(creep:GetTearFlags(), TearFlags.TEAR_NORMAL)
+	test.AssertFalse(creep:HasTearFlags(TearFlags.TEAR_POISON))
 
-	creep:AddAquariusTearFlags(TearFlags.TEAR_POISON)
-	test.AssertEquals(creep:GetAquariusTearFlags(), TearFlags.TEAR_POISON)
-	test.AssertTrue(creep:HasAquariusTearFlags(TearFlags.TEAR_POISON))
+	creep:AddTearFlags(TearFlags.TEAR_POISON)
+	test.AssertEquals(creep:GetTearFlags(), TearFlags.TEAR_POISON)
+	test.AssertTrue(creep:HasTearFlags(TearFlags.TEAR_POISON))
 
-	creep:AddAquariusTearFlags(TearFlags.TEAR_PIERCING | TearFlags.TEAR_HOMING)
-	test.AssertEquals(creep:GetAquariusTearFlags(), TearFlags.TEAR_POISON | TearFlags.TEAR_PIERCING | TearFlags.TEAR_HOMING)
-	test.AssertTrue(creep:HasAquariusTearFlags(TearFlags.TEAR_SPLIT | TearFlags.TEAR_PIERCING | TearFlags.TEAR_POISON))
-	test.AssertFalse(creep:HasAquariusTearFlags(TearFlags.TEAR_SPLIT))
+	creep:AddTearFlags(TearFlags.TEAR_PIERCING | TearFlags.TEAR_HOMING)
+	test.AssertEquals(creep:GetTearFlags(), TearFlags.TEAR_POISON | TearFlags.TEAR_PIERCING | TearFlags.TEAR_HOMING)
+	test.AssertTrue(creep:HasTearFlags(TearFlags.TEAR_SPLIT | TearFlags.TEAR_PIERCING | TearFlags.TEAR_POISON))
+	test.AssertFalse(creep:HasTearFlags(TearFlags.TEAR_SPLIT))
 
-	creep:ClearAquariusTearFlags(TearFlags.TEAR_PIERCING | TearFlags.TEAR_HOMING)
-	test.AssertEquals(creep:GetAquariusTearFlags(), TearFlags.TEAR_POISON)
+	creep:ClearTearFlags(TearFlags.TEAR_PIERCING | TearFlags.TEAR_HOMING)
+	test.AssertEquals(creep:GetTearFlags(), TearFlags.TEAR_POISON)
 
-	creep:SetAquariusTearFlags(TearFlags.TEAR_SPLIT)
-	test.AssertEquals(creep:GetAquariusTearFlags(), TearFlags.TEAR_SPLIT)
+	creep:SetTearFlags(TearFlags.TEAR_SPLIT)
+	test.AssertEquals(creep:GetTearFlags(), TearFlags.TEAR_SPLIT)
 
 	local player = Isaac.GetPlayer()
 	player.TearFlags = TearFlags.TEAR_POISON
+
 	local playerCreep = player:SpawnAquariusCreep()
-	test.AssertEquals(playerCreep:GetAquariusTearFlags(), TearFlags.TEAR_POISON)
+	test.AssertEquals(playerCreep:GetTearFlags(), TearFlags.TEAR_POISON)
+
+	local brimstoneball = player:FireBrimstoneBall(player.Position, Vector(1,0))
+	test.AssertEquals(brimstoneball:GetTearFlags(), TearFlags.TEAR_POISON)
 end
 
 

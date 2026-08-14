@@ -23,7 +23,16 @@ function XmlFeaturesTest:TestPlayerStats(player)
 	test.AssertEquals(player.ShotSpeed, 2)
 	test.AssertEquals(player.Luck, 1)
 
-	player:ChangePlayerType(PlayerType.PLAYER_ISAAC)
+	player:ChangePlayerType(test.TEST_PLAYER_2)
+
+	test.AssertEquals(player.MoveSpeed, 0.9)
+	--test.AssertEquals(player.MaxFireDelay, 31.8571)
+	test.AssertEquals(player.MaxFireDelay, 10)
+	--test.AssertEquals(player.Damage, 4.05)
+	test.AssertEquals(player.Damage, 3)
+	test.AssertEquals(player.TearRange, 240)
+	test.AssertEquals(player.ShotSpeed, 0.6)
+	test.AssertEquals(player.Luck, -1)
 end
 
 
@@ -89,6 +98,21 @@ function XmlFeaturesTest:TestHiddenRevive(player)
 	test.AssertTrue(player:WillPlayerRevive())
 	test.AssertEquals(player:GetExtraLives(), 0)
 	player:GetEffects():RemoveNullEffect(REVIVE_NULL_HIDDEN)
+end
+
+
+function XmlFeaturesTest:TestXmlInnateItems(player)
+	player:ChangePlayerType(test.TEST_PLAYER_2)
+
+	test.AssertTrue(player:HasCollectible(CollectibleType.COLLECTIBLE_FIRE_MIND))
+	test.AssertFalse(player:HasCollectible(CollectibleType.COLLECTIBLE_FIRE_MIND, true))
+	test.AssertTrue(player:HasCollectible(REVIVE_ITEM))
+	test.AssertFalse(player:HasCollectible(REVIVE_ITEM, true))
+
+	test.AssertTrue(player:HasTrinket(TrinketType.TRINKET_ROSARY_BEAD))
+	test.AssertFalse(player:HasTrinket(TrinketType.TRINKET_ROSARY_BEAD, true))
+	test.AssertTrue(player:HasTrinket(Isaac.GetTrinketIdByName("REPENTOGON TEST MAX KEYS TRINKET")))
+	test.AssertFalse(player:HasTrinket(Isaac.GetTrinketIdByName("REPENTOGON TEST MAX KEYS TRINKET"), true))
 end
 
 

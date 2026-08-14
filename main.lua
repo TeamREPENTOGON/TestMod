@@ -31,7 +31,8 @@ REPENTOGON_TEST.TestColors = {
 	Color(1,1,1,1),
 }
 
-REPENTOGON_TEST.TEST_PLAYER = Isaac.GetPlayerTypeByName("Testsaac")
+REPENTOGON_TEST.TEST_PLAYER = Isaac.GetPlayerTypeByName("Testsaac", false)
+REPENTOGON_TEST.TEST_PLAYER_2 = Isaac.GetPlayerTypeByName("Testsaac", true)
 REPENTOGON_TEST.TEST_FAMILIAR = Isaac.GetEntityVariantByName("Brother Bobentogon")
 
 include(REPENTOGON_TEST.Root .. "misc")
@@ -219,11 +220,11 @@ function REPENTOGON_TEST.RemoveGridEntity(gridentity)
 	Game():GetRoom():Update()
 end
 
-function REPENTOGON_TEST.ResetPlayer(player)
+function REPENTOGON_TEST.ResetPlayer(player, ignorePlayerType)
 	if player:IsDead() then
 		player:Revive()
 	end
-	if player:GetPlayerType() ~= PlayerType.PLAYER_ISAAC then
+	if player:GetPlayerType() ~= PlayerType.PLAYER_ISAAC and not ignorePlayerType then
 		player:ChangePlayerType(PlayerType.PLAYER_ISAAC)
 	end
 	player:AddSoulHearts(-999)
@@ -266,6 +267,7 @@ function REPENTOGON_TEST.ResetPlayer(player)
 	for pillColor = PillColor.PILL_NULL, PillColor.PILL_GOLD do
 		Game():GetItemPool():UnidentifyPill(pillColor)
 	end
+	player:ClearInnateItemGroup("")
 end
 
 function REPENTOGON_TEST.CleanEntities()
@@ -395,14 +397,16 @@ local function RunTestsForClass(className, classTests, functionToTest)
 			Log("Running test: " .. className ..".".. funcName .. "...")
 			TESTS_RAN = TESTS_RAN + 1
 			if Isaac.IsInGame() then
-				REPENTOGON_TEST.ResetPlayer(Isaac.GetPlayer())
+				for i, player in ipairs(PlayerManager.GetPlayers()) do
+					REPENTOGON_TEST.ResetPlayer(player, i > 1)
+				end
 				REPENTOGON_TEST.CleanEntities()
 			end
 			REPENTOGON_TEST.RunningTest = true
 			local success, ret = pcall(function()
-				local input = beforeFunc(classTests)
-				func(classTests, input)
-				afterFunc(classTests, input)
+				local input = table.pack(beforeFunc(classTests))
+				func(classTests, table.unpack(input))
+				afterFunc(classTests, table.unpack(input))
 			end)
 			REPENTOGON_TEST.RunningTest = false
 			REPENTOGON_TEST:ClearTestCallbacks()
