@@ -1,4 +1,4 @@
 <pocketitems>
-	<card type="tarot" pickup="1" name="REPENTOGON TEST CARD" hud="REPENTOGON TEST CARD" description="test" announcer="165" announcerdelay="0" mimiccharge="6" />
-	<pilleffect name="REPENTOGON TEST PILL" class="3+" mimiccharge="3" announcer="165" announcer2="577" announcerdelay="0" />
+	<card type="tarot" pickup="1" name="#REPENTOGON_TEST_STRING" hud="#REPENTOGON_TEST_STRING" description="#REPENTOGON_TEST_STRING" announcer="REPENTOGON TEST SOUND" achievement="REPENTOGON_TEST" announcerdelay="0" mimiccharge="6" />
+	<pilleffect name="#REPENTOGON_TEST_STRING" class="3+" mimiccharge="3" announcer="REPENTOGON TEST SOUND" announcer2="REPENTOGON TEST SOUND 2" announcerdelay="0" />
 </pocketitems>

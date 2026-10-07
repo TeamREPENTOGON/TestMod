@@ -31,8 +31,8 @@ REPENTOGON_TEST.TestColors = {
 	Color(1,1,1,1),
 }
 
-REPENTOGON_TEST.TEST_PLAYER = Isaac.GetPlayerTypeByName("Testsaac", false)
-REPENTOGON_TEST.TEST_PLAYER_2 = Isaac.GetPlayerTypeByName("Testsaac", true)
+REPENTOGON_TEST.TEST_PLAYER = Isaac.GetPlayerTypeByName("#REPENTOGON_TEST_STRING", false)
+REPENTOGON_TEST.TEST_PLAYER_2 = Isaac.GetPlayerTypeByName("#REPENTOGON_TEST_STRING", true)
 REPENTOGON_TEST.TEST_FAMILIAR = Isaac.GetEntityVariantByName("Brother Bobentogon")
 
 include(REPENTOGON_TEST.Root .. "misc")

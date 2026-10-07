@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stringtable>
+    <info version="1.0" rgon_sta_version="0"/>
+    <languages>
+        <language id="21" index="0" name="Key"/>
+        <language id="0" index="1" name="English"/>
+        <language id="2" index="2" name="Japanese"/>
+        <language id="11" index="3" name="Korean"/>
+        <language id="13" index="4" name="Chinese (Simple)"/>
+        <language id="10" index="5" name="Russian"/>
+        <language id="5" index="6" name="German"/>
+        <language id="4" index="7" name="Spanish"/>
+        <language id="3" index="8" name="French"/>
+    </languages>
+    <category name="TEST">
+        <key name="REPENTOGON_TEST_STRING">
+            <string>English</string>
+            <string>Japanese</string>
+            <string>한국인 Ｋｏｒｅａｎ</string>
+            <string>Chinese</string>
+            <string>Russian</string>
+            <string>German</string>
+            <string>Spanish</string>
+            <string>French</string>
+        </key>
+    </category>
+    <category name="Challenges">
+        <key name="REPENTOGON_TEST_STRING">
+            <string>English</string>
+            <string>Japanese</string>
+            <string>한국인 Ｋｏｒｅａｎ</string>
+            <string>Chinese</string>
+            <string>Russian</string>
+            <string>German</string>
+            <string>Spanish</string>
+            <string>French</string>
+        </key>
+    </category>
+    <category name="Default">
+        <key name="REPENTOGON_TEST_STRING">
+            <string>English</string>
+            <string>Japanese</string>
+            <string>한국인 Ｋｏｒｅａｎ</string>
+            <string>Chinese</string>
+            <string>Russian</string>
+            <string>German</string>
+            <string>Spanish</string>
+            <string>French</string>
+        </key>
+    </category>
+    <category name="Players">
+        <key name="REPENTOGON_TEST_STRING">
+            <string>English</string>
+            <string>Japanese</string>
+            <string>한국인 Ｋｏｒｅａｎ</string>
+            <string>Chinese</string>
+            <string>Russian</string>
+            <string>German</string>
+            <string>Spanish</string>
+            <string>French</string>
+        </key>
+        <key name="ISAAC_NAME">
+            <string></string>
+            <string></string>
+            <string></string>
+            <string></string>
+            <string></string>
+            <string></string>
+            <string>hi i've renamed isaac</string>
+            <string></string>
+        </key>
+        <key name="ISAAC_BIRTHRIGHT">
+            <string></string>
+            <string></string>
+            <string></string>
+            <string></string>
+            <string></string>
+            <string></string>
+            <string>hi i've renamed isaac</string>
+            <string></string>
+        </key>
+    </category>
+    <category name="Items">
+        <key name="THE_D6_NAME">
+            <string></string>
+            <string></string>
+            <string>한국인</string>
+            <string></string>
+            <string></string>
+            <string></string>
+            <string>hi i've renamed the d6</string>
+            <string></string>
+        </key>
+        <key name="THE_D6_DESCRIPTION">
+            <string></string>
+            <string></string>
+            <string></string>
+            <string></string>
+            <string></string>
+            <string></string>
+            <string>hi i've renamed the d6</string>
+            <string></string>
+        </key>
+        <key name="REPENTOGON_TEST_STRING">
+            <string>English</string>
+            <string>Japanese</string>
+            <string>한국인 Ｋｏｒｅａｎ</string>
+            <string>Chinese</string>
+            <string>Russian</string>
+            <string>German</string>
+            <string>Spanish</string>
+            <string>French</string>
+        </key>
+    </category>
+    <category name="PocketItems">
+        <key name="REPENTOGON_TEST_STRING">
+            <string>English</string>
+            <string>Japanese</string>
+            <string>한국인 Ｋｏｒｅａｎ</string>
+            <string>Chinese</string>
+            <string>Russian</string>
+            <string>German</string>
+            <string>Spanish</string>
+            <string>French</string>
+        </key>
+    </category>
+    <category name="Entities">
+        <key name="REPENTOGON_TEST_STRING">
+            <string>English</string>
+            <string>Japanese</string>
+            <string>한국인 Ｋｏｒｅａｎ</string>
+            <string>Chinese</string>
+            <string>Russian</string>
+            <string>German</string>
+            <string>Spanish</string>
+            <string>French</string>
+        </key>
+    </category>
+    <category name="Curses">
+        <key name="REPENTOGON_TEST_STRING">
+            <string>English</string>
+            <string>Japanese</string>
+            <string>한국인 Ｋｏｒｅａｎ</string>
+            <string>Chinese</string>
+            <string>Russian</string>
+            <string>German</string>
+            <string>Spanish</string>
+            <string>French</string>
+        </key>
+    </category>
+    <category name="Stages">
+        <key name="GREEN_BASEMENT_NAME">
+            <string>Green Basement</string>
+            <string>グリーン・ベースメント</string>
+            <string>그린 지하실</string>
+            <string>绿色地下室</string>
+            <string>Зеленый подвал</string>
+            <string>Grüner Keller</string>
+            <string>Sótano Ecológico</string>
+            <string>Sous-Sol Écologique</string>
+        </key>
+        <key name="SCATMANS_WORLD_NAME">
+            <string>Scatman's World</string>
+            <string>スキャットマンズ・ワールド</string>
+            <string>스캣맨스 월드</string>
+            <string>快嘴约翰的世界</string>
+            <string>Мир Скэтмена</string>
+            <string>Scatmans Welt</string>
+            <string>El Mundo del Scatman</string>
+            <string>Le Monde de Scatman</string>
+        </key>
+    </category>
+</stringtable>

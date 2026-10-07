@@ -1,0 +1,26 @@
+<backdrops gfxroot="gfx/backdrop/" gridgfxroot="gfx/grid/" effectsgfxroot="gfx/effects/">
+	<backdrop name="Green Basement" gfx="01_Basement_green.png" walls="1" wallvariants="3" floors="1" floorvariants="6"
+		watergfx	= "water_green.png"
+		waterpit	= "grid_pit_water_green.png"
+		lfloorgfx	= "01_LBasementFloor_green.png"
+		nfloorgfx	= "01_Basement_nfloor_green.png"
+		props		= "Props_01_Basement_green.anm2"
+		rocks		= "rocks_basement_green.png"
+		pit			= "grid_pit_green.png"
+		bridge		= "grid_bridge_green.png"
+		door		= "door_01_normaldoor_green.png"
+		holeinwall	= "door_08_holeinwall_green.png"
+		waterpitsmode	= "1"
+	/>
+	<backdrop name="Scatman" gfx="scatman.png" walls="1" wallvariants="2" floors="1" floorvariants="6" reftype="16" 
+		watergfx	= "water_blood.png"
+		props		= "Props_05_Depths.anm2"
+		rocks		= "rocks_bluewomb.png"
+		pit			= "grid_pit_blood_scarredwomb.png"
+		waterpit	= "grid_pit_blood_sacrifice.png"
+		bridge		= "grid_bridge_necropolis.png"
+		door		= "door_14_depthsdoor.png"
+		holeinwall	= "door_08_holeinwall_depths.png"
+		waterpitsmode	= "2"
+	/>
+</backdrops>

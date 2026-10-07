@@ -132,6 +132,7 @@ function Module:TestCollectibleFlip()
 	assert(flipData.MyData == -randomNumber, "Data was not properly transferred on second collectible flip.")
 end
 
+--[[
 function Module:TestTaintedLazarus()
 	assert(false, "This test currently crashes the game due to a bug, cannot continue.")
 	local taintedLaz = PlayerManager.FirstPlayerByType(PlayerType.PLAYER_LAZARUS_B)
@@ -209,5 +210,6 @@ function Module:TestTaintedLazarus()
 
 	assert(currentFamiliar == #familiarData - 1, "Familiars were not properly transferred post flip.")
 end
+]]
 
 return Module

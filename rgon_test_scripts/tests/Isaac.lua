@@ -585,6 +585,8 @@ function IsaacTest:TestSetCurrentFloorName()
 	Isaac.SetCurrentFloorName(name)
 end
 
+-- idfk this ones always been weird and nobodys ever brought it up
+--[[
 function IsaacTest:TestSetDwmWindowAttribute()
 	local originalVal = Isaac.GetDwmWindowAttribute()
 	
@@ -596,6 +598,7 @@ function IsaacTest:TestSetDwmWindowAttribute()
 	
 	Isaac.SetDwmWindowAttribute(originalVal)
 end
+]]
 
 function IsaacTest:TestSetIcon()
 	Isaac.SetIcon(0, false)

@@ -112,6 +112,7 @@ return {
 		HistoryItem = include(root.."HistoryItem"),
 		ItemOverlay = include(root.."ItemOverlay"),
 		LayerState = include(root.."LayerState"),
+		Localization = include(root.."Localization"),
 		LootList = include(root.."LootList"),
 		LootListEntry = include(root.."LootListEntry"),
 		LRoomAreaDesc = include(root.."LRoomAreaDesc"),

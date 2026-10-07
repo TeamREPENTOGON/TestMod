@@ -1,5 +1,8 @@
-<sounds root="sounds/">
+<sounds root="sfx/">
     <sound name="REPENTOGON TEST SOUND">
         <sample weight="1" path="zombie walker kid 2.wav" />
+    </sound>
+    <sound name="REPENTOGON TEST SOUND 2">
+        <sample weight="1" path="scream gurgle hi 3.wav" />
     </sound>
 </sounds>

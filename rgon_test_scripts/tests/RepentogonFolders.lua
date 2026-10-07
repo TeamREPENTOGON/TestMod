@@ -38,11 +38,11 @@ end
 
 -- The test pill/card are actually in content-dl3, and not overridden in content-repentogon, to verify the behaviour of that folder.
 function RgonFoldersTest:TestDlc3()
-	test.AssertTrue(Isaac.GetPillEffectByName("REPENTOGON TEST PILL") >= PillEffect.NUM_PILL_EFFECTS)
-	test.AssertTrue(Isaac.GetCardIdByName("REPENTOGON TEST CARD") >= Card.NUM_CARDS)
+	test.AssertTrue(Isaac.GetPillEffectByName("#REPENTOGON_TEST_STRING") >= PillEffect.NUM_PILL_EFFECTS)
+	test.AssertTrue(Isaac.GetCardIdByName("#REPENTOGON_TEST_STRING") >= Card.NUM_CARDS)
 
-	test.AssertEquals(XMLData.GetEntryByName(XMLNode.PILL, "REPENTOGON TEST PILL").mimiccharge, "3")
-	test.AssertEquals(XMLData.GetEntryByName(XMLNode.CARD, "REPENTOGON TEST CARD").mimiccharge, "6")
+	test.AssertEquals(XMLData.GetEntryByName(XMLNode.PILL, "#REPENTOGON_TEST_STRING").mimiccharge, "3")
+	test.AssertEquals(XMLData.GetEntryByName(XMLNode.CARD, "#REPENTOGON_TEST_STRING").mimiccharge, "6")
 
 	test.AssertTrue(Isaac.GetBackdropIdByName("test") > 0)
 	test.AssertEquals(XMLData.GetEntryByName(XMLNode.BACKDROP, "test").name, "test")

@@ -7,19 +7,23 @@
 	<passive id="6" name="REPENTOGON TEST TEARS CAP ITEM" description="Tears Cap Up" gfx="Collectibles_001_TheSadOnion.png" customcache="tearscap" />
 	<passive id="7" name="REPENTOGON TEST STAT MULT ITEM" description="Stat Multiplier" gfx="Collectibles_001_TheSadOnion.png" customcache="statmultiplier" />
 	<passive id="8" name="REPENTOGON TEST ALL STATS UP ITEM" description="Whoa" gfx="Collectibles_001_TheSadOnion.png"
-		tears="0.7" damage="1" shotspeed="0.16" speed="0.2" range="100" luck="1" />
+		tears="0.7" damage="1" shotspeed="0.16" speed="0.2" range="100" luck="1" customtags="bloodytears flying" />
 	<passive id="9" name="REPENTOGON TEST ALL STATS DOWN ITEM" description="Whoa" gfx="Collectibles_001_TheSadOnion.png"
-		tears="-0.7" damage="-1" shotspeed="-0.16" speed="-0.2" range="-100" luck="-1" />
+		tears="-0.7" damage="-1" shotspeed="-0.16" speed="-0.2" range="-100" luck="-1" customtags="disablebloodytears" />
 	<passive id="10" name="REPENTOGON TEST TEARS/DAMAGE MULT ITEM" description="Test" gfx="Collectibles_001_TheSadOnion.png" damagemult="2" tearsmult="0.4" />
 
-	<null id="1" name="REPENTOGON TEST NULL" persistent="true" customtags="" />
+	<null id="1" name="REPENTOGON TEST NULL" persistent="true" customtags="disablebloodytearseffect flyingeffect" />
 	<null id="2" name="REPENTOGON TEST NULL REVIVE" persistent="true" customtags="revive chancerevive" />
 	<null id="3" name="REPENTOGON TEST NULL HIDDEN REVIVE" persistent="true" customtags="reviveeffect hiddenrevive" />
 	<null id="4" name="REPENTOGON TEST MAX BOMBS NULL" persistent="true" customcache="maxbombs" />
-	<null id="5" name="REPENTOGON TEST FLAT TEARS/DAMAGE NULL" persistent="true" flattears="0.5" flatdamage="2" />
+	<null id="5" name="REPENTOGON TEST FLAT TEARS/DAMAGE NULL" persistent="true" flattears="0.5" flatdamage="2" customtags="bloodytearseffect" />
+	<null name="test null" tears="-0.7" />
 
 	<trinket id="1" name="REPENTOGON TEST TRINKET REVIVEEFFECT" description="Test" gfx="trinket_001_swallowedpenny.png" customtags="reviveeffect" />
 	<trinket id="2" name="REPENTOGON TEST MAX KEYS TRINKET" description="Test" persistent="true" gfx="trinket_001_swallowedpenny.png" customcache="maxkeys" />
 	<trinket id="3" name="REPENTOGON TEST ALL STATS UP TRINKET EFFECT" description="Whoa" gfx="trinket_001_swallowedpenny.png" persistent="true"
 		effecttears="0.7" effectdamage="1" effectshotspeed="0.16" effectspeed="0.2" effectrange="100" effectluck="1" />
+
+	<active name="#REPENTOGON_TEST_STRING" description="#REPENTOGON_TEST_STRING" gfx="rgon_test.png" activegfx="rgon_test_2.png" />
+	<trinket name="#REPENTOGON_TEST_STRING" description="#REPENTOGON_TEST_STRING" gfx="rgon_test.png" />
 </items>

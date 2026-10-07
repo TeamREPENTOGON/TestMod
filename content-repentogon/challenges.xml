@@ -1,4 +1,6 @@
 <challenges version = "1">
-	<challenge name="Test Challenge" endstage="1" playertype="Testsaac" startingitems="475" startingcard="5" unlockachievement="REPENTOGON_TEST_CHALLENGE"/>
-	<challenge name="Test Unlockable Challenge" endstage="1" achievements="REPENTOGON_TEST_CHALLENGE" playertype="Testsaac" canshoot="false"/>
+	<challenge name="Test Challenge" endstage="1" playertype="#REPENTOGON_TEST_STRING" startingitems="475" startingcard="5" unlockachievement="REPENTOGON_TEST_CHALLENGE"/>
+	<challenge name="Test Unlockable Challenge" endstage="1" achievements="REPENTOGON_TEST_CHALLENGE" playertype="#REPENTOGON_TEST_STRING-Tainted-" canshoot="false"/>
+	<challenge name="#REPENTOGON_TEST_STRING" endstage="1" playertype="#REPENTOGON_TEST_STRING" lockeddesc="#REPENTOGON_TEST_STRING" achievements="REPENTOGON_TEST_CHALLENGE"
+		startingitems="#REPENTOGON_TEST_STRING" startingtrinkets="#REPENTOGON_TEST_STRING" startingcard="#REPENTOGON_TEST_STRING" startingpill="#REPENTOGON_TEST_STRING" />
 </challenges>

@@ -1,0 +1,4 @@
+<wisps gfxroot="gfx/familiar/wisps/">
+	<color name="flame_black" r="20" g="20" b="20"/>
+	<wisp id="s1" hp="3" layer="1" damage="3" flameColor="flame_black" coreColor="flame_black" tearColor="flame_black" count="1" />
+</wisps>

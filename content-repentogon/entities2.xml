@@ -4,5 +4,19 @@
 			tags="cansacrifice" customtags="familiarcantakedamage familiarblockprojectiles familiarignorebffs nocharm"/>
 
 	<entity id="5" variant="20" subtype="555" name="Test Penny" anm2path="test_penny.anm2" coinvalue="3"
-			baseHP="0" stageHP="0" boss="0" champion="0" collisionDamage="0" collisionMass="3" collisionRadius="12" friction="1" numGridCollisionPoints="24" shadowSize="14" />
+			baseHP="0" stageHP="0" boss="0" champion="0" collisionDamage="0" collisionMass="3" collisionRadius="12" friction="1" numGridCollisionPoints="24" shadowSize="14"
+			customtags="nojera"/>
+
+	<entity name="#REPENTOGON_TEST_STRING" id="10" variant="1" subtype="555" anm2path="010.001_Gaper.anm2"
+			baseHP="10" boss="0" champion="1" collisionDamage="1" collisionMass="5" collisionRadius="13" friction="1"
+			hasFloorAlts="false" numGridCollisionPoints="12" portrait="1" reroll="true" shadowSize="14" stageHP="0"
+			customtags="noerase" nosplit="true" isactiveenemy="false">
+		<bestiary anim="WalkVert" overlay="Head" transform="0,0,1"/>
+		<gibs amount="6" blood="1" bone="1" eye="1" gut="1" large="0"/>
+		<devolve id="5.20.555" weight="1" />
+	</entity>
+
+	<entity id="551" variant="0" subtype="0" name="Test Entity 1" anm2path="010.001_Gaper.anm2"
+			baseHP="1" stageHP="2" collisionDamage="3" collisionMass="4" collisionRadius="5" friction="0.9" numGridCollisionPoints="21" shadowSize="6" />
+	<entity id="551" variant="1" subtype="0" name="Test Entity 2" anm2path="010.001_Gaper.anm2" />
 </entities>

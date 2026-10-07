@@ -1,0 +1,234 @@
+<stages root="rooms/repentogon/" greedroot="rooms/repentogon/greed/" bossgfxroot="gfx/ui/boss/">
+	<stage basestage="2" name="#GREEN_BASEMENT_NAME" path="green_basement.stb" playerspot="playerspot_01_basement_green.png" bossspot="bossspot_01_basement_green.png" music="1" backdrop="Green Basement" suffix="_greenbasement" />
+	<stage basestage="1" name="#SCATMANS_WORLD_NAME" path="scatmans_world.stb" playerspot="playerspot_07_womb.png" bossspot="bossspot_19_void.png" music="Scatman's World" backdrop="Scatman" />
+	<stage basestage="4" name="Cathedral Jumpscare" path="15.Cathedral.stb" playerspot="playerspot_10_cathedral.png" bossspot="bossspot_10_cathedral.png" music="10" backdrop="15" />
+	<!--<stage basestage="27" name="Drypour" path="scatmans_world.stb" playerspot="playerspot_04x_ashpit.png" bossspot="bossspot_04x_ashpit.png" music="36" backdrop="46" suffix="_ashpit" />
+	<stage basestage="30" name="Finally" path="30.Ashpit.stb" playerspot="playerspot_05x_mausoleum.png" bossspot="bossspot_05x_mausoleum.png" music="106" backdrop="33" suffix="_mausoleum" />-->
+	<stage basestage="15" name="Isaac's Home" path="scatmans_world.stb" playerspot="playerspot_02_cellar.png" bossspot="bossspot_02_cellar.png" music="112" backdrop="50" />
+	<stage basestage="17" name="Da Chest" path="scatmans_world.stb" playerspot="playerspot_12_chest.png" bossspot="bossspot_12_chest.png" music="9" backdrop="20" />
+
+<!--
+<stage basestage="1" name="The Sunken Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Ashen Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Forgotten Attic" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Rotten Cellar" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Silent Mortuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Brimstone Pit" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Cursed Ossuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Bleeding Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Stagnant Pool" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Hallowed Tomb" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Putrid Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Frozen Maw" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Scorched Earth" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Festering Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Wretched Catacombs" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Desolate Wastes" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Gilded Chamber" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Obsidian Keep" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Blighted Meadow" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Whispering Forest" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Shattered Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Murky Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Chilled Chasm" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Smoldering Cavern" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Hollow" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Tainted Sanctuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Spectral Dungeon" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Verdant Mire" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Sunparted Ruin" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Iron Labyrinth" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Bleeding Heart" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Petrified Forest" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Sunken Citadel" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Glacial Maw" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Infernal Depths" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Dreadful Cavern" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Maw of Envy" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Gilded Catacombs" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Forsaken Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Blighted Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Echoing Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Shadowed Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Ashen Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Rotten Core" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Frostbitten Chasm" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Charred Remains" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Wretched Labyrinth" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Shattered Mind" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Sunken Mortuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Pestilated Mire" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Cursed Sanctuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Iron Tomb" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Desolate Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Obsidian Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Whispering Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Bleeding Chamber" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Festering Cellar" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Spectral Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Smoldering Ruins" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Verdant Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Hollow Ossuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Chilled Mortuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Tainted Catacombs" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Gilded Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Petrified Dungeon" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Sunken Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Forsaken Chasm" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Infernal Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Blighted Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Echoing Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Shadowed Mire" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Ashen Citadel" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Rotten Sanctuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Frostbitten Tomb" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Charred Labyrinth" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Wretched Cavern" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Shattered Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Sunken Pit" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Pestilated Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Cursed Forest" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Iron Mortuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Desolate Chamber" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Obsidian Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Whispering Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Bleeding Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Festering Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Spectral Chasm" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Smoldering Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Verdant Citadel" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Hollow Core" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Chilled Labyrinth" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Tainted Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Gilded Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Petrified Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Sunken Mire" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Forsaken Sanctuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Infernal Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Blighted Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Echoing Mortuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Shadowed Cavern" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Ashen Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Rotten Chamber" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Frostbitten Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Charred Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Wretched Mire" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Shattered Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Sunken Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Pestilated Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Cursed Labyrinth" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Iron Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Desolate Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Obsidian Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Whispering Citadel" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Bleeding Core" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Festering Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Spectral Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Smoldering Mire" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Verdant Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Hollow Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Chilled Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Tainted Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Gilded Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Petrified Mire" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Sunken Labyrinth" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Forsaken Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Infernal Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Blighted Mortuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Echoing Chasm" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Shadowed Sanctuary" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Ashen Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Rotten Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Frostbitten Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Charred Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Wretched Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Shattered Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Sunken Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Pestilated Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Cursed Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Iron Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Desolate Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Obsidian Citadel" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Whispering Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Bleeding Labyrinth" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Festering Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Spectral Mire" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Smoldering Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Verdant Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Hollow Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Chilled Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Tainted Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Gilded Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Petrified Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Sunken Cavern" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Forsaken Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Infernal Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Blighted Labyrinth" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Echoing Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Shadowed Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Ashen Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Rotten Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Frostbitten Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Charred Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Wretched Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Shattered Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Sunken Labyrinth" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Pestilated Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Cursed Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Iron Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Desolate Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Obsidian Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Whispering Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Bleeding Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Festering Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Spectral Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Smoldering Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Verdant Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Hollow Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Chilled Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Tainted Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Gilded Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Petrified Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Sunken Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Forsaken Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Infernal Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Blighted Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Echoing Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Shadowed Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Ashen Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Rotten Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Frostbitten Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Charred Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Wretched Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Shattered Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Sunken Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Pestilated Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Cursed Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Iron Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Desolate Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Obsidian Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Whispering Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Bleeding Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Festering Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Spectral Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Smoldering Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Verdant Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Hollow Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Chilled Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Tainted Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Gilded Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Petrified Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Sunken Nursery" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Forsaken Vault" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Infernal Sewers" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Blighted Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Echoing Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Shadowed Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Ashen Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Rotten Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Frostbitten Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Charred Grotto" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="Wretched Abyss" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+<stage basestage="1" name="The Shattered Crypt" path="green_basement.stb" playerspot="playerspot_01_basement.png" bossspot="bossspot_01_basement.png" music="Scatman's World" backdrop="Green Basement" />
+-->
+</stages>
