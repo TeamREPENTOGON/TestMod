@@ -1,0 +1,26 @@
+<fxLayers gfxroot="gfx/">
+	<fx path="backdrop/scatman_bg.png"   numLayers="1" xMin="0.05" xMax="0.05" yMin="0.05" yMax="0.05" layer="behind" backdrop="Scatman" blendMode="0" useBGShader="1" />
+	<fx path="backdrop/scatman_bg2.png" numLayers="1" xMin="0.15" xMax="0.15" yMin="0.15" yMax="0.15" layer="behind" backdrop="Scatman" blendMode="2" useBGShader="1" />
+	<fx path="backdrop/8bitclouds_643.png" numLayers="20" xMin="0.07" xMax="0.7" yMin="-0.5" yMax="0.5" layer="foreground" stage="Improved Caves" />
+</fxLayers>
+<fxRays>
+	<rayGroup xMin="-150" xMax="150" topParallax="-0.025" bottomParallax="-0.08" rayLength="250" raySpacing="-55" perspective="1.5" stages="#GREEN_BASEMENT_NAME,#SCATMANS_WORLD_NAME">
+		<fxRay opacity="0.7" animationSpeed="0.5" path="backdrop/fx_ray.png"/>
+		<fxRay opacity="0.7" animationSpeed="0.5" path="backdrop/fx_ray_2.png"/>
+		<fxRay opacity="0.7" animationSpeed="0.5" path="backdrop/fx_ray.png"/>
+	</rayGroup>
+	<rayGroup xMin="-250" xMax="250" topParallax="-0.025" bottomParallax="-0.08" rayLength="200" raySpacing="-55" perspective="1.5" stages="#GREEN_BASEMENT_NAME,#SCATMANS_WORLD_NAME">
+		<fxRay opacity="0.6" animationSpeed="0.5" path="backdrop/fx_ray_2.png"/>
+		<fxRay opacity="0.6" animationSpeed="0.5" path="backdrop/fx_ray.png"/>
+		<fxRay opacity="0.6" animationSpeed="0.5" path="backdrop/fx_ray_2.png"/>
+		<fxRay opacity="0.6" animationSpeed="0.5" path="backdrop/fx_ray.png"/>
+		<fxRay opacity="0.6" animationSpeed="0.5" path="backdrop/fx_ray_2.png"/>
+	</rayGroup>
+</fxRays>
+<fxParams>
+	<params stage="#GREEN_BASEMENT_NAME">
+		<colorModifier r="1" g="3" b="1" a="0.15" brightness="-0.08" contrast="0.82" />
+		<shadowColor r="0" g="1" b="0" a="1" />
+		<waterColor r="0.08" g="0.5" b="0.08" a="0.6" rMul="1" gMul="1" bMul="1"/>
+	</params>
+</fxParams>

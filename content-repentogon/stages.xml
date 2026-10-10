@@ -2,6 +2,7 @@
 	<stage basestage="2" name="#GREEN_BASEMENT_NAME" path="green_basement.stb" playerspot="playerspot_01_basement_green.png" bossspot="bossspot_01_basement_green.png" music="1" backdrop="Green Basement" suffix="_greenbasement" />
 	<stage basestage="1" name="#SCATMANS_WORLD_NAME" path="scatmans_world.stb" playerspot="playerspot_07_womb.png" bossspot="bossspot_19_void.png" music="Scatman's World" backdrop="Scatman" />
 	<stage basestage="4" name="Cathedral Jumpscare" path="15.Cathedral.stb" playerspot="playerspot_10_cathedral.png" bossspot="bossspot_10_cathedral.png" music="10" backdrop="15" />
+	<stage basestage="4" name="Improved Caves" path="scatmans_world.stb" playerspot="playerspot_04_catacombs.png" bossspot="bossspot_04_catacombs.png" music="5" backdrop="5" />
 	<!--<stage basestage="27" name="Drypour" path="scatmans_world.stb" playerspot="playerspot_04x_ashpit.png" bossspot="bossspot_04x_ashpit.png" music="36" backdrop="46" suffix="_ashpit" />
 	<stage basestage="30" name="Finally" path="30.Ashpit.stb" playerspot="playerspot_05x_mausoleum.png" bossspot="bossspot_05x_mausoleum.png" music="106" backdrop="33" suffix="_mausoleum" />-->
 	<stage basestage="15" name="Isaac's Home" path="scatmans_world.stb" playerspot="playerspot_02_cellar.png" bossspot="bossspot_02_cellar.png" music="112" backdrop="50" />

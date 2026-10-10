@@ -22,5 +22,7 @@
 		door		= "door_14_depthsdoor.png"
 		holeinwall	= "door_08_holeinwall_depths.png"
 		waterpitsmode	= "2"
+		noblackbg = "true"
+		noshading = "true"
 	/>
 </backdrops>
